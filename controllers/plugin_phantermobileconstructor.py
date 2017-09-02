@@ -1,10 +1,6 @@
 # -*- coding: utf-8 -*-
-
 import os
-import gluon.contenttype
 import gluon.fileutils
-from gluon._compat import iteritems
-
 
 http_host = request.env.http_host.split(':')[0]
 remote_addr = request.env.remote_addr
@@ -17,12 +13,8 @@ except:
 
 if (remote_addr not in hosts) and (remote_addr != "127.0.0.1"):
     raise HTTP(200, T('PhanterMobile Constructor só funciona localmente'))
-precisa_autorizacao=['index', 'close', 'build']
+precisa_autorizacao=['index', 'echo_comand']
 
-# if (request.application == 'admin' and not session.authorized) or \
-#         (request.application != 'admin' and not gluon.fileutils.check_credentials(request)):
-#     redirect(URL('admin', 'default', 'index',
-#                  vars=dict(send=URL(args=request.args, vars=request.vars))))
 if (request.function in precisa_autorizacao):
     if not gluon.fileutils.check_credentials(request):
         redirect(URL('admin', 'default', 'index',
@@ -36,28 +28,29 @@ def index():
     html=DIV(DIV(IFRAME(_src="http://localhost:%s/" %android.porta, _class='iframe_mobile responsivo'), _class='html_mobile responsivo'), _class="mobile responsivo")
     return locals()
 
-def close():
+def echo_comand():
     from plugin_phantermobileconstructor.phanterandroid import PhanterAndroid
     android=PhanterAndroid()
-    android.close()
-    return "ok"
 
-def build():
-    from plugin_phantermobileconstructor.phanterandroid import PhanterAndroid
-    android=PhanterAndroid()
-    android.pre_build('index')
-    return "location.reload()"
+    if request.args(0)=='build_html':
+        android.pre_build('index')
+        return "lert('html compiled!');"
+
+    elif request.args(0)=='close':
+        android.close()
+        return "alert('server down');"
+
 
 ####################################
-#Funcões do dispoositivo mobile
+# Mobile app Functions(Views and Css)
 ####################################
 
-# O css gerado será colocado no head do "www_layout.html"
+# The generated css will be placed in the head of "www_layout.html"
 def css_head_layout_www():
     return dict()
 
-# Das funcões iniciadas com www em seu nome serão gerados os htmls que serão colocados na pasta www do cordova
-# Exemplo: da função "def www_index()" será gerado na pasta www o arquivo index.html.
+# Functions started with "www" in your name will generate the htmls that will be placed in the www folder of cordova
+# Example: the function "def www_index ()" will be generated in the www folder the index.html file.
 def www_index():
     return dict()
 

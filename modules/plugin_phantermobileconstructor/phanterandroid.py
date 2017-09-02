@@ -2,8 +2,6 @@
 # versao: 1.2.0
 import subprocess
 import os
-from gluon import template, SQLFORM
-from gluon.html import *
 from gluon import current
 from gluon.compileapp import find_exposed_functions
 import zipfile
@@ -11,141 +9,216 @@ import psutil
 import urllib2
 import shutil
 import time
+import re
 
 class PhanterAndroid(object):
-    """docstring for processos"""
-    def __init__(self):
-        self.request=current.request
-        self.aplicativo=self.request.application
-        self.portas=[]
-        self.porta=3000
-        self.pasta_cordova=os.path.join(self.request.env.web2py_path, 'cordova')
-        self.pasta_aplicativo=os.path.join(self.pasta_cordova, self.aplicativo)
+    """Make the connection between cordova app and web2py app
 
-        tem_condova=os.path.exists(self.pasta_cordova)
-        tem_aplicativo=os.path.exists(self.pasta_aplicativo)
-        if not tem_condova or not tem_aplicativo:
-            self.prepararAmbiente(pre_build=True)
-
-    def iniciarServidor(self):
-        print "Iniciando servidor..."
-        request=self.request
+        - On init create this folders structure if not exists:
+           web2py
+            | - cordova
+                    |-folderAppCordova
         
-        procs=self._localizar_processos()
-        if procs:
-            self.porta=procs['porta']
-            print 'servidor já está rodando na porta %s' %procs['porta']
+        - The name of folderAppCordova is the same of your web2py aplication
+            Cointains the default cordova app
+
+        - On Web2py Developer, inside of plugin_phantermobileconstructor, 
+            all functions started with "www_" will be rendered in the cordova application (on buildHtml method)
+            and all files in static/plugin_phantermobileconstructor/www will be copied to the www folder of cordova App
+            
+            exemple:
+                - On controller plugin_phantermobileconstructor.py
+                    def www_index():
+                        #your code
+                        return dict()
+                    def www_other_function():
+                        return DIV("my div")
+
+                - On static/plugin_phantermobileconstructor/www
+                    static/plugin_phantermobileconstructor/www/
+                            |-css/
+                                |-mycss.css
+                                |-outhes.css
+                            |-images/
+                                |-myimage.jpg
+                            |-js/
+                                |-Jquery.js
+
+                - will generate the following structure in the cordova application:
+                    folderAppCordova/
+                        |-www/
+                            |-index.html
+                            |-outher_function.html
+                            |-css/
+                                |-mycss.css
+                                |-outhes.css
+                            |-images/
+                                |-myimage.jpg
+                            |-js/
+                                |-Jquery.js
+    """
+    def __init__(self, aplication_id=None):
+        """@aplication_id: generally follows the following format: com.yoursite.youraplication
+              eg. br.com.conexaodidata.myaplication
+        """
+        self.request=current.request
+        self.aplication_name=self.request.application
+        if not application_id
+            self.aplication_id="com.yoursite.www"
         else:
-            porta=3000
+            self.aplication_id=aplication_id
+        self.ports=[]
+        self.port=3000
+        self.cordova_app_folder=os.path.join(self.request.env.web2py_path, 'cordova')
+        self.aplication_folder=os.path.join(self.cordova_app_folder, self.aplication_name)
+        self.server_chosen='phonegap'
+
+        tem_condova=os.path.exists(self.cordova_app_folder)
+        tem_aplicativo=os.path.exists(self.aplication_folder)
+        if not tem_condova or not tem_aplicativo:
+            self._prepareTheEnvironment(buildHtml=True)
+
+    def openServer(self, server='phonegap'):
+        request=self.request
+        if server != self.server_chosen:
+            self.server_chosen=server
+        print "Open %s server..." %self.server_chosen
+        procs=self._examine_process()
+        if procs:
+            self.port=procs['port']
+            print 'Server is run in door %s' %procs['port']
+        else:
+            port=3000
             for y in xrange(3000,4000):
-                if y in self.portas:
+                if y in self.ports:
                     pass
                 else:
-                    self.portas.append(y)
-                    porta=y
+                    self.ports.append(y)
+                    port=y
                     break
-            self.porta=porta
-            with open(os.path.join(self.pasta_cordova,'server_run_%s.bat' %self.aplicativo), 'w') as arquivo_aberto:
-                conteudo="cd %s\nphonegap serve -p%s" %(self.pasta_aplicativo, porta)
-                arquivo_aberto.write(conteudo)                 
+            self.port=port
+            if self.server_chosen=='phonegap':
+                with open(os.path.join(self.cordova_app_folder,'server_run_%s.bat' %self.aplication_name), 'w') as arquivo_aberto:
+                    conteudo="cd %s\nphonegap serve -p%s" %(self.aplication_folder, port)
+                    arquivo_aberto.write(conteudo)                 
+            else:
+                with open(os.path.join(self.cordova_app_folder,'server_run_%s.bat' %self.aplication_name), 'w') as arquivo_aberto:
+                    conteudo="cd %s\ncordova serve %s" %(self.aplication_folder, port)
+                    arquivo_aberto.write(conteudo)                 
 
-            processo=subprocess.Popen([os.path.join(self.pasta_cordova,'server_run_%s.bat' %self.aplicativo)], shell=False)
-            proc=psutil.Process(processo.pid)
+            processo=subprocess.Popen([os.path.join(self.cordova_app_folder,'server_run_%s.bat' %self.aplication_name)], shell=False)
+            proc=psutil.Process(processo.pid)                
+            print "%s run on door %s" %(self.server_chosen, port)
             while True:
-                print "Tentando conectar...",
+                print "Try conect (open url) to %s..." %('http://localhost:%s' %port),
                 if proc.children():
                     try:
-                        urllib2.urlopen('http://localhost:%s' %porta)
+                        urllib2.urlopen('http://localhost:%s' %port)
                         break
                     except Exception as e:
-                        print "Sem sucesso!" 
+                        print "Fail!" 
                         time.sleep(2)                  
                 else:
                     time.sleep(1)      
-            print "Concluído"
+            print "Conected"
    
     def close(self):
-        print "Fechando..."
-        procs=self._localizar_processos()
+        print "Closing..."
+        procs=self._examine_process()
         if procs:
             proc=psutil.Process(procs['pid'])
             proc.kill()
         else:
-            print 'processo não localizado para fechar'
+            print 'Server not found. nothing to do'
 
-    def pre_build(self):
+    def buildHtml(self):
         request=self.request
         
-        print "Compilando html..."
+        print "Compiling html..."
         self.close()
 
-        origem=os.path.join(request.env.web2py_path, 'applications', self.aplicativo, 'static', 'plugin_phantermobileconstructor', 'www')
+        origem=os.path.join(request.env.web2py_path, 'applications', self.aplication_name, 'static', 'plugin_phantermobileconstructor', 'www')
         self.lista_de_pastas_origem_e_destino=[]
         self.lista_de_pastas_destino=[]
         self.lista_de_arquivos_origem_e_destinos=[]
-        self._verificar_pastas(origem)
+        self._examine_folders(origem)
         for y in self.lista_de_pastas_destino:
             if not os.path.exists(y):
                 os.makedirs(y)
         for x in self.lista_de_arquivos_origem_e_destinos:
             shutil.copy(x[0], x[1])
-        arquivo_plugin=os.path.join(request.env.web2py_path, 'applications', self.aplicativo, 'controllers', 'plugin_phantermobileconstructor.py')
+        arquivo_plugin=os.path.join(request.env.web2py_path, 'applications', self.aplication_name, 'controllers', 'plugin_phantermobileconstructor.py')
         funcoes=[]
         with open(arquivo_plugin, 'r') as arquivo_aberto:
             funcoes = find_exposed_functions(arquivo_aberto.read())
         if funcoes:
             for x in (x for x in funcoes if x.startswith("www_")):
                 url="%s?phantermobilebuild=True" %URL(c='plugin_phantermobileconstructor', f=x, host=True)
-                print "tentando abrir: %s" %url
+                print "Try open url: %s" %url
                 cont=0
                 nome_arquivo_html=x.replace('www_','')
                 while cont<5:
                     try:
                         html_url=urllib2.urlopen(url)
                         html= html2 = html_url.read()
-                        arquivo_destino=os.path.join(self.pasta_aplicativo, 'www', "%s.html" %nome_arquivo_html)
+                        arquivo_destino=os.path.join(self.aplication_folder, 'www', "%s.html" %nome_arquivo_html)
                         with open(arquivo_destino, 'w') as arquivo_aberto:
-                            print 'copiando conteudo de %s para %s' %(url, arquivo_destino)
+                            print 'Get html source of %s and copy to %s' %(url, arquivo_destino)
                             arquivo_aberto.write(html)
                         break
                     except Exception as e:
                         time.sleep(2)
                         print e
                         cont+=1
-                        print "sem sucesso! tentativa %s de 5" %cont
-                        
-    def _localizar_processos(self):
+                        print "Fail! try %s of 5" %cont
+    def _getServerandDoorCmdLine(self, cmdline):
+        if 'serve' in cmdline:
+            if 'phonegap' in cmdline :
+                if '-p' in cmdline:
+                    port=cmdline.split('-p')[-1].strip()
+                    try:
+                        port=int(port)
+                    except:
+                        port=3000 #force new server don't user default port of phonegap
+                    return ['phonegap', int(port)]
+                else:
+                    return ['phonegap', 3000] #force new server don't user default port of phonegap
+            elif 'cordova' in cmdline:
+                #cordova uses default port 8000, the same as web2py, change to 3000+
+                padrao=re.compile('serve *([0-9]+)')
+                port=padrao.findall(cmdline)   
+                if port:
+                    try:
+                        port=int(port)
+                    except:
+                        port=3000 #force new server don't user default port of phonegap
+                    return ['cordova', int(port)]
+                else:
+                    return ['cordova', int(port)]
+        else:
+            return []
+
+    def _examine_process(self):
         request=self.request
-        print 'localizando processos...'
+        print 'locating all server program process (Node.exe)...'
         nome='node.exe'
         processo_localizado={}
-        processos_rodando={}
         for proc in psutil.process_iter():
             if proc.name() == nome:
-                processos_rodando[proc.pid]={}
-                if proc.parent():
-                    processos_rodando[proc.pid]['parent']=proc.parent().pid
-                else:
-                    processos_rodando[proc.pid]['parent']=None
-                porta_temp=proc.cmdline()[-1]
-                if '-p' in porta_temp:
-                    porta=porta_temp.split('-p')[-1].strip()
-                    processos_rodando[proc.pid]['porta']=int(porta)
-                    self.portas.append(int(porta))
-                else:
-                    processos_rodando[proc.pid]['porta']=3000
-                processos_rodando[proc.pid]['pasta']=proc.cwd()
-                if proc.cwd()==self.pasta_aplicativo:
-                    processo_localizado['porta']=processos_rodando[proc.pid]['porta']
-                    processo_localizado['pid']=proc.pid
-                    print "\n================ SERVIDOR ==================\n Porta: %s\n Pasta:%s\n------------------------------------\n" %(processo_localizado['porta'], proc.cwd())
-                else:
-                    print "outro processo rodando na porta %s em %s" %(processos_rodando[proc.pid]['porta'], proc.cwd())
-
+                if proc.cwd()==self.aplication_folder:
+                    linha_de_comando=proc.cmdline()[-1]
+                    port_and_server=self._getServerandDoorCmdLine(linha_de_comando)
+                    if port_and_server:
+                        processo_localizado['server']=port_and_server[0]
+                        processo_localizado['port']=port_and_server[1]
+                        processo_localizado['pid']=proc.pid
+                        print "\n================ SERVER INFO =================="+\
+                        "\n Server: %s\n Porta: %s\n Pasta:%s \n PID: %s\n" %(port_and_server[0], port_and_server[1], proc.cwd()proc.pid)+\
+                        "------------------------------------\n" 
         return processo_localizado
                     
 
-    def _verificar_pastas(self, path):
+    def _examine_folders(self, path):
         request=self.request
         
         print "Verificando Pastas..."
@@ -154,89 +227,73 @@ class PhanterAndroid(object):
             if lista:
                 for x in lista:
                     if not os.path.isfile(os.path.join(path, x)):
-                        self.lista_de_pastas_destino.append(os.path.join(path.replace(os.path.join(request.env.web2py_path, 'applications', self.aplicativo, 'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.pasta_aplicativo, 'www')), x))
+                        self.lista_de_pastas_destino.append(os.path.join(path.replace(os.path.join(request.env.web2py_path, 'applications', self.aplication_name, 'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.aplication_folder, 'www')), x))
                         self.lista_de_pastas_origem_e_destino.append([os.path.join(path, x), 
-                            os.path.join(path.replace(os.path.join(request.env.web2py_path, 'applications', self.aplicativo, 'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.pasta_aplicativo, 'www')), x), 
+                            os.path.join(path.replace(os.path.join(request.env.web2py_path, 'applications', self.aplication_name, 'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.aplication_folder, 'www')), x), 
                             ])
-                        self._verificar_pastas(os.path.join(path, x))
+                        self._examine_folders(os.path.join(path, x))
                     
                     else:
                         self.lista_de_arquivos_origem_e_destinos.append([os.path.join(path, x), 
-                            os.path.join(path.replace(os.path.join(request.env.web2py_path, 'applications', self.aplicativo, 'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.pasta_aplicativo, 'www'))), 
+                            os.path.join(path.replace(os.path.join(request.env.web2py_path, 'applications', self.aplication_name, 'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.aplication_folder, 'www'))), 
                             ])
         else:
             self.lista_de_arquivos_origem_e_destinos.append([os.path.join(path), 
-                os.path.join(path.replace(os.path.join(request.env.web2py_path, 'applications', self.aplicativo, 'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.pasta_aplicativo, 'www'))), 
+                os.path.join(path.replace(os.path.join(request.env.web2py_path, 'applications', self.aplication_name, 'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.aplication_folder, 'www'))), 
                 ])
 
-    def prepararAmbiente(self, pre_build=True):
+    def _prepareTheEnvironment(self, buildHtml=True):
         request=self.request
         
         print 'Preparando Ambiente'
-        if not os.path.exists(self.pasta_cordova):
-            print 'criando_pasta: %s' %self.pasta_cordova
-            os.makedirs(self.pasta_cordova)       
-        if not os.path.exists(os.path.join(self.pasta_cordova,'criar_aplicativo_%s.bat' %self.aplicativo)):
-            print "criando arquivo de lote criar_aplicativo_%s.bat" %self.aplicativo
-            with open(os.path.join(self.pasta_cordova,'criar_aplicativo_%s.bat' %self.aplicativo), 'w') as arquivo_aberto:
-                conteudo="cd %s\ncordova create %s br.com.conexaodidata.%s %s" %(self.pasta_cordova, self.aplicativo, self.aplicativo, self.aplicativo)
+        if not os.path.exists(self.cordova_app_folder):
+            print 'criando_pasta: %s' %self.cordova_app_folder
+            os.makedirs(self.cordova_app_folder)       
+        if not os.path.exists(os.path.join(self.cordova_app_folder,'create_app_%s.bat' %self.aplication_name)):
+            print "criando arquivo de lote create_app_%s.bat" %self.aplication_name
+            with open(os.path.join(self.cordova_app_folder,'create_app_%s.bat' %self.aplication_name), 'w') as arquivo_aberto:
+                conteudo="cd %s\ncordova create %s %s %s" %(self.cordova_app_folder, self.aplication_name, self.aplication_id, self.aplication_name)
                 arquivo_aberto.write(conteudo)
-        if not os.path.exists(self.pasta_aplicativo):
-            print "criando pasta do aplicativo: %s" %self.pasta_aplicativo
-            os.makedirs(self.pasta_aplicativo)
-            print "executando o comando: cordova create %s br.com.conexaodidata.%s %s" %(self.aplicativo, self.aplicativo, self.aplicativo)
-            subprocess.call([os.path.join(self.pasta_cordova,'criar_aplicativo_%s.bat' %self.aplicativo)], stdout=subprocess.PIPE, shell=True, stdin=subprocess.PIPE)
+        if not os.path.exists(self.aplication_folder):
+            print "criando pasta do aplicativo: %s" %self.aplication_folder
+            os.makedirs(self.aplication_folder)
+            print "executando o comando: cordova create %s %s %s" %(self.aplication_name, self.aplication_name, self.aplication_name)
+            subprocess.call([os.path.join(self.cordova_app_folder,'create_app_%s.bat' %self.aplication_name)], stdout=subprocess.PIPE, shell=True, stdin=subprocess.PIPE)
 
-        if not os.path.exists(os.path.join(self.pasta_aplicativo, 'www')):
-            print "copiando template phanterandroid em: %s" %os.path.join(self.pasta_aplicativo, 'www')
+        if not os.path.exists(os.path.join(self.aplication_folder, 'www')):
+            print "copiando template phanterandroid em: %s" %os.path.join(self.aplication_folder, 'www')
             print "desconpactando template localizado em: %s" %os.path.abspath(os.path.join(os.path.dirname(__file__), 'phanterandroidpack','template.zip'))
             zip_ref = zipfile.ZipFile(os.path.abspath(os.path.join(os.path.dirname(__file__), 'phanterandroidpack','template.zip')), 'r')
-            zip_ref.extractall(os.path.join(self.pasta_aplicativo, 'www'))
+            zip_ref.extractall(os.path.join(self.aplication_folder, 'www'))
             zip_ref.close()
-        if pre_build:
-            self.pre_build()
+        if buildHtml:
+            self.buildHtml()
             
-    def reset(self):
+    def resetApp(self):
+        self.removeCordovaApp()
+        self.PrepareTheEnvironment(buildHtml=False)
+
+
+    def removeCordovaApp(self):
         request=self.request
         
         self.close()
-        if os.path.exists(self.pasta_aplicativo):
-            shutil.rmtree(self.pasta_aplicativo)
-            self.prepararAmbiente(pre_build=False)
-
-    def deletar_app(self):
-        request=self.request
-        
-        self.close()
-        print 'removendo:', self.pasta_aplicativo
-        if os.path.exists(self.pasta_aplicativo):
+        print 'remove:', self.aplication_folder
+        if os.path.exists(self.aplication_folder):
             try:
-                shutil.rmtree(self.pasta_aplicativo)
+                shutil.rmtree(self.aplication_folder)
             except Exception as e:
-                print "Erro ao apagar:", self.pasta_aplicativo
+                print "Erro on remove:", self.aplication_folder
                 print e
-        if os.path.exists(os.path.join(self.pasta_cordova,'criar_aplicativo_%s.bat' %self.aplicativo)):
+        if os.path.exists(os.path.join(self.cordova_app_folder,'create_app_%s.bat' %self.aplication_name)):
             try:
-                os.unlink(os.path.join(self.pasta_cordova,'criar_aplicativo_%s.bat' %self.aplicativo))
+                os.unlink(os.path.join(self.cordova_app_folder,'create_app_%s.bat' %self.aplication_name))
             except Exception as e:
-                print "Erro ao apagar:", os.path.join(self.pasta_cordova,'criar_aplicativo_%s.bat' %self.aplicativo)
+                print "Erro on remove:", os.path.join(self.cordova_app_folder,'create_app_%s.bat' %self.aplication_name)
                 print e
-        if os.path.exists(os.path.join(self.pasta_cordova,'server_run_%s.bat' %self.aplicativo)):
+        if os.path.exists(os.path.join(self.cordova_app_folder,'server_run_%s.bat' %self.aplication_name)):
             try:
-                os.unlink(os.path.join(self.pasta_cordova,'server_run_%s.bat' %self.aplicativo))
+                os.unlink(os.path.join(self.cordova_app_folder,'server_run_%s.bat' %self.aplication_name))
             except Exception as e:
-                print "Erro ao apagar:", os.path.join(self.pasta_cordova,'server_run_%s.bat' %self.aplicativo)
-                print e
-
-def phanterURL(*args, **kargs):
-    if current.request.vars.phanterandroidbuild:
-        kargs['host']=True
-        url='%s' %URL(*args, **kargs)
-        if current.request.application in url:
-            url_split=url.split('%s/' %current.request.application)
-            return '%s' %url_split[-1]
-        else:
-            return ''
-    else:
-        return URL(*args, **kargs)
-        
+                print "Erro on remove:", os.path.join(self.cordova_app_folder,'server_run_%s.bat' %self.aplication_name)
+                print e        
