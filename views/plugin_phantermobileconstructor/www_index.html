@@ -1,0 +1,351 @@
+{{extend 'plugin_phantermobileconstructor/www_layout.html'}}
+{{block head}}
+  <style type="text/css">
+    html {
+      height: 100%;
+    }
+    header{
+      margin:0;
+      box-shadow: none;
+    }
+    body{
+      background: linear-gradient(#0e1830 10%,#0b0f5d 100%);
+      min-height: 100%;
+      padding: 0px;
+      margin: 0px;
+    }
+    .principal{
+      padding: 20px;
+    }
+    .caixa_logo_principal{
+      height: 150px;
+      width: 282px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    h1, h2, h3, h4{
+      text-align: center;
+      color: white;
+    }
+    h1{
+      color: orange;
+      margin-top: 0;
+    }
+    hr{
+      margin-top: 5px;
+      margin-bottom: 5px
+    }
+    /*inicio Logo*/
+      #logo_conex {
+        position: relative;
+      }
+      #letra01 {
+        width: 40px;
+        height: 40px;
+        margin-top: 13px;
+        margin-left: 0px;
+        background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll 0px -13px;
+        padding: 0px;
+        animation: letrac 30s ease-in infinite;
+      }
+      #letra02 {
+        width: 40px;
+        height: 40px;
+        margin-top: 27px;
+        margin-left: 40px;
+        background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll -40px -27px;
+        padding: 0px;
+        animation: letrao1 30s ease-in infinite;
+      }
+      #letra03 {
+        width: 40px;
+        height: 40px;
+        margin-top: 14px;
+        margin-left: 80px;
+        background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll -80px -14px;
+        padding: 0px;
+        animation: letran 30s ease-in infinite;
+      }
+      #letra04 {
+        width: 40px;
+        height: 40px;
+        margin-top: 0px;
+        margin-left: 120px;
+        background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll -120px 0px;
+        padding: 0px;
+        animation: letrae 30s ease-in infinite;
+      }
+      #letra05 {
+        width: 40px;
+        height: 40px;
+        margin-top: 14px;
+        margin-left: 163px;
+        background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll -163px -14px;
+        padding: 0px;
+        animation: letrax 30s ease-in infinite;
+      }
+      #letra06 {
+        width: 40px;
+        height: 46px;
+        margin-top: 16px;
+        margin-left: 201px;
+        background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll -201px -16px;
+        padding: 0px;
+        animation: letraa 30s ease-in infinite;
+      }
+      #letra07 {
+        width: 40px;
+        height: 40px;
+        margin-top: 13px;
+        margin-left: 241px;
+        background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll -241px -13px;
+        padding: 0px;
+        animation: letrao2 30s ease-in infinite;
+      }
+      #didata {
+        top: -5px;
+        width: 154px;
+        height: 67px;
+        margin-top: 63px;
+        margin-left: 125px;
+        background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll -125px -63px;
+        padding: 0px;
+        animation: didataani 30s ease-in infinite;
+      }
+      .letras_conex {
+        position: absolute;
+      }
+      @keyframes letrac {
+        0% {top:0; left: 0;}
+        4% {top:0; left: 0;}
+        5% {top:5px; left: 4px;}
+        20% {top:5px; left:4px;}
+        21% {top:0; left:0;}
+        100%{top:0; left: 0;}
+        }
+
+      @keyframes letrao1 {
+        0% {top:0; left: 0;}
+        7% {top:0; left: 0;}
+        8% {top:-7px; left: 3px;}
+        20% {top:-7px; left:3px;}
+        21% {top:0; left:0;}
+        100%{top:0; left: 0;}
+        }
+
+      @keyframes letran {
+        0% {top:0; left: 0;}
+        3% {top:0; left: 0;}
+        4% {top:5px; left: 2px;}
+        20% {top:5px; left:2px;}
+        21% {top:0; left:0;}
+        100%{top:0; left: 0;}
+        }
+
+      @keyframes letrae {
+        0% {top:0; left: 0;}
+        6% {top:0; left: 0;}
+        7% {top:20px; left: 0;}
+        20% {top:20px; left:0;}
+        21% {top:0; left:0;}
+        100%{top:0; left: 0;}
+        }
+
+      @keyframes letrax {
+        0% {top:0; left: 0;}
+        2% {top:0; left: 0;}
+        3% {top:5px; left: -2px;}
+        20% {top:5px; left:-2px;}
+        21% {top:0; left:0;}
+        100%{top:0; left: 0;}
+        }
+      @keyframes letraa {
+        0% {top:0; left: 0;}
+        5% {top:0; left: 0;}
+        6% {top:-9px; left: -3;}
+        20% {top:-9px; left:-3;}
+        21% {top:0; left:0;}
+        100%{top:0; left: 0;}
+        }
+      @keyframes letrao2 {
+        0% {top:0; left: 0;}
+        8% {top:0; left: 0;}
+        9% {top:5px; left: -4px;}  
+        20% {top:5px; left:-4px;}
+        21% {top:0; left:0;}
+        100%{top:0; left: 0;}
+        }
+
+      @keyframes didataani {
+        0% {top: -5px;}
+        7%{top:-5px;}
+        8%{top:-10px;}
+        20%{top:-10px;}
+        21%{top:-5px;}
+        100%{top:-5px;}
+        }
+    /*fim Logo*/
+    /*inicio Logo cordova*/
+      .logo_cordova > img {
+        width: 100%;
+      }
+      .logo_cordova {
+        width: 50px;
+        margin-left: auto;
+        margin-right: auto;
+      }
+    /*fim Logo cordova*/
+    /*Desenvolvedor*/
+      .desenvolvedor_rodape{
+        font-family: "OldSansBlack";
+        width: 20%;
+      }
+      .desenvolvedor_rodape.responsivo-tablet,
+      .desenvolvedor_rodape.responsivo-tabletlg{
+        width: 30%;
+      }
+
+      .desenvolvedor_rodape.responsivo-desktop{
+        width: 25%;
+      }
+      .desenvolvedor_rodape.responsivo-phone,
+      .desenvolvedor_rodape.responsivo-phonelg{
+        display:none;
+      }
+      .caixa_desenvolvedor_titulo {
+        margin-bottom: 10px;
+        font-size: 15pt;
+        margin-top: 10px;
+        color: wheat;
+        text-align: center;
+      }
+      .caixa_desenvolvedor_titulo.responsivo-tablet,
+      .caixa_desenvolvedor_titulo.responsivo-tablet,
+      .caixa_desenvolvedor_titulo.responsivo-desktop{
+        font-size: 12pt;
+      }
+
+      .caixa_desenvolvedor_auto {
+        display: table;
+        width: 124px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-bottom: 10px;
+      }
+      .nome_autor {
+        float: left;
+        padding-top: 8px;
+        margin-left: 10px;
+        color: orange;
+      }
+      .imagem_autor {
+        width: 40px;
+        float: left;
+      }
+      .imagem_autor img {
+        border-radius: 100%;
+        width: 100%;
+      }
+      .rodape_links {
+        width: 136px;
+        display: table;
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .rodape-link {
+        float: left;
+      }
+      .img_google_plus {
+        background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll;
+        background-position-x: 0px;
+        background-position-y: -132px;
+        width: 34px;
+        height: 34px;
+      }
+      .img_facebook {
+        background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll;
+        background-position-x: -170px;
+        background-position-y: -132px;
+        width: 34px;
+        height: 34px;
+      }
+      .img_twitter {
+        background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll;
+        background-position-x: -34px;
+        background-position-y: -132px;
+        width: 34px;
+        height: 34px;
+      }
+      .img_email {
+        background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll;
+        background-position-x: -68px;
+        background-position-y: -132px;
+        width: 34px;
+        height: 34px;
+      }
+
+    /*Fim Desenvolvedor*/
+    /*inicio powered*/
+    .caixa_powered {
+      position: fixed;
+      bottom: 14px;
+      width: 100%;
+      left: 0px;
+    }
+    .powered {
+      width: 143px;
+      margin-left: auto;
+      margin-right: auto;
+      padding: 10px;
+      background-color: white;
+      border-radius: 16px;
+      box-shadow: 0px 0px 9px black inset;
+    }
+    /*Fim powered*/
+  </style>
+{{end head}}
+
+<div class='principal'>
+<div class='caixa_logo_principal'>
+<div id="logo_conex"><div class="letras_conex" id="letra01">&nbsp;</div><div class="letras_conex" id="letra02">&nbsp;</div><div class="letras_conex" id="letra03">&nbsp;</div><div class="letras_conex" id="letra04">&nbsp;</div><div class="letras_conex" id="letra05">&nbsp;</div><div class="letras_conex" id="letra06">&nbsp;</div><div class="letras_conex" id="letra07">&nbsp;</div><div class="letras_conex" id="didata">&nbsp;</div></div>
+</div>
+<h1>PhanterMobile Constructor</h1>
+<div class='logo_cordova'><img src="{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','logo_cordova.png'])}}"></div>
+<hr>
+<div class="caixa_desenvolvedor">
+        <div class="caixa_desenvolvedor_titulo responsivo responsivo-tablet">DESENVOLVEDOR</div>
+        <div class="caixa_desenvolvedor_auto">
+        <div class="imagem_autor"><img alt="imagem do autor" src="{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','avatar.jpg'])}}"></div>
+        <div class="nome_autor">PhanterJR</div>
+
+        </div>
+        <div class="rodape_links">
+        <div class="rodape-link link-googleplus float">
+          <a href="https://plus.google.com/u/0/101638166907804991734" target="_blank">
+            <div class="link_social img_google_plus">&nbsp;</div>
+          </a>
+        </div>
+
+        <div class="rodape-link link-facebook float">
+          <a href="https://www.facebook.com/phanterjr" target="_blank">
+            <div class="link_social img_facebook">&nbsp;</div>
+          </a>
+        </div>
+
+        <div class="rodape-link link-twitter float">
+          <a href="https://twitter.com/PhanterJR" target="_blank">
+            <div class="link_social img_twitter">&nbsp;</div>
+          </a>
+        </div>
+
+        <div class="rodape-link link-email float">
+          <a href="mailto:junior@conexaodidata.com.br" target="_blank">
+            <div class="link_social img_email">&nbsp;</div>
+          </a>
+        </div>
+        </div>
+      </div>
+</div>
+<div class='caixa_powered'><div class='powered'><img src="{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','powered.jpg'])}}"></div></div>
+
+

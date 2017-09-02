@@ -1,0 +1,122 @@
+{{extend 'plugin_phantermobileconstructor/layout_phanterandroid.html'}}
+{{block head}}
+<style type="text/css">
+    .cabecalho{
+    	display: none;
+    }
+    #nav_caminho{
+    	display: none;
+    }
+    .main_conex.responsivo-phone{
+
+        padding: 0;
+        margin: 0;
+        border-radius: 0;
+    }
+    .main_conex.responsivo-phonelg{
+    	padding: 15px 10px;
+    }
+
+    .main_conex.responsivo-tablet {
+        padding: 15px 10px;
+    }
+    .main_conex.responsivo {
+        background-image: url("{{=URL('static','plugin_phantermobileconstructor', args=['images','background.jpg'])}}");
+    }
+    .mobile.responsivo-phone, .mobile.responsivo-phonelg {
+        background: transparent url("{{=URL('static','plugin_phantermobileconstructor', args=['images','celular2.png'])}}") repeat-x scroll -100px 0px;
+        height: 685px;
+        padding: 0px 15px;
+        background-size: 300px auto;
+        background-position-x: 2px;
+        background-position-y: 0px;
+        background-repeat: no-repeat;
+        width: 300px;
+        margin-left: auto;
+        margin-right: auto;
+        overflow: hidden;
+        background-clip: border-box;
+        border-radius: 25px;
+    }
+    .mobile.responsivo-tablet, .mobile.responsivo-tabletlg, .mobile.responsivo-desktop{
+        background: transparent url("{{=URL('static','plugin_phantermobileconstructor', args=['images','celular.png'])}}") repeat-x scroll -100px 0px;
+        height: 946px;
+        padding: 0px 15px;
+        background-size: 563px auto;
+        background-position-x: 0px;
+        background-position-y: 0px;
+        background-repeat: no-repeat;
+        width: 565px;
+        margin-left: auto;
+        margin-right: auto;
+        overflow: hidden;
+        background-clip: border-box;
+        border-radius: 25px;
+    }
+    .mobile.responsivo-desktoplg {
+        background: transparent url("{{=URL('static','plugin_phantermobileconstructor', args=['images','celular.png'])}}") repeat-x scroll -100px 0px;
+        height: 946px;
+        padding: 0px 15px;
+        background-size: 563px auto;
+        background-position-x: 0px;
+        background-position-y: 0px;
+        background-repeat: no-repeat;
+        width: 565px;
+        margin-left: auto;
+        margin-right: auto;
+        overflow: hidden;
+        background-clip: border-box;
+        border-radius: 25px;
+    }
+    .html_mobile.responsivo-phone, .html_mobile.responsivo-phonelg {
+        background-color: #edf5bd;
+        width: 271px;
+        height: 449px;
+        margin-left: auto;
+        margin-right: auto;
+        margin-top: 91px;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    .html_mobile.responsivo-tablet, .html_mobile.responsivo-tabletlg, .html_mobile.responsivo-desktop {
+        background-color: transparent;
+        width: 357px;
+        height: 595px;
+        margin-left: 12px;
+        margin-right: auto;
+        margin-top: 185px;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+    .html_mobile.responsivo-desktoplg {
+        background-color: transparent;
+        width: 357px;
+        height: 595px;
+        margin-left: 12px;
+        margin-right: auto;
+        margin-top: 185px;
+        border-radius: 2px;
+        overflow: hidden;
+    }
+
+    .iframe_mobile.responsivo {
+        width: 397px;
+        overflow: hidden;
+        height: 672px;
+        border: none;
+        zoom: 0.9;
+        -moz-transform: scale(0.9,0.9);
+        -moz-transform-origin: left top;
+    }
+    .iframe_mobile.responsivo-phone, .iframe_mobile.responsivo-phonelg {
+        width: 339px;
+        overflow: hidden;
+        height: 561px;
+        border: none;
+        zoom: 0.8;
+        -moz-transform: scale(0.8,0.8);
+        -moz-transform-origin: left top;
+    }
+</style>
+{{end}}
+{{=html}}

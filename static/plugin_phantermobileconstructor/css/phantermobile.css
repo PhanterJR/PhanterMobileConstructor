@@ -1,0 +1,36 @@
+
+@font-face {
+    font-family: "BEDRK";
+    src: local("BEDRK"), url("{{=URL('static','fonts')}}/BEDRK.ttf") format("truetype");
+    }
+@font-face {
+    font-family: "amazer";
+    src: local("amazer"), url("{{=URL('static','fonts')}}/amazer.ttf") format("truetype");
+    }
+@font-face {
+    font-family: "OldSansBlack";
+    src: local("OldSansBlack"), url("{{=URL('static','fonts')}}/OldSansBlack.ttf") format("truetype");
+    }
+@font-face {
+    font-family: "crushed";
+    src: local("crushed"), url("{{=URL('static','fonts')}}/crushed.ttf") format("truetype");
+    }
+@font-face {
+    font-family: "a_song_for_jennifer";
+    src: local("a_song_for_jennifer"), url("{{=URL('static','fonts')}}/a_song_for_jennifer.ttf") format("truetype");
+    }
+@font-face {
+    font-family: "BorisBlackBloxx";
+    src: local("BorisBlackBloxx"), url("{{=URL('static','fonts')}}/BorisBlackBloxx.ttf") format("truetype");
+    }
+@font-face{
+    font-family: "Terfens";
+    src: local("Terfens"), url("{{=URL('static','fonts')}}/Terfens.ttf") format("truetype");
+    }
+button.phantermobile {
+    border-radius: 5px;
+    background-color: grey;
+    border: 1px solid #b1afaf;
+    font-size: 12pt;
+    font-family: OldSansBlack;
+}

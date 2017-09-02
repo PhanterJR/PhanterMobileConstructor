@@ -1,0 +1,37 @@
+/*criado dinamicamente em models/99_phantermobile.py*/
+
+@font-face {
+    font-family: "BEDRK";
+    src: local("BEDRK"), url("/welcome/static/fonts/BEDRK.ttf") format("truetype");
+    }
+@font-face {
+    font-family: "amazer";
+    src: local("amazer"), url("/welcome/static/fonts/amazer.ttf") format("truetype");
+    }
+@font-face {
+    font-family: "OldSansBlack";
+    src: local("OldSansBlack"), url("/welcome/static/fonts/OldSansBlack.ttf") format("truetype");
+    }
+@font-face {
+    font-family: "crushed";
+    src: local("crushed"), url("/welcome/static/fonts/crushed.ttf") format("truetype");
+    }
+@font-face {
+    font-family: "a_song_for_jennifer";
+    src: local("a_song_for_jennifer"), url("/welcome/static/fonts/a_song_for_jennifer.ttf") format("truetype");
+    }
+@font-face {
+    font-family: "BorisBlackBloxx";
+    src: local("BorisBlackBloxx"), url("/welcome/static/fonts/BorisBlackBloxx.ttf") format("truetype");
+    }
+@font-face{
+    font-family: "Terfens";
+    src: local("Terfens"), url("/welcome/static/fonts/Terfens.ttf") format("truetype");
+    }
+button.phantermobile {
+    border-radius: 5px;
+    background-color: grey;
+    border: 1px solid #b1afaf;
+    font-size: 12pt;
+    font-family: OldSansBlack;
+}

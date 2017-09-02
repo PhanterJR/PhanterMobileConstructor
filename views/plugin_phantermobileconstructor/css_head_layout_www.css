@@ -1,0 +1,29 @@
+
+@font-face {
+    font-family: "BEDRK";
+    src: local("BEDRK"), url("{{=URL('static','plugin_phantermobileconstructor/www',args=['fonts', 'BEDRK.ttf'])}}") format("truetype");
+    }
+@font-face {
+    font-family: "amazer";
+    src: local("amazer"), url("{{=URL('static','plugin_phantermobileconstructor/www',args=['fonts', 'amazer.ttf'])}}") format("truetype");
+    }
+@font-face {
+    font-family: "OldSansBlack";
+    src: local("OldSansBlack"), url("{{=URL('static','plugin_phantermobileconstructor/www',args=['fonts', 'OldSansBlack.ttf'])}}") format("truetype");
+    }
+@font-face {
+    font-family: "crushed";
+    src: local("crushed"), url("{{=URL('static','plugin_phantermobileconstructor/www',args=['fonts', 'crushed.ttf'])}}") format("truetype");
+    }
+@font-face {
+    font-family: "a_song_for_jennifer";
+    src: local("a_song_for_jennifer"), url("{{=URL('static','plugin_phantermobileconstructor/www',args=['fonts', 'a_song_for_jennifer.ttf'])}}") format("truetype");
+    }
+@font-face {
+    font-family: "BorisBlackBloxx";
+    src: local("BorisBlackBloxx"), url("{{=URL('static','plugin_phantermobileconstructor/www',args=['fonts', 'BorisBlackBloxx.ttf'])}}") format("truetype");
+    }
+@font-face{
+    font-family: "Terfens";
+    src: local("Terfens"), url("{{=URL('static','plugin_phantermobileconstructor/www',args=['fonts', 'Terfens.ttf'])}}") format("truetype");
+    }
