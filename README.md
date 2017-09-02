@@ -14,13 +14,13 @@ Plugin do Web2py para criação de aplicativos mobile utilizando cordova phonega
       and all files in static/plugin_phantermobileconstructor/www will be copied to the www folder of cordova App
 
       exemple:
-          - On controller plugin_phantermobileconstructor.py
+      
+          - On controller/plugin_phantermobileconstructor.py
               def www_index():
                   #your code
                   return dict()
               def www_other_function():
                   return DIV("my div")
-
           - On static/plugin_phantermobileconstructor/www
               static/plugin_phantermobileconstructor/www/
                       |-css/
@@ -30,7 +30,6 @@ Plugin do Web2py para criação de aplicativos mobile utilizando cordova phonega
                           |-myimage.jpg
                       |-js/
                           |-Jquery.js
-
           - will generate the following structure in the cordova application:
               folderAppCordova/
                   |-www/
