@@ -1,5 +1,5 @@
 # PhanterMobileConstructor
-Plugin do Web2py para criação de aplicativos mobile utilizando cordova phonegap
+Create your mobile aplication using web2py
 
   - On init create this folders structure if not exists:
      web2py
