@@ -119,7 +119,7 @@ class PhanterAndroid(object):
                     arquivo_aberto.write(conteudo)
 
             processo = subprocess.Popen([os.path.join(
-                self.cordova_app_folder, 'server_run_%s.bat' % self.aplication_name)], shell=False)
+                self.cordova_app_folder, 'server_run_%s.bat' % self.aplication_name)], shell=True)
             proc = psutil.Process(processo.pid)
             print "%s run on door %s" % (self.server_chosen, port)
             while True:
@@ -197,14 +197,16 @@ class PhanterAndroid(object):
                         print "Fail! try %s of 5" % cont
 
     def _getServerandDoorCmdLine(self, cmdline):
-        if 'serve' in cmdline:
-            if 'phonegap' in cmdline:
-                if '-p' in cmdline:
-                    port = cmdline.split('-p')[-1].strip()
+        strcmdline=' '.join(cmdline)
+        if 'serve' in strcmdline:
+            if 'phonegap' in strcmdline:
+                if '-p' in strcmdline:
+                    padrao = re.compile(r'serve *-[pP]([0-9]+)')
+                    port = padrao.findall(strcmdline)
                     try:
-                        port = int(port)
+                        port = int(port[0])
                     except:
-                        print "error: port dont find!"
+                        print "error: port dont is a number!"
                         port = None
                     if port:
                         return ['phonegap', port]
@@ -212,13 +214,13 @@ class PhanterAndroid(object):
                         return []
                 else:
                     return []
-            elif 'cordova' in cmdline:
+            elif 'cordova' in strcmdline:
                 padrao = re.compile('serve *([0-9]+)')
-                port = padrao.findall(cmdline)
+                port = padrao.findall(strcmdline)
                 try:
-                    port = int(port)
+                    port = int(port[0])
                 except:
-                    print "error: port dont find!"
+                    print "error: port dont is a number!"
                     port = None
                 if port:
                     return ['cordova', port]
@@ -232,13 +234,15 @@ class PhanterAndroid(object):
         print 'locating all server program process (Node.exe)...'
         nome = 'node.exe'
         processo_localizado = {}
+        localized=False
         for proc in psutil.process_iter():
             if proc.name() == nome:
                 if proc.cwd() == self.aplication_folder:
-                    linha_de_comando = proc.cmdline()[-1]
+                    linha_de_comando = proc.cmdline()
                     port_and_server = self._getServerandDoorCmdLine(
                         linha_de_comando)
-                    if port_and_server:
+                    if port_and_server and not localized:
+                        localized=True
                         processo_localizado['server'] = port_and_server[0]
                         processo_localizado['port'] = port_and_server[1]
                         processo_localizado['pid'] = proc.pid
@@ -289,7 +293,7 @@ class PhanterAndroid(object):
                     self.cordova_app_folder, self.aplication_name, self.aplication_id, self.aplication_name)
                 arquivo_aberto.write(conteudo)
         if not os.path.exists(self.aplication_folder):
-            print "criando pasta do aplicativo: %s" % self.aplication_folder
+            print "Creating Folder cordova app: %s" % self.aplication_folder
             os.makedirs(self.aplication_folder)
             print "Executing: cordova create %s %s %s" % (self.aplication_name, self.aplication_id, self.aplication_name)
             subprocess.call([os.path.join(self.cordova_app_folder, 'create_app_%s.bat' %
