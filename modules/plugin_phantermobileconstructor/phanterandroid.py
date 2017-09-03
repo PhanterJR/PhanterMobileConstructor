@@ -213,6 +213,7 @@ class PhanterAndroid(object):
                         print "error: port dont is a number!"
                         port = None
                     if port:
+                        self.ports.append(port)
                         return ['phonegap', port]
                     else:
                         return []
@@ -227,6 +228,7 @@ class PhanterAndroid(object):
                     print "error: port dont is a number!"
                     port = None
                 if port:
+                    self.ports.append(port)
                     return ['cordova', port]
                 else:
                     return []
