@@ -12,6 +12,7 @@ from gluon.html import URL
 from gluon import current
 from gluon.compileapp import find_exposed_functions
 
+
 class PhanterAndroid(object):
     """Make the connection between cordova app and web2py app
 
@@ -83,6 +84,11 @@ class PhanterAndroid(object):
             self._prepareTheEnvironment(buildHtml=True)
 
     def openServer(self, server='phonegap'):
+        """
+            @server: 'phonegap' or 'cordova'
+            In linux the server will have to be opened manually, 
+            so the method will try to find the process and the port.
+        """
         request = self.request
         if server != self.server_chosen:
             self.server_chosen = server
@@ -129,7 +135,10 @@ class PhanterAndroid(object):
                     time.sleep(1)
             print "\n================================\n  Conected\n-------------------------------\n"
 
-    def close(self):
+    def closeServer(self):
+        """
+            Will try to find the server process and will close it
+        """
         print "Closing..."
         procs = self._examine_process()
         if procs:
@@ -139,6 +148,10 @@ class PhanterAndroid(object):
             print 'Server not found. nothing to do'
 
     def buildHtml(self):
+        """
+            All functions started with "www_" will be rendered in the cordova application (on buildHtml method)
+            and all files in static/plugin_phantermobileconstructor/www will be copied to the www folder of cordova App
+        """
         request = self.request
 
         print "Compiling html..."
@@ -191,24 +204,26 @@ class PhanterAndroid(object):
                     try:
                         port = int(port)
                     except:
-                        port = 3000  # force new server don't user default port of phonegap
-                    return ['phonegap', int(port)]
+                        print "error: port dont find!"
+                        port = None
+                    if port:
+                        return ['phonegap', port]
+                    else:
+                        return []
                 else:
-                    # force new server don't user default port of phonegap
-                    return ['phonegap', 3000]
+                    return []
             elif 'cordova' in cmdline:
-                # cordova uses default port 8000, the same as web2py, change to
-                # 3000+
                 padrao = re.compile('serve *([0-9]+)')
                 port = padrao.findall(cmdline)
+                try:
+                    port = int(port)
+                except:
+                    print "error: port dont find!"
+                    port = None
                 if port:
-                    try:
-                        port = int(port)
-                    except:
-                        port = 3000  # force new server don't user default port of phonegap
-                    return ['cordova', int(port)]
+                    return ['cordova', port]
                 else:
-                    return ['cordova', int(port)]
+                    return []
         else:
             return []
 
@@ -235,7 +250,7 @@ class PhanterAndroid(object):
     def _examine_folders(self, path):
         request = self.request
 
-        print "Verificando Pastas..."
+        print "Examine folders..."
         if not os.path.isfile(path):
             lista = os.listdir(path)
             if lista:
@@ -263,12 +278,12 @@ class PhanterAndroid(object):
     def _prepareTheEnvironment(self, buildHtml=True):
         request = self.request
 
-        print 'Preparando Ambiente'
+        print 'Prepare Environment'
         if not os.path.exists(self.cordova_app_folder):
-            print 'criando_pasta: %s' % self.cordova_app_folder
+            print 'Creating Folder: %s' % self.cordova_app_folder
             os.makedirs(self.cordova_app_folder)
         if not os.path.exists(os.path.join(self.cordova_app_folder, 'create_app_%s.bat' % self.aplication_name)):
-            print "criando arquivo de lote create_app_%s.bat" % self.aplication_name
+            print "Creating file create_app_%s.bat" % self.aplication_name
             with open(os.path.join(self.cordova_app_folder, 'create_app_%s.bat' % self.aplication_name), 'w') as arquivo_aberto:
                 conteudo = "cd %s\ncordova create %s %s %s" % (
                     self.cordova_app_folder, self.aplication_name, self.aplication_id, self.aplication_name)
@@ -276,19 +291,20 @@ class PhanterAndroid(object):
         if not os.path.exists(self.aplication_folder):
             print "criando pasta do aplicativo: %s" % self.aplication_folder
             os.makedirs(self.aplication_folder)
-            print "executando o comando: cordova create %s %s %s" % (self.aplication_name, self.aplication_name, self.aplication_name)
+            print "Executing: cordova create %s %s %s" % (self.aplication_name, self.aplication_name, self.aplication_name)
             subprocess.call([os.path.join(self.cordova_app_folder, 'create_app_%s.bat' %
                                           self.aplication_name)], stdout=subprocess.PIPE, shell=True, stdin=subprocess.PIPE)
-
-        if not os.path.exists(os.path.join(self.aplication_folder, 'www')):
-            print "copiando template phanterandroid em: %s" % os.path.join(self.aplication_folder, 'www')
-            print "desconpactando template localizado em: %s" % os.path.abspath(os.path.join(os.path.dirname(__file__), 'phanterandroidpack', 'template.zip'))
+            print "copy template phanterandroid in: %s" % os.path.join(self.aplication_folder, 'www')
+            print "unzip template of: %s" % os.path.abspath(os.path.join(os.path.dirname(__file__), 'phanterandroidpack', 'template.zip'))
             zip_ref = zipfile.ZipFile(os.path.abspath(os.path.join(
                 os.path.dirname(__file__), 'phanterandroidpack', 'template.zip')), 'r')
             zip_ref.extractall(os.path.join(self.aplication_folder, 'www'))
             zip_ref.close()
+
         if buildHtml:
             self.buildHtml()
+        else:
+
 
     def resetApp(self):
         self.removeCordovaApp()

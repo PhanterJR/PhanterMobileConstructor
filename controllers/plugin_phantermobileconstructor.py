@@ -13,32 +13,42 @@ except:
 
 if (remote_addr not in hosts) and (remote_addr != "127.0.0.1"):
     raise HTTP(200, T('PhanterMobile Constructor só funciona localmente'))
-precisa_autorizacao=['index', 'echo_comand']
+precisa_autorizacao = ['index', 'echo_comand']
 
 if (request.function in precisa_autorizacao):
     if not gluon.fileutils.check_credentials(request):
         redirect(URL('admin', 'default', 'index',
                      vars=dict(send=URL(args=request.args, vars=request.vars))))
 
+
 def index():
     from plugin_phantermobileconstructor.phanterandroid import PhanterAndroid
-    android=PhanterAndroid()
-    android.iniciarServidor()
-    response.flash="Bem vindo"
-    html=DIV(DIV(IFRAME(_src="http://localhost:%s/" %android.porta, _class='iframe_mobile responsivo'), _class='html_mobile responsivo'), _class="mobile responsivo")
+    android = PhanterAndroid()
+    android.openServer()
+    response.flash = T("Welcome")
+    html = DIV(DIV(IFRAME(_src="http://localhost:%s/" % android.port, _class='iframe_mobile responsivo'),
+                   _class='html_mobile responsivo'), _class="mobile responsivo")
     return locals()
+
 
 def echo_comand():
     from plugin_phantermobileconstructor.phanterandroid import PhanterAndroid
-    android=PhanterAndroid()
+    android = PhanterAndroid()
 
-    if request.args(0)=='build_html':
-        android.pre_build('index')
-        return "lert('html compiled!');"
+    if request.args(0) == 'buildhtml':
+        android.buildHtml()
+        return "lert('Html Compiled!');"
 
-    elif request.args(0)=='close':
-        android.close()
-        return "alert('server down');"
+    elif request.args(0) == 'closeserver':
+        android.closeServer()
+        return "alert('Server Closed!');"
+
+    elif request.args(0) == 'resetapp':
+        android.resetApp()
+        return "alert('Reset Done!');"
+
+    else:
+        return "console.log('Notingh to do!');"
 
 
 ####################################
@@ -50,7 +60,10 @@ def css_head_layout_www():
     return dict()
 
 # Functions started with "www" in your name will generate the htmls that will be placed in the www folder of cordova
-# Example: the function "def www_index ()" will be generated in the www folder the index.html file.
+# Example: the function "def www_index ()" will be generated in the www
+# folder the index.html file.
+
+
 def www_index():
     return dict()
 
@@ -58,13 +71,19 @@ if request.vars.phantermobilebuild:
 
     def filter(d):
         import re
-        if isinstance(d,dict):
-            html_filtrado=re.compile('\n\s\s+\n').sub('\n',response.render(d))
+        if isinstance(d, dict):
+            html_filtrado = re.compile(
+                '\n\s\s+\n').sub('\n', response.render(d))
         else:
-            html_filtrado=re.compile('\n\s\s+\n').sub('\n',response.render(d()))
-        html_filtrado=html_filtrado.replace("/%s/static/plugin_phantermobileconstructor/www/" %request.application, "")
-        html_filtrado=html_filtrado.replace("%s/static/plugin_phantermobileconstructor/www/" %request.application, "")
-        html_filtrado=html_filtrado.replace("/static/plugin_phantermobileconstructor/www/", "")
-        html_filtrado=html_filtrado.replace("static/plugin_phantermobileconstructor/www/", "")
+            html_filtrado = re.compile(
+                '\n\s\s+\n').sub('\n', response.render(d()))
+        html_filtrado = html_filtrado.replace(
+            "/%s/static/plugin_phantermobileconstructor/www/" % request.application, "")
+        html_filtrado = html_filtrado.replace(
+            "%s/static/plugin_phantermobileconstructor/www/" % request.application, "")
+        html_filtrado = html_filtrado.replace(
+            "/static/plugin_phantermobileconstructor/www/", "")
+        html_filtrado = html_filtrado.replace(
+            "static/plugin_phantermobileconstructor/www/", "")
         return html_filtrado
-    response._caller=filter
+    response._caller = filter
