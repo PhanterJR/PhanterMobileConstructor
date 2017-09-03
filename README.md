@@ -2,9 +2,10 @@
 Create your mobile aplication using web2py
 
   - On init create this folders structure if not exists:
-     web2py
-      | - cordova
-              |-folderAppCordova
+     
+        web2py
+          | - cordova
+                |-folderAppCordova
 
   - The name of folderAppCordova is the same of your web2py aplication
       Cointains the default cordova app
