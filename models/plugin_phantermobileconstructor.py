@@ -41,5 +41,8 @@ if request.controller == 'plugin_phantermobileconstructor':
 # Storage APKs
 
 db.define_table('plugin_phantermobileconstructor_apks',
-  Field('apkfile','upload', detetable=True),
-  Field('version', 'string'))
+      Field('appname', 'string', label='Name of App'),
+      Field('apkfile','upload', autodelete=True),
+      Field('apkversion', 'string', label='Version'),
+      Field('apklevel', 'string', default='debug')
+      )

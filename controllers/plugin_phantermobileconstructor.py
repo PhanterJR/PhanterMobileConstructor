@@ -34,8 +34,40 @@ def index():
         android.openServer('cordova')        
     else:
         print "http://localhost:%s/%s/plugin_phantermobileconstructor/www_index" %(request.application, request.env.server_port)
-        html = DIV(DIV(IFRAME(_src="http://localhost:%s/%s/plugin_phantermobileconstructor/www_index" %(request.env.server_port, request.application), _class='iframe_mobile responsivo'),
-                   _class='html_mobile responsivo'), _class="mobile responsivo")
+        html = DIV(
+        DIV(
+            DIV(
+                IFRAME(
+                    _src="http://localhost:%s/%s/plugin_phantermobileconstructor/www_index" %(request.env.server_port, request.application), 
+                    _class='iframe_mobile responsivo'),
+                   _class='html_mobile responsivo'), 
+            _class="mobile responsivo"),
+        DIV(
+            DIV(H1('PhanterMobile Constructor'), _class='caixa_titulo_painel_direito_g'),
+            DIV(
+                DIV(BUTTON("compilar", _class='botao_pagina_principal_comandos'),
+                               DIV(_id="status_compilar", _class='status_compilar'), 
+                               _class="phantermobile-botao-ajax",
+                               _url_ajax=URL('phantermobileconstructor', 'echo_comand', args=['buildhtml'])),
+                A(BUTTON("Abrir Servidor Cordova", _class='botao_pagina_principal_comandos'),
+                               DIV(SPAN("Without Status", _style='color:grey;'), _id='status_servidor_phonegap',_class='status_servidor'), 
+                               _class="phantermobile-botao-ajax",
+                               _href=URL(args=['cordova']),
+                               _target="blank",
+                               _url_ajax=URL('phantermobileconstructor', 'echo_comand', args=['info'])),
+                A(BUTTON("Abrir Servidor Cordova", _class='botao_pagina_principal_comandos'),
+                               DIV(SPAN("Without Status", _style='color:grey;'), _id='status_servidor_cordova',_class='status_servidor'),
+                               _class="phantermobile-botao-ajax",
+                               _href=URL(args=['phonegap']),
+                               _target="blank",
+                               _url_ajax=URL('phantermobileconstructor', 'echo_comand', args=['info'])),
+                DIV(BUTTON("CriarAPK", _class='botao_pagina_principal_comandos'),
+                               DIV(_id="dowload_newapk", _class='status_criarAPK'), 
+                               _class="phantermobile-botao-ajax",
+                               _url_ajax=URL('phantermobileconstructor', 'echo_comand', args=['createapk'])),
+                _class='caixa_comandos'),
+            _class='painel_direito_g')
+        )
     return locals()
 
 
@@ -45,8 +77,22 @@ def echo_comand():
 
     if request.args(0) == 'buildhtml':
         android.buildHtml()
-        return "lert('Html Compiled!');"
-
+        return "alert('Html Compiled!');"
+    elif request.args(0)=='info':
+        if request.vars.phonegapstatus:
+            status=android.statusServer()
+            if status:
+                html_status=DIV("Server PhoneGap running on port ", SPAN(status['port'], _style="color:green"))
+            else:
+                html_status=DIV("Server PhoneGap stoped", _style="color:green")
+            return '$("#status_servidor_phonegap").html(%s)' %html_status
+        elif request.vars.cordovastatus:
+            status=android.statusServer('cordova')
+            if status:
+                html_status=DIV("Server Cordova running on port", SPAN(status['port'], _style="color:green"))
+            else:
+                html_status=DIV("Server Cordova stoped", _style="color:green")
+            return '$("#status_servidor_cordova").html(%s)' %html_status
     elif request.args(0) == 'closeserver':
         android.closeServer()
         return "alert('Server Closed!');"
@@ -54,6 +100,46 @@ def echo_comand():
     elif request.args(0) == 'resetapp':
         android.resetApp()
         return "alert('Reset Done!');"
+    elif request.args(0)== 'createapk':
+        #android.createApk()
+        import json
+        levelfile=''
+        basedirapk=os.path.join(request.env.web2py_path,'cordova', request.application, 'platforms', 'android', 'build', 'outputs', 'apk')
+        if os.path.exists(os.path.join(basedirapk, 'android-debug.apk')) or  os.path.exists(os.path.join(basedirapk, '%s-debug.apk' %request.application)):
+            if os.path.exists(os.path.join(basedirapk, 'android-debug.apk')):
+                apk_file=os.path.join(basedirapk, 'android-debug.apk')
+                os.rename(apk_file, os.path.join(basedirapk, '%s-debug.apk' %request.application))
+            apk_file=os.path.join(basedirapk, '%s-debug.apk' %request.application)
+            levelfile="debug"
+            if request.vars.version and request.vars.appname:
+                q_apk=db((db.plugin_phantermobileconstructor_apks.versioapk==request.vars.version)&
+                    (db.plugin_phantermobileconstructor_apks.appname==request.vars.appname)&
+                    (db.plugin_phantermobileconstructor_apks.appname==levelfile)
+                    ).select().first()
+
+                if q_apk:
+                    id_apk=q_apk.id
+                    db.plugin_phantermobileconstructor_apks[q_apk.id]={
+                        'apkfile':db.plugin_phantermobileconstructor_apks.apkfile.store(open(apk_file, 'rb'), '%s-debug.apk' %request.application)
+                        }
+                else:
+                    id_apk=db.plugin_phantermobileconstructor_apks.insert(**{
+                        'apkfile':db.plugin_phantermobileconstructor_apks.apkfile.store(open(apk_file, 'rb'), '%s-debug.apk' %request.application),
+                        'appname': request.vars.appname,
+                        'apkversion': request.vars.version,
+                        'apklevel':levelfile,
+                        })
+            else:
+                id_apk=db.plugin_phantermobileconstructor_apks.insert(**{
+                    'apkfile':db.plugin_phantermobileconstructor_apks.apkfile.store(open(apk_file, 'rb'), '%s-debug.apk' %request.application),
+                    'appname': request.aplication,
+                    'apkversion': '1.0.0',
+                    'apklevel':levelfile,
+                    })
+            downloadapk=db.plugin_phantermobileconstructor_apks[id_apk].apkfile
+            db.commit()
+            return "$('#dowload_newapk').html(%s)" %(json.dumps(A(DIV('%s-debug.apk' %request.application, _class='download_newapk'),_href=URL('default','download', args=[downloadapk])).xml()))
+
 
     else:
         return "console.log('Notingh to do!');"

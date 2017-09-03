@@ -75,13 +75,17 @@ class PhanterAndroid(object):
         self.cordova_app_folder = os.path.join(
             self.request.env.web2py_path, 'cordova')
         self.aplication_folder = os.path.join(
-            self.cordova_app_folder, self.aplication_name)
+            self.request.env.web2py_path, 'cordova', self.aplication_name)
         self.server_chosen = 'phonegap'
 
         tem_condova = os.path.exists(self.cordova_app_folder)
         tem_aplicativo = os.path.exists(self.aplication_folder)
         if not tem_condova or not tem_aplicativo:
             self._prepareTheEnvironment(buildHtml=True)
+    
+    def statusServer(self, server='phonegap'):
+        return self._examine_process()
+
 
     def openServer(self, server='phonegap'):
         """
@@ -241,7 +245,7 @@ class PhanterAndroid(object):
                     linha_de_comando = proc.cmdline()
                     port_and_server = self._getServerandDoorCmdLine(
                         linha_de_comando)
-                    if port_and_server and not localized:
+                    if port_and_server and not localized and (self.server_chosen==port_and_server[0]):
                         localized=True
                         processo_localizado['server'] = port_and_server[0]
                         processo_localizado['port'] = port_and_server[1]
@@ -312,6 +316,13 @@ class PhanterAndroid(object):
         self.removeCordovaApp()
         self.PrepareTheEnvironment(buildHtml=False)
 
+    def _remove_file(self, file):
+        if os.path.exists(file):
+            try:
+                os.unlink(file)
+            except Exception as e:
+                print "Erro on remove:", file
+                print e
     def removeCordovaApp(self):
         request = self.request
 
@@ -323,20 +334,45 @@ class PhanterAndroid(object):
             except Exception as e:
                 print "Erro on remove:", self.aplication_folder
                 print e
-        if os.path.exists(os.path.join(self.cordova_app_folder, 'create_app_%s.bat' % self.aplication_name)):
-            try:
-                os.unlink(os.path.join(self.cordova_app_folder,
-                                       'create_app_%s.bat' % self.aplication_name))
-            except Exception as e:
-                print "Erro on remove:", os.path.join(self.cordova_app_folder, 'create_app_%s.bat' % self.aplication_name)
-                print e
-        if os.path.exists(os.path.join(self.cordova_app_folder, 'server_run_%s.bat' % self.aplication_name)):
-            try:
-                os.unlink(os.path.join(self.cordova_app_folder,
-                                       'server_run_%s.bat' % self.aplication_name))
-            except Exception as e:
-                print "Erro on remove:", os.path.join(self.cordova_app_folder, 'server_run_%s.bat' % self.aplication_name)
-                print e
+        self._remove_file(os.path.join(self.cordova_app_folder, 'create_app_%s.bat' % self.aplication_name))
+        self._remove_file(os.path.join(self.cordova_app_folder, 'server_run_%s.bat' % self.aplication_name))
+        self._remove_file(os.path.join(self.cordova_app_folder, 'create_apk_%s1.bat' % self.aplication_name))
+        self._remove_file(os.path.join(self.cordova_app_folder, 'create_apk_%s2.bat' % self.aplication_name))
+        self._remove_file(os.path.join(self.cordova_app_folder, 'create_apk_%s3.bat' % self.aplication_name))
+    
+    def createApk(self):
+        self.buildHtml()
+        
+        print "Creating file create_apk_%s1.bat" % self.aplication_name
+        cd = "cd %s\n" %os.path.join(self.aplication_folder)
+        with open(os.path.join(self.cordova_app_folder, 'create_apk_%s1.bat' % self.aplication_name), 'w') as arquivo_aberto:
+            conteudo = cd
+            conteudo+="cordova platform remove android\n"
+            arquivo_aberto.write(conteudo)
+        print "Remove Android Platform"
+        subprocess.call([os.path.join(self.cordova_app_folder, 'create_apk_%s1.bat' %
+                                      self.aplication_name)])
+        
+        print "Creating file create_apk_%s2.bat" % self.aplication_name
+        with open(os.path.join(self.cordova_app_folder, 'create_apk_%s2.bat' % self.aplication_name), 'w') as arquivo_aberto:
+            conteudo = "cd %s\n" %os.path.join(self.aplication_folder)
+            conteudo+="cordova platform add android\n"
+            arquivo_aberto.write(conteudo)
+        print "Inserting Android Platform"
+        subprocess.call([os.path.join(self.cordova_app_folder, 'create_apk_%s2.bat' %
+                                      self.aplication_name)])
+        
+        print "Creating file create_apk_%s3.bat" % self.aplication_name
+        with open(os.path.join(self.cordova_app_folder, 'create_apk_%s3.bat' % self.aplication_name), 'w') as arquivo_aberto:
+            conteudo = "cd %s\n" %os.path.join(self.aplication_folder)
+            conteudo+="cordova build android\n"
+            arquivo_aberto.write(conteudo)
+        print "Creating APK file"
+        subprocess.call([os.path.join(self.cordova_app_folder, 'create_apk_%s3.bat' %
+                                      self.aplication_name)])
+        print "Done!"
+
+
 if __name__ == "__main__":
     android = PhanterAndroid()
-    android.openServer()
+    android.createApk()
