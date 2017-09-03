@@ -155,7 +155,7 @@ class PhanterAndroid(object):
         request = self.request
 
         print "Compiling html..."
-        self.close()
+        self.closeServer()
 
         origem = os.path.join(request.env.web2py_path, 'applications',
                               self.aplication_name, 'static', 'plugin_phantermobileconstructor', 'www')
@@ -291,7 +291,7 @@ class PhanterAndroid(object):
         if not os.path.exists(self.aplication_folder):
             print "criando pasta do aplicativo: %s" % self.aplication_folder
             os.makedirs(self.aplication_folder)
-            print "Executing: cordova create %s %s %s" % (self.aplication_name, self.aplication_name, self.aplication_name)
+            print "Executing: cordova create %s %s %s" % (self.aplication_name, self.aplication_id, self.aplication_name)
             subprocess.call([os.path.join(self.cordova_app_folder, 'create_app_%s.bat' %
                                           self.aplication_name)], stdout=subprocess.PIPE, shell=True, stdin=subprocess.PIPE)
             print "copy template phanterandroid in: %s" % os.path.join(self.aplication_folder, 'www')
@@ -303,8 +303,6 @@ class PhanterAndroid(object):
 
         if buildHtml:
             self.buildHtml()
-        else:
-
 
     def resetApp(self):
         self.removeCordovaApp()
@@ -313,7 +311,7 @@ class PhanterAndroid(object):
     def removeCordovaApp(self):
         request = self.request
 
-        self.close()
+        self.closeServer()
         print 'remove:', self.aplication_folder
         if os.path.exists(self.aplication_folder):
             try:
