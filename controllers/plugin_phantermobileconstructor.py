@@ -23,10 +23,18 @@ if (request.function in precisa_autorizacao):
 
 def index():
     from plugin_phantermobileconstructor.phanterandroid import PhanterAndroid
-    android = PhanterAndroid()
-    android.openServer()
     response.flash = T("Welcome")
-    html = DIV(DIV(IFRAME(_src="http://localhost:%s/" % android.port, _class='iframe_mobile responsivo'),
+    if request.args(0)=='phonegap':
+        android = PhanterAndroid()
+        android.openServer()
+        html = DIV(DIV(IFRAME(_src="http://localhost:%s/" % android.port, _class='iframe_mobile responsivo'),
+                   _class='html_mobile responsivo'), _class="mobile responsivo")
+    elif request.args(0)=='cordova':
+        android = PhanterAndroid()
+        android.openServer('cordova')        
+    else:
+        print "http://localhost:%s/%s/plugin_phantermobileconstructor/www_index" %(request.application, request.env.server_port)
+        html = DIV(DIV(IFRAME(_src="http://localhost:%s/%s/plugin_phantermobileconstructor/www_index" %(request.env.server_port, request.application), _class='iframe_mobile responsivo'),
                    _class='html_mobile responsivo'), _class="mobile responsivo")
     return locals()
 

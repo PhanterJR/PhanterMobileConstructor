@@ -5,13 +5,13 @@ import urllib2
 
 response.toolbar_mob = ""
 if request.vars.phantermobilebuild:
-    # define external default server ajax here!
-    response.ajax_server = "http://conexaodidata.com.br/phantermobileconstructor"
+    response.ajax_server = "http://192.168.1.107:%s/%s/" % (
+        request.env.server_port, request.application)
 else:
     response.toolbar_mob = DIV(
-        DIV(T('Tools'),
+        DIV(A(T('Web2py ToolBar'), _style="color: #440808;", _href="#caixa_response_toolbar"),
             _class='botao_response_toolbar',
-            _style='cursor:pointer; position: fixed;right: 0; bottom: 145px; width: 93px; padding: 5px; background-color: orange; text-transform: uppercase; font-weight: bold;font-size: 8pt;padding-left: 10px;box-shadow: -1px 2px 3px;',
+            _style='cursor:pointer; position: fixed;right: 0; bottom: 45px; width: 93px; padding: 5px; background-color: orange; text-transform: uppercase; font-weight: bold;font-size: 8pt;padding-left: 10px;box-shadow: -1px 2px 3px black;',
             _onclick='$("#caixa_response_toolbar").toggle();'),
         DIV(response.toolbar(),
             _id='caixa_response_toolbar',
@@ -25,16 +25,21 @@ if request.controller == 'plugin_phantermobileconstructor':
                        DIV(A(DIV(XML("&#160;"), _class='botao_conexao responsivo'), _href=URL('phantermobileconstructor', 'index')),
                            A(DIV("Admin", _class='menu_item responsivo'),
                              _href=URL('admin', 'default', 'index')),
-                           A(DIV("View WWW_Index", _class='menu_item responsivo'), _href=URL(
+                           A(DIV("index", _class='menu_item responsivo'), _href=URL(
                                'plugin_phantermobileconstructor', 'www_index')),
-                           DIV(DIV(T("Compile"), _title="Compile WWW_* to CordovaApp", _class='menu_item responsivo'),
-                               _class="phantermobile-botao-ajax",
-                               _url_ajax=URL('phantermobileconstructor', 'echo_comand', args=['build_html'])),
-                           DIV(DIV(T("ResetApp"), _title="Reset cordovaApp to default", _class='menu_item responsivo'), _class="botao_ajax",
-                               _url_ajax=URL('phantermobileconstructor', 'echo_comand', args=['resetapp'])),
-                           # A(DIV("Config", _class='menu_item responsivo'),
-                           #   _href=URL('default', 'configuracoes')),
+                           DIV(DIV("compilar", _class='menu_item responsivo'), _class="phantermobile-botao-ajax",
+                               _url_ajax=URL('phantermobileconstructor', 'build')),
+                           DIV(DIV("resetar", _class='menu_item responsivo'), _class="botao_ajax",
+                               _comando='resetar', _url_ajax=URL('phantermobileconstructor', 'reset')),
+                           A(DIV("configurações", _class='menu_item responsivo'),
+                             _href=URL('default', 'configuracoes')),
                            _class='grupo_links responsivo')),
                    ]
     response.nav_phantermenubar = PhanterMenubar(
         *lista_links, _class="barra_navegacao responsivo")
+
+# Storage APKs
+
+db.define_table('plugin_phantermobileconstructor_apks',
+  Field('apkfile','upload', detetable=True),
+  Field('version', 'string'))
