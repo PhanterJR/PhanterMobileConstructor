@@ -113,18 +113,18 @@ class PhanterAndroid(object):
                     break
             self.port = port
             if self.server_chosen == 'phonegap':
-                with open(os.path.join(self.cordova_app_folder, 'server_run_%s.bat' % self.aplication_name), 'w') as arquivo_aberto:
+                with open(os.path.join(self.cordova_app_folder, 'server_%s_run_%s.bat' %(self.server_chosen, self.aplication_name)), 'w') as arquivo_aberto:
                     conteudo = "cd %s\nphonegap serve -p%s" % (
                         self.aplication_folder, port)
                     arquivo_aberto.write(conteudo)
             else:
-                with open(os.path.join(self.cordova_app_folder, 'server_run_%s.bat' % self.aplication_name), 'w') as arquivo_aberto:
+                with open(os.path.join(self.cordova_app_folder, 'server_%s_run_%s.bat' %(self.server_chosen, self.aplication_name)), 'w') as arquivo_aberto:
                     conteudo = "cd %s\ncordova serve %s" % (
                         self.aplication_folder, port)
                     arquivo_aberto.write(conteudo)
 
             processo = subprocess.Popen([os.path.join(
-                self.cordova_app_folder, 'server_run_%s.bat' % self.aplication_name)], shell=True)
+                self.cordova_app_folder, 'server_%s_run_%s.bat' %(self.server_chosen, self.aplication_name))], shell=True)
             proc = psutil.Process(processo.pid)
             print "%s run on door %s" % (self.server_chosen, port)
             while True:
