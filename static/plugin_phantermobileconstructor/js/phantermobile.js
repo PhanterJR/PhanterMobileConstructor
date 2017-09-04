@@ -10,6 +10,8 @@ $(".botao_hamburguer").click(function(){
 
 $(".phantermobile-botao-ajax").click(function(){
 	var url_ajax=$(this).attr('url_ajax');
+  var alvo=$(this).attr('alvo');
+  $(alvo).html('<i class="fa fa-spinner fa-pulse fa-3x fa-fw"></i>');
 	ajax(url_ajax,[],':eval');
 });
 $(".phantermobile-botao-href").click(function(){

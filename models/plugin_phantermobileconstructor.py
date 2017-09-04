@@ -22,17 +22,19 @@ else:
 if request.controller == 'plugin_phantermobileconstructor':
 
     lista_links = [DIV(DIV(I(_class="glyphicon glyphicon-menu-hamburger"), _alvo=".grupo_links", _class='botao_hamburguer responsivo'),
-                       DIV(A(DIV(XML("&#160;"), _class='botao_conexao responsivo'), _href=URL('phantermobileconstructor', 'index')),
+                       DIV(A(DIV(XML("&#160;"), _class='botao_conexao responsivo'), _href="http://www.conexaodidata.com.br"),
+                           A(DIV("PhanterMobile Constructor", _class='menu_item responsivo'),
+                             _href=URL('phantermobileconstructor', 'index')),
                            A(DIV("Admin", _class='menu_item responsivo'),
                              _href=URL('admin', 'default', 'index')),
-                           A(DIV("index", _class='menu_item responsivo'), _href=URL(
-                               'plugin_phantermobileconstructor', 'www_index')),
-                           DIV(DIV("compilar", _class='menu_item responsivo'), _class="phantermobile-botao-ajax",
-                               _url_ajax=URL('phantermobileconstructor', 'build')),
-                           DIV(DIV("resetar", _class='menu_item responsivo'), _class="botao_ajax",
-                               _comando='resetar', _url_ajax=URL('phantermobileconstructor', 'reset')),
-                           A(DIV("configurações", _class='menu_item responsivo'),
-                             _href=URL('default', 'configuracoes')),
+                           A(DIV("Appadmin", _class='menu_item responsivo'), _href=URL(
+                               'appadmin', 'index')),
+                           # DIV(DIV("compilar", _class='menu_item responsivo'), _class="phantermobile-botao-ajax",
+                           #     _url_ajax=URL('phantermobileconstructor', 'build')),
+                           # DIV(DIV("resetar", _class='menu_item responsivo'), _class="botao_ajax",
+                           #     _comando='resetar', _url_ajax=URL('phantermobileconstructor', 'reset')),
+                           # A(DIV("configurações", _class='menu_item responsivo'),
+                           #   _href=URL('default', 'configuracoes')),
                            _class='grupo_links responsivo')),
                    ]
     response.nav_phantermenubar = PhanterMenubar(

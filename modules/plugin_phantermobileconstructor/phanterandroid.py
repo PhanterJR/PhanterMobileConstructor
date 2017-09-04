@@ -83,9 +83,10 @@ class PhanterAndroid(object):
         if not tem_condova or not tem_aplicativo:
             self._prepareTheEnvironment(buildHtml=True)
     
-    def statusServer(self, server='phonegap'):
+    def statusServer(self, server='phonegap', timewait=1):
+        self.server_chosen = server
+        time.sleep(timewait)
         return self._examine_process()
-
 
     def openServer(self, server='phonegap'):
         """
@@ -325,6 +326,7 @@ class PhanterAndroid(object):
             except Exception as e:
                 print "Erro on remove:", file
                 print e
+    
     def removeCordovaApp(self):
         request = self.request
 
@@ -367,7 +369,7 @@ class PhanterAndroid(object):
         print "Creating file create_apk_%s3.bat" % self.aplication_name
         with open(os.path.join(self.cordova_app_folder, 'create_apk_%s3.bat' % self.aplication_name), 'w') as arquivo_aberto:
             conteudo = "cd %s\n" %os.path.join(self.aplication_folder)
-            conteudo+="cordova build android\n"
+            conteudo+="cordova build android --verbose\n"
             arquivo_aberto.write(conteudo)
         print "Creating APK file"
         subprocess.call([os.path.join(self.cordova_app_folder, 'create_apk_%s3.bat' %

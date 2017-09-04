@@ -77,7 +77,8 @@
       @font-face{
           font-family: "Terfens";
           src: local("Terfens"), url("/{{=request.application}}/static/plugin_phantermobileconstructor/fonts/Terfens.ttf") format("truetype");
-          }    
+          } 
+
       body {
             padding-top: 60px;
             margin-bottom: 200px;
@@ -223,21 +224,19 @@
     text-align: center;
     font-family: a_song_for_jennifer;
     color: orange;
+    font-size: 5em;
 }
 
 .painel_principal_g {
     display: table;
     width: 100%;
 }
-.painel_esquerdo_g {
-    width: 40%;
-    float: left;
-}
+
 .painel_direito_g {
     float: left;
     min-width: 300px;
-    width: 60%;
-    padding: 10px;
+    width: 100%;
+    padding: 10px 40px 10px 10px;
 }
     .rodape_principal {
         height: 200px;
@@ -493,7 +492,7 @@
     </div>
     <div class='rodape40 desenvolvedor_rodape responsivo'>
       <div class='caixa_desenvolvedor'>
-        <div class='caixa_desenvolvedor_titulo responsivo'>DESENVOLVEDOR</div>
+        <div class='caixa_desenvolvedor_titulo responsivo'>{{=T("DEVELOPER")}}</div>
         <div class='caixa_desenvolvedor_auto'>
           <div class='imagem_autor'><img alt="imagem do autor" src="{{=URL('static', 'plugin_phantermobileconstructor/images', args=['avatar.jpg'])}}"></div>
           <div class="nome_autor">PhanterJR</div>
@@ -526,12 +525,12 @@
         </div>
       </div>
     </div>
-    <div class='rodape40 mensagem_rodape responsivo'><div class='frase_rodape'>O sucesso é um professor traiçoeiro. Ele seduz pessoas inteligentes e as faz pensar que elas não podem perder tudo</div><div class='autor_frase_rodape'>(Bill Gates)</div></div>
+    <div class='rodape40 mensagem_rodape responsivo'><div class='frase_rodape'>{{=T("Success is a lousy teacher. It seduces smart people into thinking they can't lose")}}</div><div class='autor_frase_rodape'>(Bill Gates)</div></div>
     <div class='rodape40 tecnologias_rodape responsivo'>
       <div class='caixa_tecnologias'>
-        <div class='titulo_utilizamos'>Utilizamos</div>
+        <div class='titulo_utilizamos'>{{=T("we use")}}</div>
         <div class='imagem_utilizamos'><img src="{{=URL('static', 'plugin_phantermobileconstructor/images', args=['powered.jpg'])}}"></div>
-        <a href="{{=URL('default','sobre', anchor='_tecnologias_utilizadas')}}"><div class='botao_mais_tecnologias'>Saiba+</div></a>
+        <a href="http://www.conexaodidata.com.br/sobre/#_tecnologias_utilizadas"><div class='botao_mais_tecnologias'>{{=T("Know+")}}</div></a>
       </div>
     </div>
     </footer>

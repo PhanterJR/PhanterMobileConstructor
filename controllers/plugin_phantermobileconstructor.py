@@ -24,6 +24,7 @@ if (request.function in precisa_autorizacao):
 def index():
     from plugin_phantermobileconstructor.phanterandroid import PhanterAndroid
     response.flash = T("Welcome")
+    
     if request.args(0)=='phonegap':
         android = PhanterAndroid()
         android.openServer()
@@ -35,7 +36,6 @@ def index():
         html = DIV(DIV(IFRAME(_src="http://localhost:%s/" % android.port, _class='iframe_mobile responsivo'),
                    _class='html_mobile responsivo'), _class="mobile responsivo")     
     else:
-        print "http://localhost:%s/%s/plugin_phantermobileconstructor/www_index" %(request.application, request.env.server_port)
         html = DIV(
         DIV(
             DIV(
@@ -43,32 +43,52 @@ def index():
                     IFRAME(
                         _src="http://localhost:%s/%s/plugin_phantermobileconstructor/www_index" %(request.env.server_port, request.application), 
                         _class='iframe_mobile responsivo'),
-                       _class='html_mobile responsivo'), 
+                    _class='html_mobile responsivo'), 
                 _class="mobile responsivo"),
-        _class='painel_esquerdo_g'),
+            _class='painel_esquerdo_g'),
         DIV(
             DIV(H1('PhanterMobile Constructor'), _class='caixa_titulo_painel_direito_g'),
             DIV(
-                DIV(DIV(DIV(T("Compile html"), _class="center_table_cell"), _class='botao_pagina_principal_comandos'),
-                               DIV(_id="status_compilar", _class='status_botao_principal'), 
-                               _class="phantermobile-botao-ajax caixa_botao_ajax_principal",
-                               _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=['buildhtml'])),
-                A(DIV(DIV(T("Open phonegap server"), _class="center_table_cell"), _class='botao_pagina_principal_comandos'),
-                               DIV(SPAN("Without Status", _style='color:grey;'), _id='status_servidor_phonegap',_class='status_botao_principal'), 
-                               _class="phantermobile-botao-ajax caixa_botao_ajax_principal",
-                               _href=URL(args=['phonegap']),
-                               _target="blank",
-                               _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=['info'], vars={'phonegapstatus':True})),
-                A(DIV(DIV(T("Open cordova server"), _class="center_table_cell"), _class='botao_pagina_principal_comandos'),
-                               DIV(SPAN("Without Status", _style='color:grey;'), _id='status_servidor_cordova',_class='status_botao_principal'),
-                               _class="phantermobile-botao-ajax caixa_botao_ajax_principal",
-                               _href=URL(args=['cordova']),
-                               _target="blank",
-                               _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=['info'], vars={'cordovastatus':True})),
-                DIV(DIV(DIV(T("Create APK"), _class="center_table_cell"), _class='botao_pagina_principal_comandos'),
-                               DIV(_id="dowload_newapk", _class='status_botao_principal'), 
-                               _class="phantermobile-botao-ajax caixa_botao_ajax_principal",
-                               _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=['createapk'])),
+                DIV(
+                    DIV(
+                        DIV(T("Compile html"), _class="center_table_cell"), 
+                        _alvo="#status_compilar",
+                        _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=['buildhtml']),
+                        _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
+                    DIV(_id="status_compilar", _class='status_botao_principal'), 
+                    _class="caixa_botao_ajax_principal",
+                    ),
+                DIV(
+                    A(
+                        DIV(T("Open phonegap server"), _class="center_table_cell"),
+                        _alvo="#status_servidor_phonegap",
+                        _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=['info'], vars={'phonegapstatus':True, 'tryagain':True}),
+                        _href=URL(args=['phonegap']),
+                        _target="blank",
+                        _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
+                    DIV(SPAN("Without Status", _style='color:grey;'), _id='status_servidor_phonegap',_class='status_botao_principal'), 
+                    _class="caixa_botao_ajax_principal",
+                    ),
+                DIV(
+                    A(
+                        DIV(T("Open cordova server"), _class="center_table_cell"), 
+                        _alvo="#status_servidor_cordova",
+                        _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=['info'], vars={'cordovastatus':True, 'tryagain':True}),
+                        _href=URL(args=['cordova']),
+                        _target="blank",
+
+                        _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
+                    DIV(SPAN("Without Status", _style='color:grey;'), _id='status_servidor_cordova',_class='status_botao_principal'),
+                    _class="caixa_botao_ajax_principal",
+                    ),
+                DIV(
+                    DIV(DIV(T("Create APK"), _class="center_table_cell"), 
+                        _alvo="#dowload_newapk",
+                        _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=['createapk']),
+                        _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
+                    DIV(_id="dowload_newapk", _class='status_botao_principal'), 
+                    _class="caixa_botao_ajax_principal",
+                    ),
                 _class='caixa_comandos'),
             _class='painel_direito_g'),
         _class='painel_principal_g')
@@ -83,22 +103,34 @@ def echo_comand():
 
     if request.args(0) == 'buildhtml':
         android.buildHtml()
-        return '$("#status_compilar").html(%s)' %json.dumps(SPAM("Compiled", _style="color:green").xml())
+        return '$("#status_compilar").html(%s)' %json.dumps(SPAN("Compiled", _style="color:#165016").xml())
     elif request.args(0)=='info':
         if request.vars.phonegapstatus:
             status=android.statusServer()
+            jquery=""
             if status:
-                html_status=SPAN(T("Running on port "), SPAN(status['port']), _style="color:green")
+                html_status=SPAN(T("Running on port "), SPAN(status['port']), _style="color:#165016")
             else:
-                html_status=SPAN("Stoped", _style="color:green")
-            return '$("#status_servidor_phonegap").html(%s)' %json.dumps(html_status.xml())
+                if request.vars.tryagain:
+                    html_status=SPAN("Stoped! Get status again in 5 secondes", _style="color:#165016")
+                    new_ajax=URL(args=request.args, vars=request.vars)
+                    jquery="setTimeout(function(){ajax('%s',[],':eval'); console.log('3 segundos');}, 5000);" %new_ajax
+                else:
+                    html_status=SPAN("Stoped", _style="color:#165016")
+            return '$("#status_servidor_phonegap").html(%s); %s' %(json.dumps(html_status.xml()),jquery)
         elif request.vars.cordovastatus:
             status=android.statusServer('cordova')
+            jquery=""
             if status:
-                html_status=SPAN(T("Running on port: "), SPAN(status['port']), _style="color:green")
+                html_status=SPAN(T("Running on port: "), SPAN(status['port']), _style="color:#165016")
             else:
-                html_status=SPAN("Stoped", _style="color:green")
-            return '$("#status_servidor_cordova").html(%s)' %json.dumps(html_status.xml())
+                if request.vars.tryagain:
+                    html_status=SPAN("Stoped! Get status again in 5 secondes", _style="color:#165016")
+                    new_ajax=URL(args=request.args, vars=request.vars)
+                    jquery="setTimeout(function(){ajax('%s',[],':eval'); console.log('3 segundos');}, 5000);" %new_ajax
+                else:
+                    html_status=SPAN("Stoped", _style="color:#165016")
+            return '$("#status_servidor_cordova").html(%s); %s' %(json.dumps(html_status.xml()),jquery)
     elif request.args(0) == 'closeserver':
         android.closeServer()
         return "alert('Server Closed!');"
@@ -107,7 +139,9 @@ def echo_comand():
         android.resetApp()
         return "alert('Reset Done!');"
     elif request.args(0)== 'createapk':
-        #android.createApk()        levelfile=''
+        if not request.vars.getlastapk:
+            android.createApk()
+        levelfile=''
         basedirapk=os.path.join(request.env.web2py_path,'cordova', request.application, 'platforms', 'android', 'build', 'outputs', 'apk')
         if os.path.exists(os.path.join(basedirapk, 'android-debug.apk')) or  os.path.exists(os.path.join(basedirapk, '%s-debug.apk' %request.application)):
             if os.path.exists(os.path.join(basedirapk, 'android-debug.apk')):

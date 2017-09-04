@@ -61,10 +61,13 @@ width: 300px;
     color: white;
     border-radius: 5px 5px 0 0;
 }
-.status_botao_principal > span {
+.status_botao_principal > span, .status_botao_principal > i {
     display: table-cell;
     vertical-align: middle;
     text-align: center;
+}
+.status_botao_principal > i{
+    font-size: 20pt;
 }
 .status_botao_principal {
     display: table-row;
@@ -79,9 +82,12 @@ width: 300px;
     display: table-row;
 }
 .caixa_comandos {
-    padding: 10px;
+    padding: 10px 10px 30px 10px;
     display: table;
     background-color: white;
+    width: 100%;
+    border-radius: 20px;
+    box-shadow: 0px 0px 7px black inset;
 }
 .html_mobile.responsivo {
     background-color: #edf5bd;
@@ -112,6 +118,90 @@ width: 300px;
         -moz-transform: scale(0.8,0.8);
         -moz-transform-origin: left top;
     }
+    /*INICIO Media queries*/
+      @media (min-width: 1px) and (max-width: 350px) {
+        .painel_esquerdo_g {
+            width: 100%;
+        }
+        .caixa_titulo_painel_direito_g > h1{
+          font-size: 1em;
+        }
+      }
+      @media (min-width: 350px) and (max-width: 450px) {
+        .painel_esquerdo_g {
+            width: 100%;
+        }
+        .caixa_titulo_painel_direito_g > h1{
+          font-size: 3em;
+        }
+      }
+      @media (min-width: 450px) and (max-width: 600px) {
+        .painel_esquerdo_g {
+            width: 100%;
+        }
+        .caixa_titulo_painel_direito_g > h1{
+          font-size: 3em;
+        }
+      }
+      @media (min-width: 600px) and (max-width: 800px) {
+        .painel_esquerdo_g {
+            width: 100%;
+            float: left;
+        }        
+        .caixa_titulo_painel_direito_g > h1{
+          font-size: 3em;
+        }
+      }
+      @media (min-width: 800px) and (max-width: 1024px) {
+        .painel_esquerdo_g {
+            width: 400px;
+            position: absolute;
+            left: 0px;
+        }
+        .caixa_titulo_painel_direito_g > h1{
+          font-size: 4em;
+        }
+        .painel_direito_g {
+          width: 100%;
+        }
+        .painel_principal_g{
+            padding-left: 400px;
+            min-height: 650px;
+            display: block;
+        }
+      }
+      @media (min-width: 1024px) {
+        .painel_esquerdo_g {
+            width: 400px;
+            position: absolute;
+            left: 0px;
+        }
+        .caixa_titulo_painel_direito_g > h1{
+          font-size: 5em;
+        }
+        .painel_direito_g {
+          width: 100%;
+        }
+        .painel_principal_g{
+            padding-left: 400px;
+            min-height: 650px;
+            display: block;
+        }
+      }
+    /*FIM Media queries*/
+      .caixa_titulo_painel_direito_g>h1{
+        transition: font-size 1s;
+      }
+      .painel_esquerdo_g{
+        transition: width 1s;
+      }
 </style>
 {{end}}
 {{=html}}
+<script type="text/javascript">
+  $(document).ready(function(){
+    ajax('{{=URL("plugin_phantermobileconstructor","echo_comand", args=["info"], vars={"cordovastatus":True})}}',[], ':eval')
+    ajax('{{=URL("plugin_phantermobileconstructor","echo_comand", args=["info"], vars={"phonegapstatus":True})}}',[], ':eval')
+    ajax('{{=URL("plugin_phantermobileconstructor", "echo_comand", args=["createapk"], vars={"getlastapk":True})}}',[], ':eval')
+  });
+</script>
