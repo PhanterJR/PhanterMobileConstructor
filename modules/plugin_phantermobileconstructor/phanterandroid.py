@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# versao: 1.2.0
+# versao: 1.3.0
 import subprocess
 import os
 import zipfile

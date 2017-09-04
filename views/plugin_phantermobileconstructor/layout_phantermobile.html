@@ -46,65 +46,97 @@
     <!-- Favicons -->
     {{include 'plugin_phantermobileconstructor/web2py_ajax.html'}} <!-- this includes jquery.js, calendar.js/.css and web2py.js -->
     <style type="text/css">
-      @font-face {
+        @font-face {
           font-family: "TikiTropic";
           src: local('TikiTropic'), url('/{{=request.application}}/static/plugin_phantermobileconstructor/fonts/TikiTropic.ttf') format('truetype');
-          }
-      @font-face {
+        }
+
+        @font-face {
           font-family: "BEDRK";
           src: local("BEDRK"), url("/{{=request.application}}/static/plugin_phantermobileconstructor/fonts/BEDRK.ttf") format("truetype");
-          }
-      @font-face {
+        }
+
+        @font-face {
           font-family: "amazer";
           src: local("amazer"), url("/{{=request.application}}/static/plugin_phantermobileconstructor/fonts/amazer.ttf") format("truetype");
-          }
-      @font-face {
+        }
+
+        @font-face {
           font-family: "OldSansBlack";
           src: local("OldSansBlack"), url("/{{=request.application}}/static/plugin_phantermobileconstructor/fonts/OldSansBlack.ttf") format("truetype");
-          }
-      @font-face {
+        }
+
+        @font-face {
           font-family: "crushed";
           src: local("crushed"), url("/{{=request.application}}/static/plugin_phantermobileconstructor/fonts/crushed.ttf") format("truetype");
-          }
-      @font-face {
+        }
+
+        @font-face {
           font-family: "a_song_for_jennifer";
           src: local("a_song_for_jennifer"), url("/{{=request.application}}/static/plugin_phantermobileconstructor/fonts/a_song_for_jennifer.ttf") format("truetype");
-          }
-      @font-face {
+        }
+
+        @font-face {
           font-family: "BorisBlackBloxx";
           src: local("BorisBlackBloxx"), url("/{{=request.application}}/static/plugin_phantermobileconstructor/fonts/BorisBlackBloxx.ttf") format("truetype");
-          }
-      @font-face{
+        }
+
+        @font-face {
           font-family: "Terfens";
           src: local("Terfens"), url("/{{=request.application}}/static/plugin_phantermobileconstructor/fonts/Terfens.ttf") format("truetype");
-          } 
+        }
 
-      body {
-            padding-top: 60px;
-            margin-bottom: 200px;
-            overflow-x: hidden;
-      }
+        body {
+          padding-top: 60px;
+          margin-bottom: 200px;
+          overflow-x: hidden;
+          background-attachment: fixed;
+          background-position: center 0px;
+          background-image: url('/{{=request.application}}/static/plugin_phantermobileconstructor/images/background2.jpg');
+          background-position-x: 438px;
+          background-size: 1366px auto;
+          background-repeat: repeat;
+          transition: background-position-y 0.01s linear;
+          animation: movhorizontal 60s linear infinite;
+        }
 
-      .body_principal.responsivo-phone{
+        @keyframes movhorizontal {
+          0% {
+            background-position-x: 1366px;
+          }
+
+          100% {
+            background-position-x: 0px;
+          }
+
+        }
+
+        .body_principal.responsivo-phone {
           margin-bottom: 275px;
           padding-top: 0px;
-      }
-      .body_principal.responsivo-phonelg,
-      .body_principal.responsivo-tablet,
-      .body_principal.responsivo-tabletlg{
+        }
+
+        .body_principal.responsivo-phonelg,
+        .body_principal.responsivo-tablet,
+        .body_principal.responsivo-tabletlg {
           padding-top: 0px;
-      }
-      a {
+        }
+
+        a {
           text-decoration: none !important;
-      }
-      .main_conex.responsivo-phone, .main_conex.responsivo-phonelg {
+        }
+
+        .main_conex.responsivo-phone,
+        .main_conex.responsivo-phonelg {
           margin: 0px;
           border-radius: 0px;
           background: transparent;
           padding: 5px 10px 5px 5px;
-      }
+        }
+        
       /*inicio Menu*/
-      .barra_navegacao {
+
+        .barra_navegacao {
           background-image: url('/{{=request.application}}/static/plugin_phantermobileconstructor/images/novo_cabecalho.png');
           position: fixed;
           width: 100%;
@@ -112,33 +144,37 @@
           height: 60px;
           padding-top: 20px;
           z-index: 1001;
-      }
-      .barra_navegacao.responsivo-tablet,
-      .barra_navegacao.responsivo-tabletlg,
-      .barra_navegacao.responsivo-phone,
-      .barra_navegacao.responsivo-phonelg {
+        }
+
+        .barra_navegacao.responsivo-tablet,
+        .barra_navegacao.responsivo-tabletlg,
+        .barra_navegacao.responsivo-phone,
+        .barra_navegacao.responsivo-phonelg {
           position: relative;
           min-height: 60px;
           height: auto;
           padding-top: 55px;
-          }
-      .grupo_links{
+        }
+
+        .grupo_links {
           display: none;
-      }
-      .grupo_links.responsivo-tablet,
-      .grupo_links.responsivo-tabletlg,
-      .grupo_links.responsivo-phonelg,
-      .grupo_links.responsivo-phone {
-          
-      background: #000000b3;
-      padding: 10px 20px;
-      text-align: center;
-      }
-      .grupo_links.responsivo-desktop,
-      .grupo_links.responsivo-desktoplg {
-          display: block !important;   
-      }
-      .botao_hamburguer{
+        }
+
+        .grupo_links.responsivo-tablet,
+        .grupo_links.responsivo-tabletlg,
+        .grupo_links.responsivo-phonelg,
+        .grupo_links.responsivo-phone {
+          background: #000000b3;
+          padding: 10px 20px;
+          text-align: center;
+        }
+
+        .grupo_links.responsivo-desktop,
+        .grupo_links.responsivo-desktoplg {
+          display: block !important;
+        }
+
+        .botao_hamburguer {
           padding: 4px;
           display: none;
           position: absolute;
@@ -148,47 +184,51 @@
           font-size: 20pt;
           border-radius: 5px 5px 0 0;
           cursor: pointer;
-      }
-      .botao_conexao.responsivo-tablet,
-      .botao_conexao.responsivo-tabletlg,
-      .botao_conexao.responsivo-phone,
-      .botao_conexao.responsivo-phonelg {
+        }
+
+        .botao_conexao.responsivo-tablet,
+        .botao_conexao.responsivo-tabletlg,
+        .botao_conexao.responsivo-phone,
+        .botao_conexao.responsivo-phonelg {
           display: none;
-      }
-      .menu_item.responsivo-tablet,
-      .menu_item.responsivo-tabletlg,
-      .menu_item.responsivo-phone,
-      .menu_item.responsivo-phonelg {
+        }
+
+        .menu_item.responsivo-tablet,
+        .menu_item.responsivo-tabletlg,
+        .menu_item.responsivo-phone,
+        .menu_item.responsivo-phonelg {
           float: none;
-      }
-      .botao_hamburguer.responsivo-tablet,
-      .botao_hamburguer.responsivo-tabletlg,
-      .botao_hamburguer.responsivo-phonelg,
-      .botao_hamburguer.responsivo-phone {
+        }
+
+        .botao_hamburguer.responsivo-tablet,
+        .botao_hamburguer.responsivo-tabletlg,
+        .botao_hamburguer.responsivo-phonelg,
+        .botao_hamburguer.responsivo-phone {
           display: block;
-      }
-      .botao_hamburguer.responsivo:hover {
+        }
+
+        .botao_hamburguer.responsivo:hover {
           color: #668d2f;
           text-shadow: 0px 0px 2px #19AD3E, 0px 0px 10px #21c210;
           transition: text-shadow 0.5s ease 0s !important;
-      }
-      .menu_item{
-        float: left;
-        text-transform: uppercase;
-        font-family: "OldSansBlack";
-        color: #0985A7;
-        margin-left: 10px;
-        cursor: pointer;
-      }
-      .menu_item:hover{
-        color: #93c54b;
-        text-shadow: 1px 1px 1px #000,
-         0px 0px 2px #008B24,
-         0px 0px 10px #0D8B00;
-        transition: text-shadow 0.5s ease 0s !important;
-      }
+        }
 
-      .botao_conexao {
+        .menu_item {
+          float: left;
+          text-transform: uppercase;
+          font-family: "OldSansBlack";
+          color: #0985A7;
+          margin-left: 10px;
+          cursor: pointer;
+        }
+
+        .menu_item:hover {
+          color: #93c54b;
+          text-shadow: 1px 1px 1px #000, 0px 0px 2px #008B24, 0px 0px 10px #0D8B00;
+          transition: text-shadow 0.5s ease 0s !important;
+        }
+
+        .botao_conexao {
           float: left;
           width: 25px;
           height: 25px;
@@ -199,254 +239,496 @@
           border-radius: 5px;
           background-image: url('/{{=request.application}}/static/plugin_phantermobileconstructor/images/sprit_conex.png');
           margin-top: -2px;
-      }
-      .botao_conexao:hover {
+        }
+
+        .botao_conexao:hover {
           background-position: -258px -129px;
           background-color: #8de05b;
           box-shadow: 1px 1px 1px #000, 0px 0px 2px #008B24, 0px 0px 10px #0D8B00;
-      }
+        }
+
       /*fim Menu*/
 
+        .flash.alert.alert-dismissable {
+          position: fixed;
+          top: 70px;
+          left: auto;
+          right: 0px;
+          padding: 10px;
+          background-color: white;
+          z-index: 1002;
+          border-radius: 5px 0 0 5px;
+        }
 
-    .flash.alert.alert-dismissable {
-        position: fixed;
-        top: 70px;
-        left: auto;
-        right: 0px;
-        padding: 10px;
-        background-color: white;
-        z-index: 1002;
-        border-radius: 5px 0 0 5px;
-    }
-    /*inicio footer*/
+      /*inicio footer*/
 
-.caixa_titulo_painel_direito_g > h1 {
-    text-align: center;
-    font-family: a_song_for_jennifer;
-    color: orange;
-    font-size: 5em;
-}
+        .rodape_principal {
+          height: 200px;
+          box-shadow: 0px -10px 30px #929292;
+          background: black url("/{{=request.application}}/static/plugin_phantermobileconstructor/images/background_rodape.png") repeat-x scroll 0px 0px;
+          padding: 30px 0px 30px 0px;
+          color: #FFF;
+          font-size: 12pt;
+          text-shadow: #000 0px 0px 5px, #000 2px 2px 5px;
+          font-family: "Arial Black";
+          position: absolute;
+          width: 100%;
+          bottom: 0px;
+        }
 
-.painel_principal_g {
-    display: table;
-    width: 100%;
-}
+        .rodape_principal.responsivo-phone {
+          height: 255px;
+        }
 
-.painel_direito_g {
-    float: left;
-    min-width: 300px;
-    width: 100%;
-    padding: 10px 40px 10px 10px;
-}
-    .rodape_principal {
-        height: 200px;
-        box-shadow: 0px -10px 30px #929292;
-        background: black url("/{{=request.application}}/static/plugin_phantermobileconstructor/images/background_rodape.png") repeat-x scroll 0px 0px;
-        padding: 30px 0px 30px 0px;
-        color: #FFF;
-        font-size: 12pt;
-        text-shadow: #000 0px 0px 5px, #000 2px 2px 5px;
-        font-family: "Arial Black";
-        position: absolute;
-        width: 100%;
-        bottom: 0px;
-    }
-    .rodape_principal.responsivo-phone{
-      height: 255px;
-    }
-    .rodape40{
-      float: left;
-      text-align: center;
-      color: rgba(132,
-       168,
-       174,
-       1);
-    }
-    .logo_rodape{
-      font-family: "OldSansBlack";
-    }
-    .logo_rodape.responsivo-desktop{
-       width: 50%;
-    }
-    .logo_rodape.responsivo-tablet,
-    .logo_rodape.responsivo-tabletlg{
-      width: 70%;
-    }
-    .logo_rodape.responsivo-desktoplg{
-      width: 35%;
-    }
-    .logo_rodape.responsivo-phone,
-    .logo_rodape.responsivo-phonelg{
-      width: 100%;
-    }
-    .logo_rodape_full {
-        width: 284px;
-        margin-left: auto;
-        margin-right: auto;
-    }
-    .logo_rodape_conexao{
-      width: 281px;
-      height: 61px;
-      background: transparent url("/{{=request.application}}/static/plugin_phantermobileconstructor/images/sprit_conex.png") no-repeat scroll;
-    }
-    .logo_rodape_didata {
-        width: 160px;
-        height: 70px;
-        background: transparent url("/{{=request.application}}/static/plugin_phantermobileconstructor/images/sprit_conex.png") no-repeat scroll -120px -62px;
-        margin-left: auto;
-        margin-right: 0px;
-    }
-    .desenvolvedor_rodape{
-      font-family: "OldSansBlack";
-      width: 20%;
-    }
-    .desenvolvedor_rodape.responsivo-tablet,
-    .desenvolvedor_rodape.responsivo-tabletlg{
-      width: 30%;
-    }
+        .rodape40 {
+          float: left;
+          text-align: center;
+          color: rgba(132, 168, 174, 1);
+        }
 
-    .desenvolvedor_rodape.responsivo-desktop{
-      width: 25%;
-    }
-    .desenvolvedor_rodape.responsivo-phone,
-    .desenvolvedor_rodape.responsivo-phonelg{
-      display:none;
-    }
-    .mensagem_rodape.responsivo-phone,
-    .mensagem_rodape.responsivo-phonelg,
-    .mensagem_rodape.responsivo-tablet,
-    .mensagem_rodape.responsivo-tabletlg,
-    .mensagem_rodape.responsivo-desktop{
-        display: none;
-        width: 0%;
-    }
-    .mensagem_rodape.responsivo-desktoplg{
-        width: 25%;
-        padding-top: 10px;
-    }
-    .frase_rodape {
-        font-family: 'Terfens';
-        color: white;
-    }
-    .autor_frase_rodape {
-        text-align: right;
-        color: orange;
-        padding-right: 16px;
-    }
-    .tecnologias_rodape.responsivo-desktoplg{
-      width: 20%;
-    }
-    .tecnologias_rodape.responsivo-desktop{
-      width: 25%;
-    }
-    .tecnologias_rodape.responsivo-tablet,
-    .tecnologias_rodape.responsivo-tabletlg,
-    .tecnologias_rodape.responsivo-phone,
-    .tecnologias_rodape.responsivo-phonelg{
-      display: none;
-    }
-    .caixa_desenvolvedor_titulo {
-        margin-bottom: 10px;
-        font-size: 15pt;
-        margin-top: 10px;
-        color: wheat;
-    }
-    .caixa_desenvolvedor_titulo.responsivo-tablet,
-    .caixa_desenvolvedor_titulo.responsivo-tablet,
-    .caixa_desenvolvedor_titulo.responsivo-desktop{
-      font-size: 12pt;
-    }
+        .logo_rodape {
+          font-family: "OldSansBlack";
+        }
 
-    .caixa_desenvolvedor_auto {
-        display: table;
-        width: 124px;
-        margin-left: auto;
-        margin-right: auto;
-        margin-bottom: 10px;
-    }
-    .nome_autor {
-        float: left;
-        padding-top: 8px;
-        margin-left: 10px;
-        color: orange;
-    }
-    .imagem_autor {
-        width: 40px;
-        float: left;
-    }
-    .imagem_autor img {
-        border-radius: 100%;
-        width: 100%;
-    }
-    .rodape_links {
-        width: 136px;
-        display: table;
-        margin-left: auto;
-        margin-right: auto;
-    }
-    .rodape-link {
-        float: left;
-    }
-    .img_google_plus {
-        background: transparent url("/{{=request.application}}/static/plugin_phantermobileconstructor/images/sprit_conex.png") no-repeat scroll;
-        background-position-x: 0px;
-        background-position-y: -132px;
-        width: 34px;
-        height: 34px;
-    }
-    .img_facebook {
-        background: transparent url("/{{=request.application}}/static/plugin_phantermobileconstructor/images/sprit_conex.png") no-repeat scroll;
-        background-position-x: -170px;
-        background-position-y: -132px;
-        width: 34px;
-        height: 34px;
-    }
-    .img_twitter {
-        background: transparent url("/{{=request.application}}/static/plugin_phantermobileconstructor/images/sprit_conex.png") no-repeat scroll;
-        background-position-x: -34px;
-        background-position-y: -132px;
-        width: 34px;
-        height: 34px;
-    }
-    .img_email {
-        background: transparent url("/{{=request.application}}/static/plugin_phantermobileconstructor/images/sprit_conex.png") no-repeat scroll;
-        background-position-x: -68px;
-        background-position-y: -132px;
-        width: 34px;
-        height: 34px;
-    }
-    .caixa_tecnologias {
-        width: 138px;
-        margin-left: auto;
-        margin-right: auto;
-        padding: 5px;
-        background-color: white;
-        border-radius: 15px;
-        box-shadow: 0px 0px 5px black inset;
-    }
-    .titulo_utilizamos {
-        font-family: "OldSansBlack";
-        text-transform: uppercase;
-        font-size: 9pt;
-        color: white;
-        margin-bottom: 4px;
-    }
-    .imagem_utilizamos img {
-        width: 100%;
-    }
-    .imagem_utilizamos {
-        width: 74%;
-        margin-left: auto;
-        margin-right: auto;
-    }
-    .botao_mais_tecnologias:hover {
-        color: orange;
-    }
-    .botao_mais_tecnologias {
-        text-shadow: none;
-        text-decoration: none;
-    }
-    /*fim footer*/
+        .logo_rodape.responsivo-desktop {
+          width: 50%;
+        }
+
+        .logo_rodape.responsivo-tablet,
+        .logo_rodape.responsivo-tabletlg {
+          width: 70%;
+        }
+
+        .logo_rodape.responsivo-desktoplg {
+          width: 35%;
+        }
+
+        .logo_rodape.responsivo-phone,
+        .logo_rodape.responsivo-phonelg {
+          width: 100%;
+        }
+
+        .logo_rodape_full {
+          width: 284px;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .logo_rodape_conexao {
+          width: 281px;
+          height: 61px;
+          background: transparent url("/{{=request.application}}/static/plugin_phantermobileconstructor/images/sprit_conex.png") no-repeat scroll;
+        }
+
+        .logo_rodape_didata {
+          width: 160px;
+          height: 70px;
+          background: transparent url("/{{=request.application}}/static/plugin_phantermobileconstructor/images/sprit_conex.png") no-repeat scroll -120px -62px;
+          margin-left: auto;
+          margin-right: 0px;
+        }
+
+        .desenvolvedor_rodape {
+          font-family: "OldSansBlack";
+          width: 20%;
+        }
+
+        .desenvolvedor_rodape.responsivo-tablet,
+        .desenvolvedor_rodape.responsivo-tabletlg {
+          width: 30%;
+        }
+
+        .desenvolvedor_rodape.responsivo-desktop {
+          width: 25%;
+        }
+
+        .desenvolvedor_rodape.responsivo-phone,
+        .desenvolvedor_rodape.responsivo-phonelg {
+          display: none;
+        }
+
+        .mensagem_rodape.responsivo-phone,
+        .mensagem_rodape.responsivo-phonelg,
+        .mensagem_rodape.responsivo-tablet,
+        .mensagem_rodape.responsivo-tabletlg,
+        .mensagem_rodape.responsivo-desktop {
+          display: none;
+          width: 0%;
+        }
+
+        .mensagem_rodape.responsivo-desktoplg {
+          width: 25%;
+          padding-top: 10px;
+        }
+
+        .frase_rodape {
+          font-family: 'Terfens';
+          color: white;
+        }
+
+        .autor_frase_rodape {
+          text-align: right;
+          color: orange;
+          padding-right: 16px;
+        }
+
+        .tecnologias_rodape.responsivo-desktoplg {
+          width: 20%;
+        }
+
+        .tecnologias_rodape.responsivo-desktop {
+          width: 25%;
+        }
+
+        .tecnologias_rodape.responsivo-tablet,
+        .tecnologias_rodape.responsivo-tabletlg,
+        .tecnologias_rodape.responsivo-phone,
+        .tecnologias_rodape.responsivo-phonelg {
+          display: none;
+        }
+
+        .caixa_desenvolvedor_titulo {
+          margin-bottom: 10px;
+          font-size: 15pt;
+          margin-top: 10px;
+          color: wheat;
+        }
+
+        .caixa_desenvolvedor_titulo.responsivo-tablet,
+        .caixa_desenvolvedor_titulo.responsivo-tablet,
+        .caixa_desenvolvedor_titulo.responsivo-desktop {
+          font-size: 12pt;
+        }
+
+        .caixa_desenvolvedor_auto {
+          display: table;
+          width: 124px;
+          margin-left: auto;
+          margin-right: auto;
+          margin-bottom: 10px;
+        }
+
+        .nome_autor {
+          float: left;
+          padding-top: 8px;
+          margin-left: 10px;
+          color: orange;
+        }
+
+        .imagem_autor {
+          width: 40px;
+          float: left;
+        }
+
+        .imagem_autor img {
+          border-radius: 100%;
+          width: 100%;
+        }
+
+        .rodape_links {
+          width: 136px;
+          display: table;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .rodape-link {
+          float: left;
+        }
+
+        .img_google_plus {
+          background: transparent url("/{{=request.application}}/static/plugin_phantermobileconstructor/images/sprit_conex.png") no-repeat scroll;
+          background-position-x: 0px;
+          background-position-y: -132px;
+          width: 34px;
+          height: 34px;
+        }
+
+        .img_facebook {
+          background: transparent url("/{{=request.application}}/static/plugin_phantermobileconstructor/images/sprit_conex.png") no-repeat scroll;
+          background-position-x: -170px;
+          background-position-y: -132px;
+          width: 34px;
+          height: 34px;
+        }
+
+        .img_twitter {
+          background: transparent url("/{{=request.application}}/static/plugin_phantermobileconstructor/images/sprit_conex.png") no-repeat scroll;
+          background-position-x: -34px;
+          background-position-y: -132px;
+          width: 34px;
+          height: 34px;
+        }
+
+        .img_email {
+          background: transparent url("/{{=request.application}}/static/plugin_phantermobileconstructor/images/sprit_conex.png") no-repeat scroll;
+          background-position-x: -68px;
+          background-position-y: -132px;
+          width: 34px;
+          height: 34px;
+        }
+        .caixa_tecnologias {
+          width: 138px;
+          margin-left: auto;
+          margin-right: auto;
+          padding: 5px;
+          background-color: white;
+          border-radius: 15px;
+          box-shadow: 0px 0px 5px black inset;
+        }
+
+        .titulo_utilizamos {
+          font-family: "OldSansBlack";
+          text-transform: uppercase;
+          font-size: 9pt;
+          color: white;
+          margin-bottom: 4px;
+        }
+
+        .imagem_utilizamos img {
+          width: 100%;
+        }
+
+        .imagem_utilizamos {
+          width: 74%;
+          margin-left: auto;
+          margin-right: auto;
+        }
+
+        .botao_mais_tecnologias:hover {
+          color: orange;
+        }
+
+        .botao_mais_tecnologias {
+          text-shadow: none;
+          text-decoration: none;
+        }
+
+      /*fim footer*/
+        .cabecalho {
+          display: none;
+        }
+
+        #nav_caminho {
+          display: none;
+        }
+
+        .main_conex.responsivo-phone {
+          padding: 0;
+          margin: 0;
+          border-radius: 0;
+        }
+
+        .main_conex.responsivo-phonelg {
+          padding: 15px 10px;
+        }
+
+        .main_conex.responsivo-tablet {
+          padding: 15px 10px;
+        }
+
+        .mobile.responsivo {
+          background-image: url("{{=URL('static','plugin_phantermobileconstructor', args=['images','celular2.png'])}}");
+          background-color: transparent;
+          background-size: 300px auto;
+          background-position-x: 2px;
+          background-position-y: 0px;
+          background-repeat: no-repeat;
+          padding: 0px 15px;
+          height: 587px;
+          margin-right: auto;
+          margin-left: auto;
+          overflow: hidden;
+          border-radius: 25px;
+          width: 300px;
+        }
+        .caixa_titulo_painel_direito_g > h1 {
+          text-align: center;
+          font-family: a_song_for_jennifer;
+          color: orange;
+          font-size: 5em;
+        }
+
+        .painel_principal_g {
+          display: table;
+          width: 100%;
+        }
+
+        .painel_direito_g {
+          float: left;
+          min-width: 300px;
+          width: 100%;
+          padding: 10px 40px 10px 10px;
+        }
+
+        .caixa_botao_ajax_principal {
+          float: left;
+          width: 30%;
+          height: 100px;
+          margin-left: 3%;
+          margin-top: 20px;
+          display: table;
+        }
+
+        .botao_pagina_principal_comandos {
+          display: table-row;
+        }
+
+        .center_table_cell {
+          display: table-cell;
+          vertical-align: middle;
+          background-color: #3e2929;
+          text-align: center;
+          cursor: pointer;
+          text-transform: uppercase;
+          font-family: OldSansBlack;
+          color: white;
+          border-radius: 5px 5px 0 0;
+        }
+
+        .status_botao_principal > span,
+        .status_botao_principal > i {
+          display: table-cell;
+          vertical-align: middle;
+          text-align: center;
+        }
+
+        .status_botao_principal > i {
+          font-size: 20pt;
+        }
+
+        .status_botao_principal {
+          display: table-row;
+          vertical-align: middle;
+          background-color: #804141;
+        }
+
+        .status_botao_principal {
+          display: table-row;
+          vertical-align: middle;
+        }
+
+        .status_botao_principal {
+          display: table-row;
+        }
+
+        .caixa_comandos {
+          padding: 10px 10px 30px 10px;
+          display: table;
+          background-color: white;
+          width: 100%;
+          border-radius: 20px;
+          box-shadow: 0px 0px 7px black inset;
+        }
+
+        .html_mobile.responsivo {
+          background-color: #edf5bd;
+          width: 271px;
+          height: 449px;
+          margin-left: 0;
+          margin-right: auto;
+          margin-top: 91px;
+          border-radius: 2px;
+          overflow: hidden;
+        }
+
+        .iframe_mobile.responsivo {
+          width: 397px;
+          overflow: hidden;
+          height: 672px;
+          border: none;
+          zoom: 0.9;
+          -moz-transform: scale(0.9, 0.9);
+          -moz-transform-origin: left top;
+        }
+
+        .iframe_mobile.responsivo {
+          width: 339px;
+          overflow: hidden;
+          height: 561px;
+          border: none;
+          zoom: 0.8;
+          -moz-transform: scale(0.8, 0.8);
+          -moz-transform-origin: left top;
+        }
+      
+      /*INICIO Media queries*/
+        @media (min-width: 1px) and (max-width: 350px) {
+          .painel_esquerdo_g {
+              width: 100%;
+          }
+          .caixa_titulo_painel_direito_g > h1{
+            font-size: 1em;
+          }
+        }
+        @media (min-width: 350px) and (max-width: 450px) {
+          .painel_esquerdo_g {
+              width: 100%;
+          }
+          .caixa_titulo_painel_direito_g > h1{
+            font-size: 3em;
+          }
+        }
+        @media (min-width: 450px) and (max-width: 600px) {
+          .painel_esquerdo_g {
+              width: 100%;
+          }
+          .caixa_titulo_painel_direito_g > h1{
+            font-size: 3em;
+          }
+        }
+        @media (min-width: 600px) and (max-width: 800px) {
+          .painel_esquerdo_g {
+              width: 100%;
+              float: left;
+          }        
+          .caixa_titulo_painel_direito_g > h1{
+            font-size: 3em;
+          }
+        }
+        @media (min-width:800px) and (max-width:1024px) {
+          .painel_esquerdo_g {
+            width: 400px;
+            position: absolute;
+            left: 0px;
+          }
+          .caixa_titulo_painel_direito_g > h1 {
+            font-size: 4em;
+          }
+          .painel_direito_g {
+            width: 100%;
+          }
+          .painel_principal_g {
+            padding-left: 400px;
+            min-height: 650px;
+            display: block;
+          }
+        }
+        @media (min-width: 1024px) {
+          .painel_esquerdo_g {
+              width: 400px;
+              position: absolute;
+              left: 0px;
+          }
+          .caixa_titulo_painel_direito_g > h1{
+            font-size: 5em;
+          }
+          .painel_direito_g {
+            width: 100%;
+          }
+          .painel_principal_g{
+              padding-left: 400px;
+              min-height: 650px;
+              display: block;
+          }
+        }
+      /*FIM Media queries*/
+        .caixa_titulo_painel_direito_g>h1{
+          transition: font-size 1s;
+        }
+        .painel_esquerdo_g{
+          transition: width 1s;
+        }
     </style>
     {{block head}}{{end}}
 
