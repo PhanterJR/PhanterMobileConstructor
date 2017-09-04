@@ -375,8 +375,3 @@ class PhanterAndroid(object):
         subprocess.call([os.path.join(self.cordova_app_folder, 'create_apk_%s3.bat' %
                                       self.aplication_name)])
         print "Done!"
-
-
-if __name__ == "__main__":
-    android = PhanterAndroid()
-    android.createApk()
