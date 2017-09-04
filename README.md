@@ -45,3 +45,29 @@ Create your mobile aplication using web2py
                           |-myimage.jpg
                       |-js/
                           |-Jquery.js
+NOTE: In Linux the server many features have not been implemented, in windows many functions are executed through batch files (.bat), below the list of commands that will have to be made manually in linux to work.
+
+In the web2py folder, create a folder named cordova.
+Then create a cordova application with the same name as your web2py application (I'll use the web2py welcome application as an example)
+
+  -To create your first Cordova application
+
+    $ls web2py_folder/cordova
+    $cordova create welcome com.yoursite.www welcome
+
+  -to open the phonegap server
+
+    $ls web2py_folder/cordova/your_app_name
+    $phonegap serve -p3000
+
+  -if you prefer to use the cordova server
+
+      $ls web2py_folder/cordova/your_app_name
+      $cordova serve 3000
+
+  -to create the apk of your application
+  
+      $ls web2py_folder/cordova/your_app_name
+      $cordova platform remove android
+      $cordova platform add android
+      $cordova build android
