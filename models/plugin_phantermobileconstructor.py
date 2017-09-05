@@ -36,13 +36,16 @@ if request.controller == 'plugin_phantermobileconstructor':
 
 
 # Storage APKs and app info
-
-db.define_table('plugin_phantermobileconstructor_apks',
+db.define_table('plugin_phantermobileconstructor_apps',
       Field('appname', 'string', default=request.application, label=T('App Name'), requires=IS_NOT_EMPTY()),
       Field('idapp', 'string', 
         default="com.yoursite.%s" %request.application, 
         label=CAT(T('ID'), SPAN(" ?", _title=T("Specifies the app's reverse-domain identifier, and the version its full version number expressed in major/minor/patch notation."))),
         requires=IS_NOT_EMPTY()
+        ),
+      Field('description', 'text', 
+        default="A sample from PhanterMobile Constructor using web2py, phonegap and cordova.", 
+        label=CAT(T('Description'), SPAN(" ?", _title=T("Specifies metadata that may appear within app-store listings.")))
         ),
       Field('apkversion', 'string', 
         default="0.0.1",
@@ -76,7 +79,11 @@ db.define_table('plugin_phantermobileconstructor_apks',
         default=["http://*/*", "https://*/*", "tel:*", "sms:*", "mailto:*", "geo:*" ],
         label=CAT(T('Allow-Intent'), SPAN(" ?", _title=T("Defines which URLs the app is allowed to ask the system to open."))),
         requires=IS_NOT_EMPTY()
-        ),
+        )
+      )
+
+db.define_table('plugin_phantermobileconstructor_apks',
+      Field('application', 'reference plugin_phantermobileconstructor_apps', default=db(db.plugin_phantermobileconstructor_apps).select().first().id if not db(db.plugin_phantermobileconstructor_apps).isempty() else '',requires=IS_IN_DB(db, db.plugin_phantermobileconstructor_apps, "%(appname)s - %(idapp)s - %(apkversion)s")),
       Field('apklevel', 'string', default='debug', 
         label=CAT(T('Build type'), SPAN(" ?", _title=T("Perform a release build or Perform a debug build"))),
         requires=IS_IN_SET(['debug', 'release'])),

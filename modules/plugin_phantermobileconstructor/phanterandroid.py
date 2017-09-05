@@ -344,7 +344,7 @@ class PhanterAndroid(object):
         self._remove_file(os.path.join(self.cordova_app_folder, 'create_apk_%s2.bat' % self.aplication_name))
         self._remove_file(os.path.join(self.cordova_app_folder, 'create_apk_%s3.bat' % self.aplication_name))
     
-    def createApk(self):
+    def createApk(self, level="debug"):
         self.buildHtml()
         
         print "Creating file create_apk_%s1.bat" % self.aplication_name
@@ -369,9 +369,13 @@ class PhanterAndroid(object):
         print "Creating file create_apk_%s3.bat" % self.aplication_name
         with open(os.path.join(self.cordova_app_folder, 'create_apk_%s3.bat' % self.aplication_name), 'w') as arquivo_aberto:
             conteudo = "cd %s\n" %os.path.join(self.aplication_folder)
-            conteudo+="cordova build android --verbose\n"
+            if level=='release':
+                conteudo+="cordova build android --verbose --release\n"
+            else:
+                conteudo+="cordova build android --verbose\n"
             arquivo_aberto.write(conteudo)
         print "Creating APK file"
         subprocess.call([os.path.join(self.cordova_app_folder, 'create_apk_%s3.bat' %
                                       self.aplication_name)])
         print "Done!"
+
