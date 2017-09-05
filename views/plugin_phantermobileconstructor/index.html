@@ -2,10 +2,12 @@
 {{block head}}
 {{end}}
 {{=html}}
-<script type="text/javascript">
-  $(document).ready(function(){
-    ajax('{{=URL("plugin_phantermobileconstructor", "echo_comand", args=["info"], vars={"cordovastatus":True})}}',[], ':eval')
-    ajax('{{=URL("plugin_phantermobileconstructor", "echo_comand", args=["info"], vars={"phonegapstatus":True})}}',[], ':eval')
-    ajax('{{=URL("plugin_phantermobileconstructor", "echo_comand", args=["createapk"], vars={"getlastapk":True})}}',[], ':eval')
-  });
-</script>
+{{if not request.args(0):}}
+	<script type="text/javascript">
+	  $(document).ready(function(){
+	    ajax('{{=URL("plugin_phantermobileconstructor", "echo_comand", args=["info"], vars={"cordovastatus":True})}}',[], ':eval')
+	    ajax('{{=URL("plugin_phantermobileconstructor", "echo_comand", args=["info"], vars={"phonegapstatus":True})}}',[], ':eval')
+	    ajax('{{=URL("plugin_phantermobileconstructor", "echo_comand", args=["createapk"], vars={"getlastapk":True})}}',[], ':eval')
+	  });
+	</script>
+{{pass}}

@@ -28,13 +28,58 @@ def index():
     if request.args(0)=='phonegap':
         android = PhanterAndroid()
         android.openServer()
-        html = DIV(DIV(IFRAME(_src="http://localhost:%s/" % android.port, _class='iframe_mobile responsivo'),
-                   _class='html_mobile responsivo'), _class="mobile responsivo")
+        html = DIV(
+                    DIV(
+                        DIV(
+                            DIV(
+                                IFRAME(_src="http://localhost:%s/" % android.port, _class='iframe_mobile_portrait responsivo'),
+                                _class='html_mobile_portrait responsivo'),
+                            _class="mobile_portrait responsivo"),
+                        _class="painel_esquerdo_g"),
+                    DIV(DIV(H1(T('View in PhoneGap Server')), _class='caixa_titulo_painel_direito_g'),
+                        DIV(
+                            DIV(
+                                IFRAME(_src="http://localhost:%s/" % android.port, _class='iframe_mobile_landscape responsivo'),
+                                _class='html_mobile_landscape responsivo'),
+                            _class="mobile_landscape responsivo"),
+                        _class="painel_direito_g"),
+                    _class="painel_principal_g caixa_view_semdistracoes_landscape")
     elif request.args(0)=='cordova':
         android = PhanterAndroid()
         android.openServer('cordova') 
-        html = DIV(DIV(IFRAME(_src="http://localhost:%s/" % android.port, _class='iframe_mobile responsivo'),
-                   _class='html_mobile responsivo'), _class="mobile responsivo")     
+        html = DIV(
+                    DIV(
+                        DIV(
+                            DIV(
+                                IFRAME(_src="http://localhost:%s/" % android.port, _class='iframe_mobile_portrait responsivo'),
+                                _class='html_mobile_portrait responsivo'),
+                            _class="mobile_portrait responsivo"),
+                        _class="painel_esquerdo_g"),
+                    DIV(DIV(H1(T('View in Cordova Server')), _class='caixa_titulo_painel_direito_g'),
+                        DIV(
+                            DIV(
+                                IFRAME(_src="http://localhost:%s/" % android.port, _class='iframe_mobile_landscape responsivo'),
+                                _class='html_mobile_landscape responsivo'),
+                            _class="mobile_landscape responsivo"),
+                        _class="painel_direito_g"),
+                    _class="painel_principal_g caixa_view_semdistracoes_landscape")
+    elif request.args(0)=='localview':
+        html = DIV(
+                    DIV(
+                        DIV(
+                            DIV(
+                                IFRAME(_src="http://localhost:%s/%s/plugin_phantermobileconstructor/www_index" %(request.env.server_port, request.application), _class='iframe_mobile_portrait responsivo'),
+                                _class='html_mobile_portrait responsivo'),
+                            _class="mobile_portrait responsivo"),
+                        _class="painel_esquerdo_g"),
+                    DIV(DIV(H1(T('View in Web2py Server')), _class='caixa_titulo_painel_direito_g'),
+                        DIV(
+                            DIV(
+                                IFRAME(_src="http://localhost:%s/%s/plugin_phantermobileconstructor/www_index" %(request.env.server_port, request.application), _class='iframe_mobile_landscape responsivo'),
+                                _class='html_mobile_landscape responsivo'),
+                            _class="mobile_landscape responsivo"),
+                        _class="painel_direito_g"),
+                    _class="painel_principal_g caixa_view_semdistracoes_landscape")
     else:
         html = DIV(
         DIV(
@@ -42,9 +87,9 @@ def index():
                 DIV(
                     IFRAME(
                         _src="http://localhost:%s/%s/plugin_phantermobileconstructor/www_index" %(request.env.server_port, request.application), 
-                        _class='iframe_mobile responsivo'),
-                    _class='html_mobile responsivo'), 
-                _class="mobile responsivo"),
+                        _class='iframe_mobile_portrait responsivo'),
+                    _class='html_mobile_portrait responsivo'), 
+                _class="mobile_portrait responsivo"),
             _class='painel_esquerdo_g'),
         DIV(
             DIV(H1('PhanterMobile Constructor'), _class='caixa_titulo_painel_direito_g'),
@@ -64,7 +109,7 @@ def index():
                         _alvo="#status_servidor_phonegap",
                         _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=['info'], vars={'phonegapstatus':True, 'tryagain':True}),
                         _href=URL(args=['phonegap']),
-                        _target="blank",
+                        _target="_blank",
                         _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
                     DIV(SPAN("Without Status", _style='color:grey;'), _id='status_servidor_phonegap',_class='status_botao_principal'), 
                     _class="caixa_botao_ajax_principal",
@@ -75,10 +120,17 @@ def index():
                         _alvo="#status_servidor_cordova",
                         _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=['info'], vars={'cordovastatus':True, 'tryagain':True}),
                         _href=URL(args=['cordova']),
-                        _target="blank",
-
+                        _target="_blank",
                         _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
                     DIV(SPAN("Without Status", _style='color:grey;'), _id='status_servidor_cordova',_class='status_botao_principal'),
+                    _class="caixa_botao_ajax_principal",
+                    ),
+                DIV(
+                    A(
+                        DIV(T("Local View"), _class="center_table_cell"),
+                        _href=URL(args=['localview']),
+                        _target="_blank",
+                        _class='botao_pagina_principal_comandos'),
                     _class="caixa_botao_ajax_principal",
                     ),
                 DIV(
@@ -148,11 +200,11 @@ def echo_comand():
                 apk_file=os.path.join(basedirapk, 'android-debug.apk')
                 os.rename(apk_file, os.path.join(basedirapk, '%s-debug.apk' %request.application))
             apk_file=os.path.join(basedirapk, '%s-debug.apk' %request.application)
-            levelfile="debug"
+            levelfile=request.vars.levelfile or "debug"
             if request.vars.version and request.vars.appname:
-                q_apk=db((db.plugin_phantermobileconstructor_apks.versioapk==request.vars.version)&
+                q_apk=db((db.plugin_phantermobileconstructor_apks.apkversion==request.vars.version)&
                     (db.plugin_phantermobileconstructor_apks.appname==request.vars.appname)&
-                    (db.plugin_phantermobileconstructor_apks.appname==levelfile)
+                    (db.plugin_phantermobileconstructor_apks.apklevel==levelfile)
                     ).select().first()
 
                 if q_apk:
@@ -168,12 +220,23 @@ def echo_comand():
                         'apklevel':levelfile,
                         })
             else:
-                id_apk=db.plugin_phantermobileconstructor_apks.insert(**{
-                    'apkfile':db.plugin_phantermobileconstructor_apks.apkfile.store(open(apk_file, 'rb'), '%s-debug.apk' %request.application),
-                    'appname': request.aplication,
-                    'apkversion': '1.0.0',
-                    'apklevel':levelfile,
-                    })
+                q_apk=db((db.plugin_phantermobileconstructor_apks.apkversion=='0.0.1')&
+                    (db.plugin_phantermobileconstructor_apks.appname==request.aplication)&
+                    (db.plugin_phantermobileconstructor_apks.apklevel==levelfile)
+                    ).select().first()
+
+                if q_apk:
+                    id_apk=q_apk.id
+                    db.plugin_phantermobileconstructor_apks[q_apk.id]={
+                        'apkfile':db.plugin_phantermobileconstructor_apks.apkfile.store(open(apk_file, 'rb'), '%s-debug.apk' %request.application)
+                        }
+                else:
+                    id_apk=db.plugin_phantermobileconstructor_apks.insert(**{
+                        'apkfile':db.plugin_phantermobileconstructor_apks.apkfile.store(open(apk_file, 'rb'), '%s-debug.apk' %request.application),
+                        'appname': request.aplication,
+                        'apkversion': '0.0.1',
+                        'apklevel':levelfile,
+                        })
             downloadapk=db.plugin_phantermobileconstructor_apks[id_apk].apkfile
             db.commit()
             return "$('#dowload_newapk').html(%s)" %(json.dumps(SPAN(A(DIV('%s-debug.apk' %request.application, _class='download_newapk'),_href=URL('default','download', args=[downloadapk]))).xml()))

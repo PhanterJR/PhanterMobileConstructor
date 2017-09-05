@@ -527,7 +527,7 @@
           padding: 15px 10px;
         }
 
-        .mobile.responsivo {
+        .mobile_portrait.responsivo {
           background-image: url("{{=URL('static','plugin_phantermobileconstructor', args=['images','celular2.png'])}}");
           background-color: transparent;
           background-size: 300px auto;
@@ -541,6 +541,21 @@
           overflow: hidden;
           border-radius: 25px;
           width: 300px;
+        }
+        .mobile_landscape.responsivo {
+          background-image: url("{{=URL('static','plugin_phantermobileconstructor', args=['images','celular1.png'])}}");
+          background-color: transparent;
+          background-size: 600px auto;
+          background-position-x: 2px;
+          background-position-y: 0px;
+          background-repeat: no-repeat;
+          padding: 0px 15px;
+          height: 300px;
+          margin-right: auto;
+          margin-left: auto;
+          overflow: hidden;
+          border-radius: 25px;
+          width: 600px;
         }
         .caixa_titulo_painel_direito_g > h1 {
           text-align: center;
@@ -621,7 +636,7 @@
           box-shadow: 0px 0px 7px black inset;
         }
 
-        .html_mobile.responsivo {
+        .html_mobile_portrait.responsivo {
           background-color: #edf5bd;
           width: 271px;
           height: 449px;
@@ -631,18 +646,17 @@
           border-radius: 2px;
           overflow: hidden;
         }
-
-        .iframe_mobile.responsivo {
-          width: 397px;
-          overflow: hidden;
-          height: 672px;
-          border: none;
-          zoom: 0.9;
-          -moz-transform: scale(0.9, 0.9);
-          -moz-transform-origin: left top;
+        .html_mobile_landscape {
+            background-color: rgb(237, 245, 189);
+            width: 483px;
+            height: 265px;
+            margin-left: 45px;
+            margin-right: auto;
+            margin-top: 27px;
+            border-radius: 1px;
+            overflow: hidden;
         }
-
-        .iframe_mobile.responsivo {
+        .iframe_mobile_portrait.responsivo {
           width: 339px;
           overflow: hidden;
           height: 561px;
@@ -650,6 +664,15 @@
           zoom: 0.8;
           -moz-transform: scale(0.8, 0.8);
           -moz-transform-origin: left top;
+        }
+        .iframe_mobile_landscape {
+            width: 605px;
+            height: 339px;
+            border: none;
+            overflow: hidden;
+            zoom: 0.8;
+            -moz-transform: scale(0.8, 0.8);
+            -moz-transform-origin: left top;
         }
       
       /*INICIO Media queries*/

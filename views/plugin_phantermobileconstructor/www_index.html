@@ -6,9 +6,11 @@
     }
     header{
       margin:0;
-      box-shadow: none;
+      -webkit-box-shadow: none;
+              box-shadow: none;
     }
     body{
+      background: -webkit-gradient(linear,left top, left bottom,color-stop(10%, #0e1830),to(#0b0f5d));
       background: linear-gradient(#0e1830 10%,#0b0f5d 100%);
       min-height: 100%;
       padding: 0px;
@@ -46,7 +48,8 @@
         margin-left: 0px;
         background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll 0px -13px;
         padding: 0px;
-        animation: letrac 30s ease-in infinite;
+        -webkit-animation: letrac 30s ease-in infinite;
+                animation: letrac 30s ease-in infinite;
       }
       #letra02 {
         width: 40px;
@@ -55,7 +58,8 @@
         margin-left: 40px;
         background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll -40px -27px;
         padding: 0px;
-        animation: letrao1 30s ease-in infinite;
+        -webkit-animation: letrao1 30s ease-in infinite;
+                animation: letrao1 30s ease-in infinite;
       }
       #letra03 {
         width: 40px;
@@ -64,7 +68,8 @@
         margin-left: 80px;
         background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll -80px -14px;
         padding: 0px;
-        animation: letran 30s ease-in infinite;
+        -webkit-animation: letran 30s ease-in infinite;
+                animation: letran 30s ease-in infinite;
       }
       #letra04 {
         width: 40px;
@@ -73,7 +78,8 @@
         margin-left: 120px;
         background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll -120px 0px;
         padding: 0px;
-        animation: letrae 30s ease-in infinite;
+        -webkit-animation: letrae 30s ease-in infinite;
+                animation: letrae 30s ease-in infinite;
       }
       #letra05 {
         width: 40px;
@@ -82,7 +88,8 @@
         margin-left: 163px;
         background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll -163px -14px;
         padding: 0px;
-        animation: letrax 30s ease-in infinite;
+        -webkit-animation: letrax 30s ease-in infinite;
+                animation: letrax 30s ease-in infinite;
       }
       #letra06 {
         width: 40px;
@@ -91,7 +98,8 @@
         margin-left: 201px;
         background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll -201px -16px;
         padding: 0px;
-        animation: letraa 30s ease-in infinite;
+        -webkit-animation: letraa 30s ease-in infinite;
+                animation: letraa 30s ease-in infinite;
       }
       #letra07 {
         width: 40px;
@@ -100,7 +108,8 @@
         margin-left: 241px;
         background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll -241px -13px;
         padding: 0px;
-        animation: letrao2 30s ease-in infinite;
+        -webkit-animation: letrao2 30s ease-in infinite;
+                animation: letrao2 30s ease-in infinite;
       }
       #didata {
         top: -5px;
@@ -110,16 +119,34 @@
         margin-left: 125px;
         background: transparent url("{{=URL('static', 'plugin_phantermobileconstructor', args=['www', 'images','sprit_conex.png'])}}") no-repeat scroll -125px -63px;
         padding: 0px;
-        animation: didataani 30s ease-in infinite;
+        -webkit-animation: didataani 30s ease-in infinite;
+                animation: didataani 30s ease-in infinite;
       }
       .letras_conex {
         position: absolute;
       }
+      @-webkit-keyframes letrac {
+        0% {top:0; left: 0;}
+        4% {top:0; left: 0;}
+        5% {top:5px; left: 4px;}
+        20% {top:5px; left:4px;}
+        21% {top:0; left:0;}
+        100%{top:0; left: 0;}
+        }
       @keyframes letrac {
         0% {top:0; left: 0;}
         4% {top:0; left: 0;}
         5% {top:5px; left: 4px;}
         20% {top:5px; left:4px;}
+        21% {top:0; left:0;}
+        100%{top:0; left: 0;}
+        }
+
+      @-webkit-keyframes letrao1 {
+        0% {top:0; left: 0;}
+        7% {top:0; left: 0;}
+        8% {top:-7px; left: 3px;}
+        20% {top:-7px; left:3px;}
         21% {top:0; left:0;}
         100%{top:0; left: 0;}
         }
@@ -133,11 +160,29 @@
         100%{top:0; left: 0;}
         }
 
+      @-webkit-keyframes letran {
+        0% {top:0; left: 0;}
+        3% {top:0; left: 0;}
+        4% {top:5px; left: 2px;}
+        20% {top:5px; left:2px;}
+        21% {top:0; left:0;}
+        100%{top:0; left: 0;}
+        }
+
       @keyframes letran {
         0% {top:0; left: 0;}
         3% {top:0; left: 0;}
         4% {top:5px; left: 2px;}
         20% {top:5px; left:2px;}
+        21% {top:0; left:0;}
+        100%{top:0; left: 0;}
+        }
+
+      @-webkit-keyframes letrae {
+        0% {top:0; left: 0;}
+        6% {top:0; left: 0;}
+        7% {top:20px; left: 0;}
+        20% {top:20px; left:0;}
         21% {top:0; left:0;}
         100%{top:0; left: 0;}
         }
@@ -151,11 +196,28 @@
         100%{top:0; left: 0;}
         }
 
+      @-webkit-keyframes letrax {
+        0% {top:0; left: 0;}
+        2% {top:0; left: 0;}
+        3% {top:5px; left: -2px;}
+        20% {top:5px; left:-2px;}
+        21% {top:0; left:0;}
+        100%{top:0; left: 0;}
+        }
+
       @keyframes letrax {
         0% {top:0; left: 0;}
         2% {top:0; left: 0;}
         3% {top:5px; left: -2px;}
         20% {top:5px; left:-2px;}
+        21% {top:0; left:0;}
+        100%{top:0; left: 0;}
+        }
+      @-webkit-keyframes letraa {
+        0% {top:0; left: 0;}
+        5% {top:0; left: 0;}
+        6% {top:-9px; left: -3;}
+        20% {top:-9px; left:-3;}
         21% {top:0; left:0;}
         100%{top:0; left: 0;}
         }
@@ -167,6 +229,14 @@
         21% {top:0; left:0;}
         100%{top:0; left: 0;}
         }
+      @-webkit-keyframes letrao2 {
+        0% {top:0; left: 0;}
+        8% {top:0; left: 0;}
+        9% {top:5px; left: -4px;}  
+        20% {top:5px; left:-4px;}
+        21% {top:0; left:0;}
+        100%{top:0; left: 0;}
+        }
       @keyframes letrao2 {
         0% {top:0; left: 0;}
         8% {top:0; left: 0;}
@@ -174,6 +244,15 @@
         20% {top:5px; left:-4px;}
         21% {top:0; left:0;}
         100%{top:0; left: 0;}
+        }
+
+      @-webkit-keyframes didataani {
+        0% {top: -5px;}
+        7%{top:-5px;}
+        8%{top:-10px;}
+        20%{top:-10px;}
+        21%{top:-5px;}
+        100%{top:-5px;}
         }
 
       @keyframes didataani {
@@ -299,7 +378,8 @@
       padding: 10px;
       background-color: white;
       border-radius: 16px;
-      box-shadow: 0px 0px 9px black inset;
+      -webkit-box-shadow: 0px 0px 9px black inset;
+              box-shadow: 0px 0px 9px black inset;
     }
     /*Fim powered*/
   </style>
