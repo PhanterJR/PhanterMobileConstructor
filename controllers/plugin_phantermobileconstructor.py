@@ -195,7 +195,7 @@ def echo_comand():
             android.createApk()
         levelfile=''
         basedirapk=os.path.join(request.env.web2py_path,'cordova', request.application, 'platforms', 'android', 'build', 'outputs', 'apk')
-        if os.path.exists(os.path.join(basedirapk, 'android-debug.apk')) or  os.path.exists(os.path.join(basedirapk, '%s-debug.apk' %request.application)):
+        if os.path.exists(os.path.join(basedirapk, 'android-debug.apk')) or os.path.exists(os.path.join(basedirapk, '%s-debug.apk' %request.application)):
             if os.path.exists(os.path.join(basedirapk, 'android-debug.apk')):
                 apk_file=os.path.join(basedirapk, 'android-debug.apk')
                 os.rename(apk_file, os.path.join(basedirapk, '%s-debug.apk' %request.application))
@@ -221,7 +221,7 @@ def echo_comand():
                         })
             else:
                 q_apk=db((db.plugin_phantermobileconstructor_apks.apkversion=='0.0.1')&
-                    (db.plugin_phantermobileconstructor_apks.appname==request.aplication)&
+                    (db.plugin_phantermobileconstructor_apks.appname==request.application)&
                     (db.plugin_phantermobileconstructor_apks.apklevel==levelfile)
                     ).select().first()
 
@@ -233,7 +233,7 @@ def echo_comand():
                 else:
                     id_apk=db.plugin_phantermobileconstructor_apks.insert(**{
                         'apkfile':db.plugin_phantermobileconstructor_apks.apkfile.store(open(apk_file, 'rb'), '%s-debug.apk' %request.application),
-                        'appname': request.aplication,
+                        'appname': request.application,
                         'apkversion': '0.0.1',
                         'apklevel':levelfile,
                         })
@@ -254,14 +254,20 @@ def echo_comand():
 def css_head_layout_www():
     return dict()
 
+
 # Functions started with "www" in your name will generate the htmls that will be placed in the www folder of cordova
 # Example: the function "def www_index ()" will be generated in the www
 # folder the index.html file.
 
-
 def www_index():
     return dict()
 
+
+
+
+
+
+#This is necessary to convert links generated from URL() function to local links from Cordova App.
 if request.vars.phantermobilebuild:
 
     def filter(d):
