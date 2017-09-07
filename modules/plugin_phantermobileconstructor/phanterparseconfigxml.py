@@ -2,6 +2,7 @@
 import xml.etree.ElementTree as ET
 import os
 
+
 class parseConfigXML(object):
 	"""docstring for parseConfigXML"""
 	def __init__(self, arquivo):
@@ -132,5 +133,3 @@ class parseConfigXML(object):
 		text= '\n'.join(lines).replace('ns0:','').replace('/><', '/>\n    <').replace('/>\n<', '/>\n    <').replace('    </widget>','</widget>')
 		with open(local, 'w') as arquivo_aberto:
 			arquivo_aberto.write(text.strip())
-
-		

@@ -752,6 +752,16 @@
         .painel_esquerdo_g{
           transition: width 1s;
         }
+        span.help {
+          background-color: #c5bcbc;
+          margin-left: 4px;
+          padding: 0px 7px;
+          border-radius: 100%;
+          text-align: center;
+          position: absolute;
+          top: -5px;
+          right: -11px;
+      }
     </style>
     {{block head}}{{end}}
 
@@ -760,10 +770,11 @@
 
     <!--[if lt IE 8]><p class="browserupgrade">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p><![endif]-->
     {{if response.flash or session.flash:}}
-      {{if response.flash:}}
-        <div class="flash alert alert-dismissable" id='meuflash'>{{=response.flash}}</div>
-      {{else:}}
+      {{if session.flash:}}
         <div class="flash alert alert-dismissable" id='meuflash'>{{=session.flash}}</div>
+        {{#del session.flash}}
+      {{else:}}
+        <div class="flash alert alert-dismissable" id='meuflash'>{{=response.flash}}</div>
       {{pass}}
       <script type="text/javascript">
         setTimeout(function(){$('#meuflash').fadeOut();}, 5000);
@@ -778,7 +789,7 @@
     {{block header}}
     {{end}}
     <!-- Main ========================================= -->
-    
+
     {{block center}}
       <main class='main_conex responsivo'>
         {{include}}

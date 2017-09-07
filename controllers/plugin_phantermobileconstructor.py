@@ -21,10 +21,8 @@ if (request.function in precisa_autorizacao):
         redirect(URL('admin', 'default', 'index',
                      vars=dict(send=URL(args=request.args, vars=request.vars))))
 
-
 def index():
     from plugin_phantermobileconstructor.phanterandroid import PhanterAndroid
-    response.flash = T("Welcome")
     q_config=None
     if db(db.plugin_phantermobileconstructor_apps).isempty():
         appname, version, idapp = request.application, '0.0.1', 'com.yoursite.youapp'
@@ -40,14 +38,14 @@ def index():
                     DIV(
                         DIV(
                             DIV(
-                                IFRAME(_src="http://localhost:%s/" % android.port, _class='iframe_mobile_portrait responsivo'),
+                                IFRAME(_src="http://%s:%s/" %(http_host, android.port), _class='iframe_mobile_portrait responsivo'),
                                 _class='html_mobile_portrait responsivo'),
                             _class="mobile_portrait responsivo"),
                         _class="painel_esquerdo_g"),
                     DIV(DIV(H1(T('View in PhoneGap Server')), _class='caixa_titulo_painel_direito_g'),
                         DIV(
                             DIV(
-                                IFRAME(_src="http://localhost:%s/" % android.port, _class='iframe_mobile_landscape responsivo'),
+                                IFRAME(_src="http://%s:%s/" %(http_host, android.port), _class='iframe_mobile_landscape responsivo'),
                                 _class='html_mobile_landscape responsivo'),
                             _class="mobile_landscape responsivo"),
                         _class="painel_direito_g"),
@@ -59,14 +57,14 @@ def index():
                     DIV(
                         DIV(
                             DIV(
-                                IFRAME(_src="http://localhost:%s/" % android.port, _class='iframe_mobile_portrait responsivo'),
+                                IFRAME(_src="http://%s:%s/browser/www" %(http_host, android.port), _class='iframe_mobile_portrait responsivo'),
                                 _class='html_mobile_portrait responsivo'),
                             _class="mobile_portrait responsivo"),
                         _class="painel_esquerdo_g"),
                     DIV(DIV(H1(T('View in Cordova Server')), _class='caixa_titulo_painel_direito_g'),
                         DIV(
                             DIV(
-                                IFRAME(_src="http://localhost:%s/" % android.port, _class='iframe_mobile_landscape responsivo'),
+                                IFRAME(_src="http://%s:%s/browser/www" %(http_host, android.port), _class='iframe_mobile_landscape responsivo'),
                                 _class='html_mobile_landscape responsivo'),
                             _class="mobile_landscape responsivo"),
                         _class="painel_direito_g"),
@@ -76,14 +74,14 @@ def index():
                     DIV(
                         DIV(
                             DIV(
-                                IFRAME(_src="http://localhost:%s/%s/plugin_phantermobileconstructor/www_index" %(request.env.server_port, request.application), _class='iframe_mobile_portrait responsivo'),
+                                IFRAME(_src="http://%s/%s/plugin_phantermobileconstructor/www_index" %(request.env.http_host, request.application), _class='iframe_mobile_portrait responsivo'),
                                 _class='html_mobile_portrait responsivo'),
                             _class="mobile_portrait responsivo"),
                         _class="painel_esquerdo_g"),
                     DIV(DIV(H1(T('View in Web2py Server')), _class='caixa_titulo_painel_direito_g'),
                         DIV(
                             DIV(
-                                IFRAME(_src="http://localhost:%s/%s/plugin_phantermobileconstructor/www_index" %(request.env.server_port, request.application), _class='iframe_mobile_landscape responsivo'),
+                                IFRAME(_src="http://%s/%s/plugin_phantermobileconstructor/www_index" %(request.env.http_host, request.application), _class='iframe_mobile_landscape responsivo'),
                                 _class='html_mobile_landscape responsivo'),
                             _class="mobile_landscape responsivo"),
                         _class="painel_direito_g"),
@@ -98,7 +96,7 @@ def index():
             DIV(
                 DIV(
                     IFRAME(
-                        _src="http://localhost:%s/%s/plugin_phantermobileconstructor/www_index" %(request.env.server_port, request.application), 
+                        _src="http://%s/%s/plugin_phantermobileconstructor/www_index" %(request.env.http_host, request.application), 
                         _class='iframe_mobile_portrait responsivo'),
                     _class='html_mobile_portrait responsivo'), 
                 _class="mobile_portrait responsivo"),
@@ -146,21 +144,37 @@ def index():
                     _class="caixa_botao_ajax_principal",
                     ),
                 DIV(
-                    DIV(DIV(T("Create APK"), _class="center_table_cell"), 
-                        _alvo="#dowload_newapk",
-                        _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=['createapk']),
+                    DIV(DIV(T("Create Debug APK"), _class="center_table_cell"), 
+                        _alvo="#dowload_newapk_debug",
+                        _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=['createapk', 'debug']),
                         _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
-                    DIV(_id="dowload_newapk", _class='status_botao_principal'), 
+                    DIV(_id="dowload_newapk_debug", _class='status_botao_principal'), 
+                    _class="caixa_botao_ajax_principal",
+                    ),
+                DIV(
+                    DIV(DIV(T("Create Release APK"), _class="center_table_cell"), 
+                        _alvo="#dowload_newapk_release",
+                        _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=['createapk', 'release']),
+                        _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
+                    DIV(_id="dowload_newapk_release", _class='status_botao_principal'), 
                     _class="caixa_botao_ajax_principal",
                     ),
                 DIV(
                     A(
                         DIV(T("Config XML"), _class="center_table_cell"), 
                         _alvo="#status_config_xml",
-                        _href=URL(args=['cordova']),
-                        _target="_blank",
+                        _href=URL('configxml'),
                         _class='botao_pagina_principal_comandos'),
-                    DIV(SPAN("Create first Config.xml", _style='color:red;') if db(db.plugin_phantermobileconstructor_apps).isempty() else "", _id='status_servidor_cordova',_class='status_botao_principal'),
+                    DIV(SPAN("Create first Config.xml", _style='color:red;') if db(db.plugin_phantermobileconstructor_apps).isempty() else "", _id='status_config_xml',_class='status_botao_principal'),
+                    _class="caixa_botao_ajax_principal",
+                    ),
+                DIV(
+                    A(
+                        DIV(T("Config KeyStore"), _class="center_table_cell"), 
+                        _alvo="#status_config_keystore",
+                        _href=URL('configkeystore'),
+                        _class='botao_pagina_principal_comandos'),
+                    DIV(SPAN("Config your keystore", _style='color:red;') if db(db.plugin_phantermobileconstructor_keystore).isempty() else "", _id='status_config_keystore',_class='status_botao_principal'),
                     _class="caixa_botao_ajax_principal",
                     ),
                 _class='caixa_comandos'),
@@ -169,18 +183,10 @@ def index():
     return locals()
 
 def configxml():
+    response.flash=T("Edit config.xml of app")
     q_config=db(db.plugin_phantermobileconstructor_apps).select().first()
-    form=SQLFORM(db.plugin_phantermobileconstructor_apps, q_config.id if q_config else None,fields=['appname',
-                                                                'idapp',
-                                                                'description',
-                                                                'apkversion',
-                                                                'authorname',
-                                                                'authoremail',
-                                                                'authorwebsite',
-                                                                'externalacess',
-                                                                'allownavigation',
-                                                                'allowintent'], show_id=False)
-    if form.process().accepted:
+    form=SQLFORM(db.plugin_phantermobileconstructor_apps, q_config.id if q_config else None, showid=False)
+    if form.process().accepted: 
         if not os.path.exists(os.path.join(request.env.web2py_path, 'cordova', request.application,'config.xml')):
             from phanterandroid import PhanterAndroid
             android=PhanterAndroid()
@@ -200,8 +206,38 @@ def configxml():
             meuxml.addElementList('allow-intent', 'origin', z)
             
         meuxml.write(os.path.join(r'C:\web2py_mobiletest\cordova\welcome\config2.xml'))
+        session.flash="config.xml saved!"
+        print session.flash
+        redirect(URL('plugin_phantermobileconstructor','index'))
+    if form.errors:
+        response.flash=T("Problems in form!")
     return dict(form=form)
 
+def configkeystore():
+    from plugin_phantermobileconstructor.phanterandroid import PhanterAndroid
+    android = PhanterAndroid()  
+    if db(db.plugin_phantermobileconstructor_keystore).isempty():
+        db.plugin_phantermobileconstructor_keystore.appkeystore.readable=False
+        db.plugin_phantermobileconstructor_keystore.appkeystore.writable=False
+        keytool=android.requeriments('keytool')
+
+        print keytool
+        if keytool['keytool']:
+            if len(keytool['keytool']) > 1:
+                db.plugin_phantermobileconstructor_keystore.keytool.default=keytool['keytool'][0]
+                db.plugin_phantermobileconstructor_keystore.keytool.requires=IS_IN_SET(keytool['keytool'])
+            else:
+                db.plugin_phantermobileconstructor_keystore.keytool.default=keytool['keytool'][0]
+        form=SQLFORM(db.plugin_phantermobileconstructor_keystore)
+    else:
+        q_keystore=db(db.plugin_phantermobileconstructor_keystore).select().first()
+        form=SQLFORM(db.plugin_phantermobileconstructor_keystore, q_keystore.id)
+
+    if form.process().accepted:
+        session.flash="Keystore configured!"
+        redirect(URL('plugin_phantermobileconstructor','index'))
+    
+    return dict(form=form)
 
 def echo_comand():
 
@@ -247,16 +283,56 @@ def echo_comand():
         android.resetApp()
         return "alert('Reset Done!');"
     elif request.args(0)== 'createapk':
-        if db(db.plugin_phantermobileconstructor_apps).isempty():
-            return "$('#dowload_newapk').html('<span>First config xml</span>')"
+        signed=False
+        apk_file=None
+        levelfile='debug'
+        if db(db.plugin_phantermobileconstructor_apps).isempty() and db(db.plugin_phantermobileconstructor_keystore).isempty():
+            return "$('#dowload_newapk_release').html('<span>First config xml and create keystore</span>'); $('#dowload_newapk_debug').html('<span>First config xml</span>')"
+        elif db(db.plugin_phantermobileconstructor_apps).isempty():
+            return "$('#dowload_newapk_release').html('<span>First config xml</span>'); $('#dowload_newapk_debug').html('<span>First config xml</span>')"
+
         q_apps_config=db(db.plugin_phantermobileconstructor_apps).select().first()
+        q_keystore=db(db.plugin_phantermobileconstructor_keystore).select().first()
         if not request.vars.getlastapk:
-            if request.vars.level=='release':
+            if request.args(1)=='release':
+                if q_keystore:
+                    key_created=android.createKeystore(
+                        keytool=os.path.join(q_keystore.keytool),
+                        keyname=q_keystore.keyname,
+                        aliasname=q_keystore.aliasname,
+                        validity=q_keystore.validity,
+                        storepass=q_keystore.storepass,
+                        keypass=q_keystore.keypass,
+                        CN=q_keystore.common_name,
+                        OU=q_keystore.organization_unit,
+                        O=q_keystore.organization,
+                        L=q_keystore.district,
+                        ST=q_keystore.yourstate,
+                        C=q_keystore.country
+                        )
+                    if key_created:
+                        print key_created[0]
+                        my_file=open(key_created[0], 'rb')
+                        q_keystore.update_record(appkeystore=db.plugin_phantermobileconstructor_keystore.appkeystore.store(my_file, "%s.keystore" %q_keystore.keyname))
+                        db.commit()                      
+                        signed=True
+
                 android.createApk('release')
                 levelfile='release'
             else:
                 android.createApk()
                 levelfile='debug'
+        else:
+            if q_keystore:
+                if q_keystore.appkeystore and request.args(1)=='release':
+                    levelfile='release'
+                    signed=True
+            if request.args(1)=='release':
+                    levelfile='release'               
+            else:
+
+                levelfile='debug'
+
        
         basedirapk=os.path.join(request.env.web2py_path,'cordova', request.application, 'platforms', 'android', 'build', 'outputs', 'apk')
         if levelfile=='debug':
@@ -264,29 +340,53 @@ def echo_comand():
                 apk_file=os.path.join(basedirapk, 'android-debug.apk')
 
         else:
-            if os.path.exists(os.path.join(basedirapk, 'android-release-unsigned.apk')):
-                apk_file=os.path.join(basedirapk, 'android-release-unsigned.apk')
+            if signed:
+                if os.path.exists(os.path.join(basedirapk, 'android-release.apk')):
+                    apk_file=os.path.join(basedirapk, 'android-release.apk')
+            else:
+                if os.path.exists(os.path.join(basedirapk, 'android-release-unsigned.apk')):
+                    apk_file=os.path.join(basedirapk, 'android-release-unsigned.apk')
+
         if apk_file:
             q_apk=db(
                 (db.plugin_phantermobileconstructor_apks.application==q_apps_config.id)&
-                (db.plugin_phantermobileconstructor_apks.apklevel==levelfile)
+                (db.plugin_phantermobileconstructor_apks.apklevel==levelfile)&
+                (db.plugin_phantermobileconstructor_apks.signed==signed)
                 ).select().first()
 
-            if q_apk:
-                id_apk=q_apk.id
-                db.plugin_phantermobileconstructor_apks[q_apk.id]={
-                    'apkfile':db.plugin_phantermobileconstructor_apks.apkfile.store(open(apk_file, 'rb'), '%s-debug.apk' %q_apps_config.appname)
-                    }
+            if signed and levelfile=='release':
+                apk_saved_name="%s-release.apk" %q_apps_config.appname
+            elif levelfile=='release':
+                apk_saved_name="%s-release-unsigned.apk" %q_apps_config.appname
             else:
-                id_apk=db.plugin_phantermobileconstructor_apks.insert(**{
-                    'apkfile':db.plugin_phantermobileconstructor_apks.apkfile.store(open(apk_file, 'rb'), '%s-debug.apk' %q_apps_config.appname),
-                    'apklevel':levelfile,
-                    })
+                apk_saved_name="%s-debug.apk" %q_apps_config.appname
+            if request.vars.getlastapk and q_apk.apkfile:
+                downloadapk=q_apk.apkfile
+                if request.args(1)=='release':
+                    return "$('#dowload_newapk_release').html(%s)" %(json.dumps(SPAN(A(DIV(apk_saved_name, _class='download_newapk_release'),_href=URL('default','download', args=[downloadapk]))).xml()))
+                else:
+                    return "$('#dowload_newapk_debug').html(%s)" %(json.dumps(SPAN(A(DIV(apk_saved_name, _class='download_newapk_release'),_href=URL('default','download', args=[downloadapk]))).xml()))
+            else:
+                if q_apk:
+                    id_apk=q_apk.id
+                    db.plugin_phantermobileconstructor_apks[q_apk.id]={
+                        'apkfile':db.plugin_phantermobileconstructor_apks.apkfile.store(open(apk_file, 'rb'), apk_saved_name),
+                        'signed':signed
+                        }
+                else:
+                    id_apk=db.plugin_phantermobileconstructor_apks.insert(**{
+                        'apkfile':db.plugin_phantermobileconstructor_apks.apkfile.store(open(apk_file, 'rb'), apk_saved_name),
+                        'apklevel':levelfile,
+                        'signed':signed
+                        })
             downloadapk=db.plugin_phantermobileconstructor_apks[id_apk].apkfile
             db.commit()
-            return "$('#dowload_newapk').html(%s)" %(json.dumps(SPAN(A(DIV('%s-debug.apk' %request.application, _class='download_newapk'),_href=URL('default','download', args=[downloadapk]))).xml()))
+            if request.args(1)=='release':
+                return "$('#dowload_newapk_release').html(%s)" %(json.dumps(SPAN(A(DIV(apk_saved_name, _class='download_newapk_release'),_href=URL('default','download', args=[downloadapk]))).xml()))
+            else:
+                return "$('#dowload_newapk_debug').html(%s)" %(json.dumps(SPAN(A(DIV(apk_saved_name, _class='download_newapk_debug'),_href=URL('default','download', args=[downloadapk]))).xml()))
         else:
-            return "$('#dowload_newapk').html('<span>Apk don't created!</span>')"
+            return "$('#dowload_newapk_debug').html(%s); $('#dowload_newapk_release').html(%s);" %(json.dumps("<span>Apk don't created!</span>"), json.dumps("<span>Apk don't created!</span>"))
     else:
         return "console.log('Notingh to do!');"
 
