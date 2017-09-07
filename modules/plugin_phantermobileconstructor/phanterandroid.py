@@ -421,7 +421,7 @@ class PhanterAndroid(object):
                 try:
                     cordova=subprocess.check_output(['which','cordova'])
                     cordova=cordova.strip().split('\n')[0]
-                    self.requeriments_store['cordova']=cordova
+                    self.requeriments_store['cordova']=[cordova]
                 except Exception as e:
                     print "Don't find cordova in your system, try install. eg. npm install -g cordova"
                     print e
@@ -429,7 +429,7 @@ class PhanterAndroid(object):
                 try:
                     phonegap=subprocess.check_output(['which','phonegap'])
                     phonegap=phonegap.strip().split('\n')[0]
-                    self.requeriments_store['phonegap']=phonegap
+                    self.requeriments_store['phonegap']=[phonegap]
                 except Exception as e:
                     print "Don't find phonegap in your system, try install. eg. npm install -g phonegap"
                     print e
@@ -437,7 +437,7 @@ class PhanterAndroid(object):
                 try:
                     keytool=subprocess.check_output(['which','keytool'])
                     keytool=keytool.strip().split('\n')[0]
-                    self.requeriments_store['keytool']=keytool
+                    self.requeriments_store['keytool']=[keytool]
                 except Exception as e:
                     print "Don't find keytool in your system, try install JAVA SDK"
                     print e  
@@ -445,7 +445,7 @@ class PhanterAndroid(object):
                 try:
                     javac=subprocess.check_output(['which','javac'])
                     javac=javac.strip().split('\n')[0]
-                    self.requeriments_store['javac']=javac
+                    self.requeriments_store['javac']=[javac]
                 except Exception as e:
                     print "Don't find javac in your system, try install JAVA SDK"
                     print e
@@ -554,4 +554,3 @@ class PhanterAndroid(object):
             else:
                 subprocess.call(['cordova build android --verbose'], cwd=self.aplication_folder, shell=True)
         print "Done!"
-
