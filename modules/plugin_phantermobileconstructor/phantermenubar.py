@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from gluon.html import *
 
+
 class PhanterMenubar(object):
     """Helper to construct the menubar"""
 

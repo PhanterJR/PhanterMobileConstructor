@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # versao: 1.5.0
+# personal import
+from phanterparseconfigxml import parseConfigXML
 
 # python battery
 import subprocess
@@ -451,7 +453,6 @@ class PhanterAndroid(object):
                     print e
             return self.requeriments_store
 
-
     def removeCordovaApp(self):
         request = self.request
 
@@ -527,23 +528,62 @@ class PhanterAndroid(object):
         @include_key: is include in apk if keystore exists
         """
         self.buildHtml()
+        if os.path.exists(os.path.join(self.aplication_folder, 'package.json')):
+            self._remove_file(os.path.join(self.aplication_folder, 'package.json'))
+        configxml=parseConfigXML(os.path.join(self.aplication_folder, 'config.xml'))
+        engine=configxml.checkEngine('android')
+
+        outputfilebase=os.path.join(self.aplication_folder,'platforms', 'android', 'build', 'outputs', 'apk')
         if platform == "win32" or platform == 'cygwin':
-            print "Creating file create_apk_%s3.bat" % self.aplication_name
-            with open(os.path.join(self.cordova_app_folder, 'create_apk_%s3.bat' % self.aplication_name), 'w') as arquivo_aberto:
+            if not engine:
+                with open(os.path.join(self.cordova_app_folder, 'create_apk_%s1.bat' % self.aplication_name), 'w') as arquivo_aberto:
+                    conteudo = "cd %s\n" %os.path.join(self.aplication_folder)
+                    conteudo+="cordova platform add android\n"
+                    arquivo_aberto.write(conteudo)
+                print "Inserting Android Platform"
+                try:
+                    apk1=subprocess.call([os.path.join(self.cordova_app_folder, 'create_apk_%s1.bat' %
+                                                  self.aplication_name)])
+                except Exception as e:
+                    print e
+
+            with open(os.path.join(self.cordova_app_folder, 'create_apk_%s2.bat' % self.aplication_name), 'w') as arquivo_aberto:
                 conteudo = "cd %s\n" %os.path.join(self.aplication_folder)
                 if level=='release':
                     if self._created_key:
+                        outputfile=os.path.join(outputfilebase, 'android-release.apk')
                         conteudo+="cordova build android --verbose --release -- --keystore=\"%s\" --storePassword=%s --alias=%s" %(
                             self._created_key[0],self._created_key[1],self._created_key[2])
                     else:
+                        outputfile=os.path.join(outputfilebase, 'android-release-unsigned.apk')
                         conteudo+="cordova build android --verbose --release\n"
                 else:
+                    outputfile=os.path.join(outputfilebase, 'android-debug.apk')
                     conteudo+="cordova build android --verbose\n"
                 arquivo_aberto.write(conteudo)
-            print "Creating APK file"
-            subprocess.call([os.path.join(self.cordova_app_folder, 'create_apk_%s3.bat' %
-                                          self.aplication_name)])
+            procs=subprocess.Popen([os.path.join(self.cordova_app_folder, 'create_apk_%s2.bat' %
+                                              self.aplication_name)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+            print '\n\n\n####################################################'
+            print '# Creating APK file'
+            print '#####################################################\n\n\n'
+            while True:
+                time.sleep(.1) # so i don't kill the cpu on the machine i'm checking
+                output = procs.stdout.readline()
+                if output:
+                    print output.strip()
+                    if output.strip()==outputfile.replace('\\','/'):
+                        for proc in psutil.process_iter():
+                            if proc.name()=='java.exe':
+                                cwd_proc = proc.cwd()
+                                if 'gradle\daemon' in cwd_proc:
+                                    proc.kill()
+                        break
+
+            saida=procs.stdout.read()
+
         elif platform == "linux" or platform == "linux2":
+            if not engine:
+                subprocess.call(["cordova platform add android"], cwd=self.aplication_folder, shell=True)
             if level=='release':
                 if self._created_key:
                     subprocess.call(["cordova build android --verbose --release -- --keystore=\"%s\" --storePassword=%s --alias=%s" %(

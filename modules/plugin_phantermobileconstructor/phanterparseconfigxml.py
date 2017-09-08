@@ -12,6 +12,16 @@ class parseConfigXML(object):
 		self.root = self.tree.getroot()
 		elements={}
 
+	def checkEngine(self, platform='android'):
+		for x in self.root:
+			if x.tag.split(self._prefixmlns)[1] == 'engine':
+				if x.attrib:
+					if 'name' in x.attrib.keys():
+						if x.attrib['name']==platform:
+							return True
+		return False
+
+
 	def _changeText(self, element, new_text):
 		for x in self.root:
 			elementname="%s%s" %(self._prefixmlns, element)
@@ -133,3 +143,15 @@ class parseConfigXML(object):
 		text= '\n'.join(lines).replace('ns0:','').replace('/><', '/>\n    <').replace('/>\n<', '/>\n    <').replace('    </widget>','</widget>')
 		with open(local, 'w') as arquivo_aberto:
 			arquivo_aberto.write(text.strip())
+
+	def save(self):
+		cabecalho='<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<widget id="%s" version="%s" xmlns="%s" xmlns:cdv="http://cordova.apache.org/ns/1.0">' %(self.idapp, self.apkversion, self._prefixmlns.replace('{','').replace('}',''))
+		import StringIO
+		output = StringIO.StringIO()
+		self.tree.write(output)
+		lines=output.getvalue().split('\n')
+		lines[0]=cabecalho
+		text= '\n'.join(lines).replace('ns0:','').replace('/><', '/>\n    <').replace('/>\n<', '/>\n    <').replace('    </widget>','</widget>')
+		with open(self.arquivo, 'w') as arquivo_aberto:
+			arquivo_aberto.write(text.strip())
+
