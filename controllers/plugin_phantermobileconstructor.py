@@ -1,4 +1,6 @@
 # -*- coding: utf-8 -*-
+# phanterandroid defined in models
+
 import os
 import gluon.fileutils
 from plugin_phantermobileconstructor.phanterparseconfigxml import parseConfigXML
@@ -13,7 +15,7 @@ except:
     hosts = (http_host, )
 
 if (remote_addr not in hosts) and (remote_addr != "127.0.0.1"):
-    raise HTTP(200, T('PhanterMobile Constructor só funciona localmente'))
+    raise HTTP(200, T('PhanterMobile Constructor only works locally'))
 precisa_autorizacao = ['index', 'echo_comand']
 
 if (request.function in precisa_autorizacao):
@@ -21,9 +23,8 @@ if (request.function in precisa_autorizacao):
         redirect(URL('admin', 'default', 'index',
                      vars=dict(send=URL(args=request.args, vars=request.vars))))
 
-
 def index():
-    from plugin_phantermobileconstructor.phanterandroid import PhanterAndroid
+    
     q_config = None
     if db(db.plugin_phantermobileconstructor_apps).isempty():
         appname, version, idapp = request.application, '0.0.1', 'com.yoursite.youapp'
@@ -32,13 +33,13 @@ def index():
         appname, version, idapp = q_config.appname, q_config.apkversion, q_config.idapp
 
     if request.args(0) == 'phonegap':
-        android = PhanterAndroid()
-        android.openServer()
+
+        phanterandroid.openServer()
         html = DIV(
             DIV(
                 DIV(
                     DIV(
-                        IFRAME(_src="http://%s:%s/" % (http_host, android.port),
+                        IFRAME(_src="http://%s:%s/" % (http_host, phanterandroid.port),
                                _class='iframe_mobile_portrait responsivo'),
                         _class='html_mobile_portrait responsivo'),
                     _class="mobile_portrait responsivo"),
@@ -46,21 +47,21 @@ def index():
             DIV(DIV(H1(T('View in PhoneGap Server')), _class='caixa_titulo_painel_direito_g'),
                 DIV(
                 DIV(
-                    IFRAME(_src="http://%s:%s/" % (http_host, android.port),
+                    IFRAME(_src="http://%s:%s/" % (http_host, phanterandroid.port),
                            _class='iframe_mobile_landscape responsivo'),
                     _class='html_mobile_landscape responsivo'),
                 _class="mobile_landscape responsivo"),
                 _class="painel_direito_g"),
             _class="painel_principal_g caixa_view_semdistracoes_landscape")
     elif request.args(0) == 'cordova':
-        android = PhanterAndroid()
-        android.openServer('cordova')
+
+        phanterandroid.openServer('cordova')
         html = DIV(
             DIV(
                 DIV(
                     DIV(
                         IFRAME(_src="http://%s:%s/browser/www" % (http_host,
-                                                                  android.port), _class='iframe_mobile_portrait responsivo'),
+                                                                  phanterandroid.port), _class='iframe_mobile_portrait responsivo'),
                         _class='html_mobile_portrait responsivo'),
                     _class="mobile_portrait responsivo"),
                 _class="painel_esquerdo_g"),
@@ -68,31 +69,40 @@ def index():
                 DIV(
                 DIV(
                     IFRAME(_src="http://%s:%s/browser/www" % (http_host,
-                                                              android.port), _class='iframe_mobile_landscape responsivo'),
+                                                              phanterandroid.port), _class='iframe_mobile_landscape responsivo'),
                     _class='html_mobile_landscape responsivo'),
                 _class="mobile_landscape responsivo"),
                 _class="painel_direito_g"),
             _class="painel_principal_g caixa_view_semdistracoes_landscape")
     elif request.args(0) == 'localview':
+        if phanterandroid.default_controller:
+            controller_default = '%s/index' %phanterandroid.default_controller
+        else:
+            controller_default = 'plugin_phantermobileconstructor/www_index'
+
         html = DIV(
             DIV(
                 DIV(
                     DIV(
-                        IFRAME(_src="http://%s/%s/plugin_phantermobileconstructor/www_index" % (
-                                    request.env.http_host, request.application), _class='iframe_mobile_portrait responsivo'),
+                        IFRAME(_src="http://%s/%s/%s" % (
+                                    request.env.http_host, request.application, controller_default), _class='iframe_mobile_portrait responsivo'),
                         _class='html_mobile_portrait responsivo'),
                     _class="mobile_portrait responsivo"),
                 _class="painel_esquerdo_g"),
             DIV(DIV(H1(T('View in Web2py Server')), _class='caixa_titulo_painel_direito_g'),
                 DIV(
                 DIV(
-                    IFRAME(_src="http://%s/%s/plugin_phantermobileconstructor/www_index" % (
-                        request.env.http_host, request.application), _class='iframe_mobile_landscape responsivo'),
+                    IFRAME(_src="http://%s/%s/%s" % (
+                        request.env.http_host, request.application, controller_default), _class='iframe_mobile_landscape responsivo'),
                     _class='html_mobile_landscape responsivo'),
                 _class="mobile_landscape responsivo"),
                 _class="painel_direito_g"),
             _class="painel_principal_g caixa_view_semdistracoes_landscape")
     else:
+        if phanterandroid.default_controller:
+            controller_default = '%s/index' %phanterandroid.default_controller
+        else:
+            controller_default = 'plugin_phantermobileconstructor/www_index'
         if q_config:
             html_apks = DIV(
                 DIV(H4('APK List')), _style='width:100%; display:table;text-align:center;')
@@ -104,8 +114,8 @@ def index():
                 DIV(
                     DIV(
                         IFRAME(
-                            _src="http://%s/%s/plugin_phantermobileconstructor/www_index" % (
-                                request.env.http_host, request.application),
+                            _src="http://%s/%s/%s" % (
+                                    request.env.http_host, request.application, controller_default),
                             _class='iframe_mobile_portrait responsivo'),
                         _class='html_mobile_portrait responsivo'),
                     _class="mobile_portrait responsivo"),
@@ -240,12 +250,11 @@ def configxml():
 
 
 def configkeystore():
-    from plugin_phantermobileconstructor.phanterandroid import PhanterAndroid
-    android = PhanterAndroid()
+    
     if db(db.plugin_phantermobileconstructor_keystore).isempty():
         db.plugin_phantermobileconstructor_keystore.appkeystore.readable = False
         db.plugin_phantermobileconstructor_keystore.appkeystore.writable = False
-        keytool = android.requeriments('keytool')
+        keytool = phanterandroid.requeriments('keytool')
 
         if keytool['keytool']:
             if len(keytool['keytool']) > 1:
@@ -273,15 +282,13 @@ def configkeystore():
 def echo_comand():
 
     import json
-    from plugin_phantermobileconstructor.phanterandroid import PhanterAndroid
-    android = PhanterAndroid()
-
+    
     if request.args(0) == 'buildhtml':
-        android.buildHtml()
+        phanterandroid.buildHtml()
         return '$("#status_compilar").html(%s)' % json.dumps(SPAN("Compiled", _style="color:#165016").xml())
     elif request.args(0) == 'info':
         if request.vars.phonegapstatus:
-            status = android.statusServer()
+            status = phanterandroid.statusServer()
             jquery = ""
             if status:
                 html_status = SPAN(T("Running on port "), SPAN(
@@ -296,7 +303,7 @@ def echo_comand():
                     html_status = SPAN("Stoped", _style="color:#165016")
             return '$("#status_servidor_phonegap").html(%s); %s' % (json.dumps(html_status.xml()), jquery)
         elif request.vars.cordovastatus:
-            status = android.statusServer('cordova')
+            status = phanterandroid.statusServer('cordova')
             jquery = ""
             if status:
                 html_status = SPAN(T("Running on port: "), SPAN(
@@ -311,11 +318,11 @@ def echo_comand():
                     html_status = SPAN("Stoped", _style="color:#165016")
             return '$("#status_servidor_cordova").html(%s); %s' % (json.dumps(html_status.xml()), jquery)
     elif request.args(0) == 'closeserver':
-        android.closeServer()
+        phanterandroid.closeServer()
         return "alert('Server Closed!');"
 
     elif request.args(0) == 'resetapp':
-        android.resetApp()
+        phanterandroid.resetApp()
         return "alert('Reset Done!');"
     elif request.args(0) == 'createapk':
         signed = False
@@ -333,7 +340,7 @@ def echo_comand():
         if not request.vars.getlastapk:
             if request.args(1) == 'release':
                 if q_keystore:
-                    key_created = android.createKeystore(
+                    key_created = phanterandroid.createKeystore(
                         keytool=os.path.join(q_keystore.keytool),
                         keyname=q_keystore.keyname,
                         aliasname=q_keystore.aliasname,
@@ -354,10 +361,10 @@ def echo_comand():
                         db.commit()
                         signed = True
 
-                android.createApk('release')
+                phanterandroid.createApk('release')
                 levelfile = 'release'
             else:
-                android.createApk()
+                phanterandroid.createApk()
                 levelfile = 'debug'
         else:
             if q_keystore:
@@ -433,6 +440,12 @@ def echo_comand():
 ####################################
 # Mobile app Functions(Views and Css)
 ####################################
+
+# In this place you can develop the views that will be rendered in your mobile application, but must be started with www_. 
+# We encourage you to make a new controller, but to work properly PhanterAndroid Class must be instantiated by setting  
+# the name of the new controller in the models folder, the system will create, if it does not exist, an example file.  
+# Remembering that static files should be placed in the folder of the same name.
+
 
 # The generated css will be placed in the head of "www_layout.html"
 def css_head_layout_www():

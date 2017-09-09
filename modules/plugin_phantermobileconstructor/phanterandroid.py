@@ -69,7 +69,7 @@ class PhanterAndroid(object):
                                 |-Jquery.js
     """
 
-    def __init__(self, application_id=None):
+    def __init__(self, default_controller=None):
         """@aplication_id: generally follows the following format: com.yoursite.youraplication
               eg. br.com.conexaodidata.myaplication
               NOTE: this option is obsolet
@@ -83,10 +83,7 @@ class PhanterAndroid(object):
         self._created_key=[]
         self.request = current.request
         self.aplication_name = self.request.application
-        if not application_id:
-            self.aplication_id = "com.yoursite.yourapp"
-        else:
-            self.aplication_id = application_id
+        self.default_controller = default_controller
         self.ports = []
         self.port = 3000
         self.cordova_app_folder = os.path.join(
@@ -100,19 +97,20 @@ class PhanterAndroid(object):
         if not tem_condova or not tem_aplicativo:
             self._prepareTheEnvironment(buildHtml=True)
 
-    def statusServer(self, server='phonegap', timewait=1):
-        self.server_chosen = server
+    def statusServer(self, server=None, timewait=1):
+        if server:
+            self.server_chosen = server
         time.sleep(timewait)
         return self._examine_process()
 
-    def openServer(self, server='phonegap'):
+    def openServer(self, server=None):
         """
             @server: 'phonegap' or 'cordova'
             In linux the server will have to be opened manually, 
             so the method will try to find the process and the port.
         """
         request = self.request
-        if server != self.server_chosen:
+        if server:
             self.server_chosen = server
         print "Open %s server..." % self.server_chosen
         procs = self._examine_process()
@@ -131,21 +129,19 @@ class PhanterAndroid(object):
             self.port = port
             if platform == "win32" or platform == 'cygwin':
                 if self.server_chosen == 'phonegap':
-                    with open(os.path.join(self.cordova_app_folder, 'server_%s_run_%s.bat' %(self.server_chosen, self.aplication_name)), 'w') as arquivo_aberto:
-                        conteudo = "cd %s\nphonegap serve -p%s" % (
+                    with open(os.path.join(self.cordova_app_folder, 'server_%s_run_%s1.bat' %(self.server_chosen, self.aplication_name)), 'w') as file_opened:
+                        content = "cd %s\nphonegap serve -p%s" % (
                             self.aplication_folder, port)
-                        arquivo_aberto.write(conteudo)
+                        file_opened.write(content)
                 else:
-                    with open(os.path.join(self.cordova_app_folder, 'server_%s_run_%s.bat' %(self.server_chosen, self.aplication_name)), 'w') as arquivo_aberto:
-                        conteudo = "cd %s\ncordova prepare\ncordova serve %s" % (
+                    with open(os.path.join(self.cordova_app_folder, 'server_%s_run_%s1.bat' %(self.server_chosen, self.aplication_name)), 'w') as file_opened:
+                        content = "cd %s\ncordova serve %s" % (
                             self.aplication_folder, port)
-                        arquivo_aberto.write(conteudo)
-
+                        file_opened.write(content)
                 processo = subprocess.Popen([os.path.join(
-                    self.cordova_app_folder, 'server_%s_run_%s.bat' %(self.server_chosen, self.aplication_name))], shell=True)
+                    self.cordova_app_folder, 'server_%s_run_%s1.bat' %(self.server_chosen, self.aplication_name))], shell=True)
             elif platform == "linux" or platform == "linux2":
-                if server_chosen=='cordova':
-                    subprocess.call(['cordova prepare'], shell=True, cwd=self.aplication_folder)
+
                 processo = subprocess.Popen(['%S serve %s' %(self.server_chosen, port)], shell=True, cwd=self.aplication_folder)
             proc = psutil.Process(processo.pid)
             print "%s run on door %s" % (self.server_chosen, port)
@@ -183,9 +179,12 @@ class PhanterAndroid(object):
 
         print "Compiling html..."
         self.closeServer()
-
-        origem = os.path.join(request.env.web2py_path, 'applications',
-                              self.aplication_name, 'static', 'plugin_phantermobileconstructor', 'www')
+        if self.default_controller:
+            origem = os.path.join(request.env.web2py_path, 'applications',
+                                  self.aplication_name, 'static', self.default_controller)            
+        else:
+            origem = os.path.join(request.env.web2py_path, 'applications',
+                                  self.aplication_name, 'static', 'plugin_phantermobileconstructor', 'www')
         self.lista_de_pastas_origem_e_destino = []
         self.lista_de_pastas_destino = []
         self.lista_de_arquivos_origem_e_destinos = []
@@ -195,33 +194,71 @@ class PhanterAndroid(object):
                 os.makedirs(y)
         for x in self.lista_de_arquivos_origem_e_destinos:
             shutil.copy(x[0], x[1])
-        arquivo_plugin = os.path.join(request.env.web2py_path, 'applications',
-                                      self.aplication_name, 'controllers', 'plugin_phantermobileconstructor.py')
-        funcoes = []
-        with open(arquivo_plugin, 'r') as arquivo_aberto:
-            funcoes = find_exposed_functions(arquivo_aberto.read())
-        if funcoes:
-            for x in (x for x in funcoes if x.startswith("www_")):
-                url = "%s?phantermobilebuild=True" % URL(
-                    c='plugin_phantermobileconstructor', f=x, host=True)
-                print "Try open url: %s" % url
-                cont = 0
-                nome_arquivo_html = x.replace('www_', '')
-                while cont < 5:
-                    try:
-                        html_url = urllib2.urlopen(url)
-                        html = html2 = html_url.read()
-                        arquivo_destino = os.path.join(
-                            self.aplication_folder, 'www', "%s.html" % nome_arquivo_html)
-                        with open(arquivo_destino, 'w') as arquivo_aberto:
-                            print 'Get html source of %s and copy to %s' % (url, arquivo_destino)
-                            arquivo_aberto.write(html)
-                        break
-                    except Exception as e:
-                        time.sleep(2)
-                        print e
-                        cont += 1
-                        print "Fail! try %s of 5" % cont
+        if self.default_controller:
+            new_controller = os.path.join(request.env.web2py_path, 'applications',
+                                          self.aplication_name, 'controllers', "%s.py" % self.default_controller)
+            mobile_functions = []
+            with open(new_controller, 'r') as file_opened:
+                mobile_functions = find_exposed_functions(file_opened.read())
+            if mobile_functions:
+                for x in mobile_functions:
+                    url = "%s?phantermobilebuild=True" % URL(
+                        c=self.default_controller, f=x, host=True)
+                    print "Try open url: %s" % url
+                    cont = 0
+                    html_file_name = x
+                    while cont < 5:
+                        try:
+                            html_url = urllib2.urlopen(url)
+                            html = html2 = html_url.read()
+                            arquivo_destino = os.path.join(
+                                self.aplication_folder, 'www', "%s.html" % html_file_name)
+                            with open(arquivo_destino, 'w') as file_opened:
+                                print 'Get html source of %s and copy to %s' % (url, arquivo_destino)
+                                file_opened.write(html)
+                            break
+                        except Exception as e:
+                            time.sleep(2)
+                            print e
+                            cont += 1
+                            print "Fail! try %s of 5" % cont            
+        else:       
+            arquivo_plugin = os.path.join(request.env.web2py_path, 'applications',
+                                          self.aplication_name, 'controllers', 'plugin_phantermobileconstructor.py')
+            mobile_functions = []
+            with open(arquivo_plugin, 'r') as file_opened:
+                mobile_functions = find_exposed_functions(file_opened.read())
+            if mobile_functions:
+                for x in (x for x in mobile_functions if x.startswith("www_")):
+                    url = "%s?phantermobilebuild=True" % URL(
+                        c='plugin_phantermobileconstructor', f=x, host=True)
+                    print "Try open url: %s" % url
+                    cont = 0
+                    html_file_name = x.replace('www_', '')
+                    while cont < 5:
+                        try:
+                            html_url = urllib2.urlopen(url)
+                            html = html2 = html_url.read()
+                            arquivo_destino = os.path.join(
+                                self.aplication_folder, 'www', "%s.html" % html_file_name)
+                            with open(arquivo_destino, 'w') as file_opened:
+                                print 'Get html source of %s and copy to %s' % (url, arquivo_destino)
+                                file_opened.write(html)
+                            break
+                        except Exception as e:
+                            time.sleep(2)
+                            print e
+                            cont += 1
+                            print "Fail! try %s of 5" % cont
+        if platform == "win32" or platform == 'cygwin':
+            with open(os.path.join(self.cordova_app_folder, 'cordova_prepare_%s.bat' %(self.aplication_name)), 'w') as file_opened:
+                print 'cordova prepare'
+                content = "cd %s\ncordova prepare" %self.aplication_folder
+                file_opened.write(content)
+            processo = subprocess.Popen([os.path.join(
+                self.cordova_app_folder, 'cordova_prepare_%s.bat' %(self.aplication_name))], shell=True)
+        elif platform == "linux" or platform == "linux2":
+            subprocess.call(['cordova prepare'], shell=True, cwd=self.aplication_folder)
 
     def _getServerandDoorCmdLine(self, cmdline):
         strcmdline=' '.join(cmdline)
@@ -294,22 +331,40 @@ class PhanterAndroid(object):
                     if not os.path.isfile(os.path.join(path, x)):
                         self.lista_de_pastas_destino.append(os.path.join(path.replace(os.path.join(
                             request.env.web2py_path, 'applications', self.aplication_name, 'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.aplication_folder, 'www')), x))
-                        self.lista_de_pastas_origem_e_destino.append([os.path.join(path, x),
+                        self._examine_folders(os.path.join(path, x))
+                        if self.default_controller:
+                            self.lista_de_pastas_origem_e_destino.append([os.path.join(path, x),
+                                                                      os.path.join(path.replace(os.path.join(request.env.web2py_path, 'applications', self.aplication_name,
+                                                                                                             'static', self.default_controller), os.path.join(self.aplication_folder, 'www')), x),
+                                                                      ])
+                        else:
+
+                            self.lista_de_pastas_origem_e_destino.append([os.path.join(path, x),
                                                                       os.path.join(path.replace(os.path.join(request.env.web2py_path, 'applications', self.aplication_name,
                                                                                                              'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.aplication_folder, 'www')), x),
                                                                       ])
-                        self._examine_folders(os.path.join(path, x))
-
                     else:
-                        self.lista_de_arquivos_origem_e_destinos.append([os.path.join(path, x),
-                                                                         os.path.join(path.replace(os.path.join(
-                                                                             request.env.web2py_path, 'applications', self.aplication_name, 'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.aplication_folder, 'www'))),
-                                                                         ])
+                        if self.default_controller:
+                            self.lista_de_arquivos_origem_e_destinos.append([os.path.join(path, x),
+                                                                             os.path.join(path.replace(os.path.join(
+                                                                                 request.env.web2py_path, 'applications', self.aplication_name, 'static', self.default_controller), os.path.join(self.aplication_folder, 'www'))),
+                                                                             ])
+                        else:
+                            self.lista_de_arquivos_origem_e_destinos.append([os.path.join(path, x),
+                                                                             os.path.join(path.replace(os.path.join(
+                                                                                 request.env.web2py_path, 'applications', self.aplication_name, 'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.aplication_folder, 'www'))),
+                                                                             ])
         else:
-            self.lista_de_arquivos_origem_e_destinos.append([os.path.join(path),
-                                                             os.path.join(path.replace(os.path.join(request.env.web2py_path, 'applications', self.aplication_name,
-                                                                                                    'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.aplication_folder, 'www'))),
-                                                             ])
+            if self.default_controller:
+                self.lista_de_arquivos_origem_e_destinos.append([os.path.join(path),
+                                                                 os.path.join(path.replace(os.path.join(request.env.web2py_path, 'applications', self.aplication_name,
+                                                                                                        'static', self.default_controller), os.path.join(self.aplication_folder, 'www'))),
+                                                                 ])
+            else:
+                self.lista_de_arquivos_origem_e_destinos.append([os.path.join(path),
+                                                                 os.path.join(path.replace(os.path.join(request.env.web2py_path, 'applications', self.aplication_name,
+                                                                                                        'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.aplication_folder, 'www'))),
+                                                                 ])
 
     def _prepareTheEnvironment(self, buildHtml=True):
         request = self.request
@@ -322,14 +377,14 @@ class PhanterAndroid(object):
 
             if not os.path.exists(os.path.join(self.cordova_app_folder, 'create_app_%s.bat' % self.aplication_name)):
                 print "Creating file create_app_%s.bat" % self.aplication_name
-                with open(os.path.join(self.cordova_app_folder, 'create_app_%s.bat' % self.aplication_name), 'w') as arquivo_aberto:
-                    conteudo = "cd %s\ncordova create %s %s %s\ncordova platform add browser" % (
-                        self.cordova_app_folder, self.aplication_name, self.aplication_id, self.aplication_name)
-                    arquivo_aberto.write(conteudo)
+                with open(os.path.join(self.cordova_app_folder, 'create_app_%s.bat' % self.aplication_name), 'w') as file_opened:
+                    content = "cd %s\ncordova create %s %s %s\ncordova platform add browser" % (
+                        self.cordova_app_folder, self.aplication_name, 'com.yoursite.yourapp', self.aplication_name)
+                    file_opened.write(content)
             if not os.path.exists(self.aplication_folder):
                 print "Creating Folder cordova app: %s" % self.aplication_folder
                 os.makedirs(self.aplication_folder)
-                print "Executing: cordova create %s %s %s" % (self.aplication_name, self.aplication_id, self.aplication_name)
+                print "Executing: cordova create %s %s %s" % (self.aplication_name, 'com.yoursite.yourapp', self.aplication_name)
                 subprocess.call([os.path.join(self.cordova_app_folder, 'create_app_%s.bat' %
                                               self.aplication_name)], stdout=subprocess.PIPE, shell=True, stdin=subprocess.PIPE)
                 print "copy template phanterandroid in: %s" % os.path.join(self.aplication_folder, 'www')
@@ -340,7 +395,7 @@ class PhanterAndroid(object):
                 zip_ref.close()
         elif platform == "linux" or platform == "linux2":
             if not os.path.exists(self.aplication_folder):
-                subprocess.call(["cordova create %s %s %s" % (os.path.join(self.cordova_app_folder, self.aplication_name), self.aplication_id, self.aplication_name)], cwd=self.cordova_app_folder, shell=True)
+                subprocess.call(["cordova create %s %s %s" % (os.path.join(self.cordova_app_folder, self.aplication_name), 'com.yoursite.yourapp', self.aplication_name)], cwd=self.cordova_app_folder, shell=True)
                 subprocess.call(["cordova platform add browser"], cwd=self.cordova_app_folder, shell=True)
                 print "copy template phanterandroid in: %s" % os.path.join(self.aplication_folder, 'www')
                 print "unzip template of: %s" % os.path.abspath(os.path.join(os.path.dirname(__file__), 'phanterandroidpack', 'template.zip'))
@@ -397,8 +452,8 @@ class PhanterAndroid(object):
                     print e
             if update_req=='all' or update_req=='keytool':
                 try:
-                    with open(os.path.join(self.cordova_app_folder, 'check_keytool.bat'), 'w') as arquivo_aberto:
-                        arquivo_aberto.write('where /r "%ProgramW6432%\java" keytool.exe\nwhere /r "%ProgramFiles%\java" keytool.exe')
+                    with open(os.path.join(self.cordova_app_folder, 'check_keytool.bat'), 'w') as file_opened:
+                        file_opened.write('where /r "%ProgramW6432%\java" keytool.exe\nwhere /r "%ProgramFiles%\java" keytool.exe')
                     keytool=subprocess.Popen([os.path.join(self.cordova_app_folder, 'check_keytool.bat')], stdout=subprocess.PIPE)
                     result_keytool=keytool.stdout.read()
                     path_keytool=re_keytool.findall(result_keytool)
@@ -408,8 +463,8 @@ class PhanterAndroid(object):
                     print e  
             if update_req=='all' or update_req=='javac':
                 try:
-                    with open(os.path.join(self.cordova_app_folder, 'check_javac.bat'), 'w') as arquivo_aberto:
-                        arquivo_aberto.write('where /r "%ProgramW6432%\java" javac.exe\nwhere /r "%ProgramFiles%\java" javac.exe')
+                    with open(os.path.join(self.cordova_app_folder, 'check_javac.bat'), 'w') as file_opened:
+                        file_opened.write('where /r "%ProgramW6432%\java" javac.exe\nwhere /r "%ProgramFiles%\java" javac.exe')
                     javac=subprocess.Popen([os.path.join(self.cordova_app_folder, 'check_javac.bat')], stdout=subprocess.PIPE)
                     result_javac=javac.stdout.read()
                     path_javac=re_javac.findall(result_javac)
@@ -504,11 +559,11 @@ class PhanterAndroid(object):
         "%(keypass)s -dname \"CN=%(CN)s OU=%(OU)s O=%(O)s L=%(L)s ST=%(ST)s C=%(C)s\""
         if platform == "win32" or platform == 'cygwin':
             args_keytool_map=args_keytool %kargs
-            with open(os.path.join(self.cordova_app_folder, 'create_key_%s.bat' % self.aplication_name), 'w') as arquivo_aberto:
-                conteudo = "cd %s\n" %os.path.join(self.cordova_app_folder)
+            with open(os.path.join(self.cordova_app_folder, 'create_key_%s.bat' % self.aplication_name), 'w') as file_opened:
+                content = "cd %s\n" %os.path.join(self.cordova_app_folder)
                 complete_comand="%s %s" %(keytool, args_keytool_map)
-                conteudo+=complete_comand
-                arquivo_aberto.write(conteudo)
+                content+=complete_comand
+                file_opened.write(content)
             print "creating keystore"
             subprocess.call([os.path.join(self.cordova_app_folder, 'create_key_%s.bat' %
                                           self.aplication_name)])
@@ -536,10 +591,10 @@ class PhanterAndroid(object):
         outputfilebase=os.path.join(self.aplication_folder,'platforms', 'android', 'build', 'outputs', 'apk')
         if platform == "win32" or platform == 'cygwin':
             if not engine:
-                with open(os.path.join(self.cordova_app_folder, 'create_apk_%s1.bat' % self.aplication_name), 'w') as arquivo_aberto:
-                    conteudo = "cd %s\n" %os.path.join(self.aplication_folder)
-                    conteudo+="cordova platform add android\n"
-                    arquivo_aberto.write(conteudo)
+                with open(os.path.join(self.cordova_app_folder, 'create_apk_%s1.bat' % self.aplication_name), 'w') as file_opened:
+                    content = "cd %s\n" %os.path.join(self.aplication_folder)
+                    content+="cordova platform add android\n"
+                    file_opened.write(content)
                 print "Inserting Android Platform"
                 try:
                     apk1=subprocess.call([os.path.join(self.cordova_app_folder, 'create_apk_%s1.bat' %
@@ -547,20 +602,20 @@ class PhanterAndroid(object):
                 except Exception as e:
                     print e
 
-            with open(os.path.join(self.cordova_app_folder, 'create_apk_%s2.bat' % self.aplication_name), 'w') as arquivo_aberto:
-                conteudo = "cd %s\n" %os.path.join(self.aplication_folder)
+            with open(os.path.join(self.cordova_app_folder, 'create_apk_%s2.bat' % self.aplication_name), 'w') as file_opened:
+                content = "cd %s\n" %os.path.join(self.aplication_folder)
                 if level=='release':
                     if self._created_key:
                         outputfile=os.path.join(outputfilebase, 'android-release.apk')
-                        conteudo+="cordova build android --verbose --release -- --keystore=\"%s\" --storePassword=%s --alias=%s" %(
+                        content+="cordova build android --verbose --release -- --keystore=\"%s\" --storePassword=%s --alias=%s" %(
                             self._created_key[0],self._created_key[1],self._created_key[2])
                     else:
                         outputfile=os.path.join(outputfilebase, 'android-release-unsigned.apk')
-                        conteudo+="cordova build android --verbose --release\n"
+                        content+="cordova build android --verbose --release\n"
                 else:
                     outputfile=os.path.join(outputfilebase, 'android-debug.apk')
-                    conteudo+="cordova build android --verbose\n"
-                arquivo_aberto.write(conteudo)
+                    content+="cordova build android --verbose\n"
+                file_opened.write(content)
             procs=subprocess.Popen([os.path.join(self.cordova_app_folder, 'create_apk_%s2.bat' %
                                               self.aplication_name)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             print '\n\n\n####################################################'

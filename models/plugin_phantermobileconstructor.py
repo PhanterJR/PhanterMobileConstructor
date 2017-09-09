@@ -1,12 +1,22 @@
 # -*- coding: utf-8 -*-
 from plugin_phantermobileconstructor.phantermenubar import PhanterMenubar
+from plugin_phantermobileconstructor.phanterandroid import PhanterAndroid
+from plugin_phantermobileconstructor.phanterajaxdevelopment import PhanterAjaxDevelopment #remove in prodution
+
+# Here you can define another controller where the views of your mobile application will be developed.
+# We encourage this, because in an eventual update of the plugin, your project is not affected.
+# We also encourage PhanterAndroid to be defined in the models of your application.
+#phanterandroid=PhanterAndroid()
+
 import os
 import urllib2
 
 response.toolbar_mob = ""
+
+# using the request.vars.phantermobilebuild to prebuild (before cordova prepare)
 if request.vars.phantermobilebuild:
-    response.ajax_server = "http://%s/%s/" % (
-        request.env.http_host, request.application)
+    phanteajaxdevelopment = PhanterAjaxDevelopment()
+    response.ajax_server = phanteajaxdevelopment.urlAjaxServer("%s/%s" %(request.env.http_host, request.application))
 else:
     response.toolbar_mob = DIV(
         DIV(A(T('Web2py ToolBar'), _style="color: #440808;", _href="#caixa_response_toolbar"),
