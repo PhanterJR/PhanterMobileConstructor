@@ -1,6 +1,20 @@
 # PhanterMobileConstructor
 Create your mobile aplication using web2py
 
+Requeriments:
+
+  - windows (suport linux in tests)
+  - web2py
+  - python 2.7 (suport python 3 in tests)
+  - cordova (npm install -g cordova)
+  - phonegap (optional server, npm install -g phonegap)
+  - corsproxy (ajax CORS suport, npm install -g corsproxy)
+  - psutil (pip install psutil)
+  - javaSDK (Javac(cordova requirements) and Keytool(sing apk))
+  - Android Studio and androidSDK (cordova requirements)
+
+Structure:
+
   - On init create this folders structure if not exists:
      
         web2py
@@ -10,21 +24,20 @@ Create your mobile aplication using web2py
   - The name of folderAppCordova is the same of your web2py aplication
       Cointains the default cordova app
 
-  - On Web2py Developer, inside of plugin_phantermobileconstructor, 
-      all functions started with "www_" will be rendered in the cordova application (on buildHtml method)
-      and all files in static/plugin_phantermobileconstructor/www will be copied to the www folder of cordova App
+  - In the first run of the plugin, if you create a www controller, a www templates, a www folder will be created in the views and in the static folder, where it is placed as views and files.
+The following structure will be created in cordova in relation to the structure of web2py:
 
       exemple:
       
-          - On controller/plugin_phantermobileconstructor.py (web2py)
-              def www_index():
+          - On controller/www.py (web2py)
+              def index():
                   #your code
                   return dict()
-              def www_other_function():
+              def Other_function():
                   return DIV("my div")
                   
-          - On static/plugin_phantermobileconstructor/www
-              static/plugin_phantermobileconstructor/www/
+          - On static/www
+              static/www/
                       |-css/
                           |-mycss.css
                           |-outhes.css
@@ -45,29 +58,5 @@ Create your mobile aplication using web2py
                           |-myimage.jpg
                       |-js/
                           |-Jquery.js
-NOTE: In Linux the server many features have not been implemented, in windows many functions are executed through batch files (.bat), below the list of commands that will have to be made manually in linux to work.
 
-In the web2py folder, create a folder named cordova.
-Then create a cordova application with the same name as your web2py application (I'll use the web2py welcome application as an example)
 
-  -To create your first Cordova application
-
-    $ls web2py_folder/cordova
-    $cordova create welcome com.yoursite.www welcome
-
-  -to open the phonegap server
-
-    $ls web2py_folder/cordova/your_app_name
-    $phonegap serve -p3000
-
-  -if you prefer to use the cordova server
-
-      $ls web2py_folder/cordova/your_app_name
-      $cordova serve 3000
-
-  -to create the apk of your application
-  
-      $ls web2py_folder/cordova/your_app_name
-      $cordova platform remove android
-      $cordova platform add android
-      $cordova build android
