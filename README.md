@@ -60,3 +60,9 @@ The following structure will be created in cordova in relation to the structure 
                           |-Jquery.js
 
 
+Features
+  
+  - Edit config.xml (cordova project)
+  - Views in cordova server or phonegap server
+  - Create keystore (keytool)
+  - Build debug and release APK (Stored by version in sqllite database)
