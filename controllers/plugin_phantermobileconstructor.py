@@ -37,11 +37,12 @@ def index():
     if request.args(0) == 'phonegap':
 
         phanterandroid.openServer()
+        response.server_phonegap_http_address="http://%s:%s/" % (http_host, phanterandroid.port)
         html = DIV(
             DIV(
                 DIV(
                     DIV(
-                        IFRAME(_src="http://%s:%s/" % (http_host, phanterandroid.port),
+                        IFRAME(_src=response.server_phonegap_http_address,
                                _class='iframe_mobile_portrait responsivo'),
                         _class='html_mobile_portrait responsivo'),
                     _class="mobile_portrait responsivo"),
@@ -49,31 +50,38 @@ def index():
             DIV(DIV(H1(T('View in PhoneGap Server')), _class='caixa_titulo_painel_direito_g'),
                 DIV(
                 DIV(
-                    IFRAME(_src="http://%s:%s/" % (http_host, phanterandroid.port),
+                    IFRAME(_src=response.server_phonegap_http_address,
                            _class='iframe_mobile_landscape responsivo'),
                     _class='html_mobile_landscape responsivo'),
                 _class="mobile_landscape responsivo"),
+                DIV(
+                    A(DIV("without distractions", _class='menu_item_extra_buttons'), _href=response.server_phonegap_http_address, _target="_blank"),
+                    _class='extra_buttons'),
                 _class="painel_direito_g"),
             _class="painel_principal_g caixa_view_semdistracoes_landscape")
+
     elif request.args(0) == 'cordova':
 
         phanterandroid.openServer('cordova')
+        response.server_cordova_http_address="http://%s:%s/browser/www" % (http_host,
+                                                                  phanterandroid.port)
         html = DIV(
             DIV(
                 DIV(
                     DIV(
-                        IFRAME(_src="http://%s:%s/browser/www" % (http_host,
-                                                                  phanterandroid.port), _class='iframe_mobile_portrait responsivo'),
+                        IFRAME(_src=response.server_cordova_http_address, _class='iframe_mobile_portrait responsivo'),
                         _class='html_mobile_portrait responsivo'),
                     _class="mobile_portrait responsivo"),
                 _class="painel_esquerdo_g"),
             DIV(DIV(H1(T('View in Cordova Server')), _class='caixa_titulo_painel_direito_g'),
                 DIV(
                 DIV(
-                    IFRAME(_src="http://%s:%s/browser/www" % (http_host,
-                                                              phanterandroid.port), _class='iframe_mobile_landscape responsivo'),
+                    IFRAME(_src=response.server_cordova_http_address, _class='iframe_mobile_landscape responsivo'),
                     _class='html_mobile_landscape responsivo'),
                 _class="mobile_landscape responsivo"),
+                DIV(
+                    A(DIV("without distractions", _class='menu_item_extra_buttons'), _href=response.server_cordova_http_address, _target="_blank"),
+                    _class='extra_buttons'),
                 _class="painel_direito_g"),
             _class="painel_principal_g caixa_view_semdistracoes_landscape")
     elif request.args(0) == 'localview':
@@ -87,7 +95,7 @@ def index():
                 DIV(
                     DIV(
                         IFRAME(_src="http://%s/%s/%s" % (
-                                    request.env.http_host, request.application, controller_default), _class='iframe_mobile_portrait responsivo'),
+                        request.env.http_host, request.application, controller_default), _class='iframe_mobile_portrait responsivo'),
                         _class='html_mobile_portrait responsivo'),
                     _class="mobile_portrait responsivo"),
                 _class="painel_esquerdo_g"),
@@ -98,6 +106,9 @@ def index():
                         request.env.http_host, request.application, controller_default), _class='iframe_mobile_landscape responsivo'),
                     _class='html_mobile_landscape responsivo'),
                 _class="mobile_landscape responsivo"),
+                DIV(
+                    A(DIV("without distractions", _class='menu_item_extra_buttons'), _href=URL('www', 'index'), _target="_blank"),
+                    _class='extra_buttons'),
                 _class="painel_direito_g"),
             _class="painel_principal_g caixa_view_semdistracoes_landscape")
     else:

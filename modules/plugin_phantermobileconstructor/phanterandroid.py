@@ -188,6 +188,7 @@ class PhanterAndroid(object):
             proc = psutil.Process(processo.pid)
             while not proc.children():
                 print("Try open server %s run on door %s" % (self.server_chosen, port))
+                time.sleep(1)
             cont=50
             while cont<50:
                 cont+=1

@@ -212,7 +212,7 @@
           text-shadow: 0px 0px 2px #19AD3E, 0px 0px 10px #21c210;
           transition: text-shadow 0.5s ease 0s !important;
         }
-
+        
         .menu_item {
           float: left;
           text-transform: uppercase;
@@ -220,6 +220,16 @@
           color: #0985A7;
           margin-left: 10px;
           cursor: pointer;
+        }
+
+        .menu_item.responsivo-desktop {
+          border-left: 1px solid #36374b;
+          padding-left: 10px;
+        }
+
+        .menu_item.responsivo-desktoplg {
+          border-left: 1px solid #36374b;
+          padding-left: 10px;
         }
 
         .menu_item:hover {
@@ -575,7 +585,21 @@
           width: 100%;
           padding: 10px 40px 10px 10px;
         }
-
+        .extra_buttons {
+            display: table;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .menu_item_extra_buttons {
+            width: 100px;
+            padding: 10px;
+            text-align: center;
+            background: black;
+            border-radius: 5px;
+            margin-top: 5px;
+            float: left;
+        }
         .caixa_botao_ajax_principal {
           float: left;
           width: 30%;
