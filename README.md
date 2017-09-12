@@ -1,4 +1,4 @@
-# PhanterMobileConstructor
+# PhanterMobile Constructor
 Create your mobile aplication using web2py
 
 Requeriments:
