@@ -163,7 +163,7 @@ class PhanterAndroid(object):
                     except Exception as e:
                         print(e)
                 if self.server_chosen == 'phonegap':
-                    with open(os.path.join(self.cordova_app_folder, 'server_%s_run_%s1.bat' %(self.server_chosen, self.aplication_name)), 'w') as file_opened:
+                    with open(os.path.join(self.cordova_app_folder, '%s_server_%s_run.bat' %(self.aplication_name, self.server_chosen)), 'w') as file_opened:
                         content = "cd %s\nphonegap serve -p%s" % (
                             self.aplication_folder, port)
                         try:
@@ -172,7 +172,7 @@ class PhanterAndroid(object):
                             pass
                         file_opened.write(content)
                 else:
-                    with open(os.path.join(self.cordova_app_folder, 'server_%s_run_%s1.bat' %(self.server_chosen, self.aplication_name)), 'w') as file_opened:
+                    with open(os.path.join(self.cordova_app_folder, '%s_server_%s_run.bat' %(self.aplication_name, self.server_chosen)), 'w') as file_opened:
                         content = "cd %s\ncordova serve %s" % (
                             self.aplication_folder, port)
                         try:
@@ -181,7 +181,7 @@ class PhanterAndroid(object):
                             pass
                         file_opened.write(content)
                 processo = subprocess.Popen([os.path.join(
-                    self.cordova_app_folder, 'server_%s_run_%s1.bat' %(self.server_chosen, self.aplication_name))], shell=True)
+                    self.cordova_app_folder, '%s_server_%s_run.bat' %(self.aplication_name, self.server_chosen))], shell=True)
             elif platform == "linux" or platform == "linux2":
 
                 processo = subprocess.Popen(['%S serve %s' %(self.server_chosen, port)], shell=True, cwd=self.aplication_folder)
@@ -596,11 +596,13 @@ class PhanterAndroid(object):
                 print("Erro on remove:", self.aplication_folder)
                 print(e)
         if platform == "win32" or platform == 'cygwin':
-            self._remove_file(os.path.join(self.cordova_app_folder, 'create_app_%s.bat' % self.aplication_name))
-            self._remove_file(os.path.join(self.cordova_app_folder, 'server_run_%s.bat' % self.aplication_name))
-            self._remove_file(os.path.join(self.cordova_app_folder, 'create_apk_%s1.bat' % self.aplication_name))
-            self._remove_file(os.path.join(self.cordova_app_folder, 'create_apk_%s2.bat' % self.aplication_name))
-            self._remove_file(os.path.join(self.cordova_app_folder, 'create_apk_%s3.bat' % self.aplication_name))
+            self._remove_file(os.path.join(self.cordova_app_folder, '%s_create_app.bat' % self.aplication_name))
+            self._remove_file(os.path.join(self.cordova_app_folder, '%s_server_cordova_run_.bat' % self.aplication_name))
+            self._remove_file(os.path.join(self.cordova_app_folder, '%s_create_apk_debug.bat' % self.aplication_name))
+            self._remove_file(os.path.join(self.cordova_app_folder, '%s_create_apk_release.bat' % self.aplication_name))
+            self._remove_file(os.path.join(self.cordova_app_folder, '%s_platform_browser' % self.aplication_name))
+            self._remove_file(os.path.join(self.cordova_app_folder, '%s_cordova_prepare' % self.aplication_name))
+
     
     def createKeystore(self, keytool, 
         keyname="phantermobile", 
@@ -671,7 +673,7 @@ class PhanterAndroid(object):
         outputfilebase=os.path.join(self.aplication_folder,'platforms', 'android', 'build', 'outputs', 'apk')
         if platform == "win32" or platform == 'cygwin':
             if not engine or not os.path.exists(os.path.join(self.aplication_folder,'platforms', 'android')):
-                with open(os.path.join(self.cordova_app_folder, 'create_apk_%s1.bat' % self.aplication_name), 'w') as file_opened:
+                with open(os.path.join(self.cordova_app_folder, '%s_create_apk_build.bat' % self.aplication_name), 'w') as file_opened:
                     content = "cd %s\n" %os.path.join(self.aplication_folder)
                     content+="cordova platform add android\n"
                     try:
@@ -681,12 +683,12 @@ class PhanterAndroid(object):
                     file_opened.write(content)
                 print("Inserting Android Platform")
                 try:
-                    apk1=subprocess.call([os.path.join(self.cordova_app_folder, 'create_apk_%s1.bat' %
+                    apk1=subprocess.call([os.path.join(self.cordova_app_folder, '%s_create_apk_build.bat' %
                                                   self.aplication_name)])
                 except Exception as e:
                     print(e)
 
-            with open(os.path.join(self.cordova_app_folder, 'create_apk_%s2.bat' % self.aplication_name), 'w') as file_opened:
+            with open(os.path.join(self.cordova_app_folder, '%s_create_apk_release.bat' % self.aplication_name), 'w') as file_opened:
                 content = "cd %s\n" %os.path.join(self.aplication_folder)
                 if level=='release':
                     if self._created_key:
@@ -704,7 +706,7 @@ class PhanterAndroid(object):
                 except:
                     pass                
                 file_opened.write(content)
-            procs=subprocess.Popen([os.path.join(self.cordova_app_folder, 'create_apk_%s2.bat' %
+            procs=subprocess.Popen([os.path.join(self.cordova_app_folder, '%s_create_apk_release.bat' %
                                               self.aplication_name)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             print('\n\n\n####################################################')
             print('# Creating APK file')
