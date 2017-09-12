@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
 # phanterandroid defined in models
+# python 3 comtability
+from __future__ import print_function
 
 import os
 import gluon.fileutils
@@ -239,7 +241,7 @@ def configxml():
         for y in form.vars.allownavigation:
             meuxml.addElementList('allow-navigation', 'origin', y)
         for z in form.vars.allowintent:
-            meuxml.addElementList('allow-intent', 'origin', z)
+            meuxml.addElementList('allow-intent', 'href', z)
 
         meuxml.save()
         session.flash = "config.xml saved!"
@@ -281,14 +283,18 @@ def configkeystore():
 
 def echo_comand():
 
-    import json
+    try: 
+        import simplejson as json
+    except ImportError:
+        import json
     
     if request.args(0) == 'buildhtml':
         phanterandroid.buildHtml()
-        return '$("#status_compilar").html(%s)' % json.dumps(SPAN("Compiled", _style="color:#165016").xml())
+        return '$("#status_compilar").html(%s)' % json.dumps(SPAN("Compiled", _style="color:#165016").xml().decode('utf-8'))
     elif request.args(0) == 'info':
         if request.vars.phonegapstatus:
             status = phanterandroid.statusServer()
+            print("stataus phonegap",status)
             jquery = ""
             if status:
                 html_status = SPAN(T("Running on port "), SPAN(
@@ -301,10 +307,11 @@ def echo_comand():
                     jquery = "setTimeout(function(){ajax('%s',[],':eval'); console.log('3 segundos');}, 5000);" % new_ajax
                 else:
                     html_status = SPAN("Stoped", _style="color:#165016")
-            return '$("#status_servidor_phonegap").html(%s); %s' % (json.dumps(html_status.xml()), jquery)
+            return '$("#status_servidor_phonegap").html(%s); %s' % (json.dumps(html_status.xml().decode('utf-8')), jquery)
         elif request.vars.cordovastatus:
             status = phanterandroid.statusServer('cordova')
             jquery = ""
+            print("status cordova",status)
             if status:
                 html_status = SPAN(T("Running on port: "), SPAN(
                     status['port']), _style="color:#165016")
@@ -316,7 +323,7 @@ def echo_comand():
                     jquery = "setTimeout(function(){ajax('%s',[],':eval'); console.log('3 segundos');}, 5000);" % new_ajax
                 else:
                     html_status = SPAN("Stoped", _style="color:#165016")
-            return '$("#status_servidor_cordova").html(%s); %s' % (json.dumps(html_status.xml()), jquery)
+            return '$("#status_servidor_cordova").html(%s); %s' % (json.dumps(html_status.xml().decode('utf-8')), jquery)
     elif request.args(0) == 'closeserver':
         phanterandroid.closeServer()
         return "alert('Server Closed!');"
@@ -408,9 +415,9 @@ def echo_comand():
             if request.vars.getlastapk and q_apk.apkfile:
                 downloadapk = q_apk.apkfile
                 if request.args(1) == 'release':
-                    return "$('#dowload_newapk_release').html(%s)" % (json.dumps(SPAN(A(DIV(apk_saved_name, _class='download_newapk_release'), _href=URL('default', 'download', args=[downloadapk]))).xml()))
+                    return "$('#dowload_newapk_release').html(%s)" % (json.dumps(SPAN(A(DIV(apk_saved_name, _class='download_newapk_release'), _href=URL('default', 'download', args=[downloadapk]))).xml().decode('utf-8')))
                 else:
-                    return "$('#dowload_newapk_debug').html(%s)" % (json.dumps(SPAN(A(DIV(apk_saved_name, _class='download_newapk_release'), _href=URL('default', 'download', args=[downloadapk]))).xml()))
+                    return "$('#dowload_newapk_debug').html(%s)" % (json.dumps(SPAN(A(DIV(apk_saved_name, _class='download_newapk_release'), _href=URL('default', 'download', args=[downloadapk]))).xml().decode('utf-8')))
             else:
                 if q_apk:
                     id_apk = q_apk.id
@@ -428,9 +435,9 @@ def echo_comand():
                 id_apk].apkfile
             db.commit()
             if request.args(1) == 'release':
-                return "$('#dowload_newapk_release').html(%s)" % (json.dumps(SPAN(A(DIV(apk_saved_name, _class='download_newapk_release'), _href=URL('default', 'download', args=[downloadapk]))).xml()))
+                return "$('#dowload_newapk_release').html(%s)" % (json.dumps(SPAN(A(DIV(apk_saved_name, _class='download_newapk_release'), _href=URL('default', 'download', args=[downloadapk]))).xml().decode('utf-8')))
             else:
-                return "$('#dowload_newapk_debug').html(%s)" % (json.dumps(SPAN(A(DIV(apk_saved_name, _class='download_newapk_debug'), _href=URL('default', 'download', args=[downloadapk]))).xml()))
+                return "$('#dowload_newapk_debug').html(%s)" % (json.dumps(SPAN(A(DIV(apk_saved_name, _class='download_newapk_debug'), _href=URL('default', 'download', args=[downloadapk]))).xml().decode('utf-8')))
         else:
             return "$('#dowload_newapk_debug').html(%s); $('#dowload_newapk_release').html(%s);" % (json.dumps("<span>Apk don't created!</span>"), json.dumps("<span>Apk don't created!</span>"))
     else:
@@ -453,32 +460,8 @@ def css_head_layout_www():
 
 
 # Functions started with "www" in your name will generate the htmls that will be placed in the www folder of cordova
-# Example: the function "def www_index ()" will be generated in the www
+# Example: the function "def  www_index ()" will be generated in the www
 # folder the index.html file.
 
 def www_index():
     return dict()
-
-
-# This is necessary to convert links generated from URL() function to
-# local links from Cordova App.
-if request.vars.phantermobilebuild:
-
-    def filter(d):
-        import re
-        if isinstance(d, dict):
-            html_filtrado = re.compile(
-                '\n\s\s+\n').sub('\n', response.render(d))
-        else:
-            html_filtrado = re.compile(
-                '\n\s\s+\n').sub('\n', response.render(d()))
-        html_filtrado = html_filtrado.replace(
-            "/%s/static/plugin_phantermobileconstructor/www/" % request.application, "")
-        html_filtrado = html_filtrado.replace(
-            "%s/static/plugin_phantermobileconstructor/www/" % request.application, "")
-        html_filtrado = html_filtrado.replace(
-            "/static/plugin_phantermobileconstructor/www/", "")
-        html_filtrado = html_filtrado.replace(
-            "static/plugin_phantermobileconstructor/www/", "")
-        return html_filtrado
-    response._caller = filter

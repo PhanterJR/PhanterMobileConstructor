@@ -1,6 +1,8 @@
 # -*- coding: utf-8 -*-
 # requires corsproxy
 # npm install -g corsproxy
+# python 3 comtability
+from __future__ import print_function
 
 # python battery
 from sys import platform
@@ -47,32 +49,30 @@ class PhanterAjaxDevelopment(object):
                         processo_localizado['port'] = 1337
                         processo_localizado['pid'] = proc.pid
                         if cmd_status:
-                            print "\n================ SERVER PROXY ==================" +\
+                            print("\n================ SERVER PROXY ==================" +\
                                 "\n Server: Corsproxy\n Porta: %s\n PID: %s\n" %(1337, proc.pid) +\
-                                "------------------------------------\n"
+                                "----------------------------------------\n")
         if not processo_localizado:
             if platform == 'win32' or platform == 'cygwin':
                 re_corsproxy=re.compile(r'^[A-Z]:\\.+corsproxy\.cmd')
                 path_corsproxy=None
                 try:
                     corsproxy=subprocess.check_output(['where','corsproxy.cmd'])
-                    corsproxy=corsproxy.strip().split('\n')[0]
+                    corsproxy=corsproxy.decode('utf-8').strip().split('\n')[0]
                     path_corsproxy=re_corsproxy.findall(corsproxy)
                 except Exception as e:
-                    print "Don't find corsproxy in your system, try install. eg. npm install -g corsproxy"
-                    print e
+                    print("Don't find corsproxy in your system, try install. eg. npm install -g corsproxy")
+                    print(e)
                 if path_corsproxy:
                     with open(os.path.join(self.cordova_app_folder, 'server_run_corsproxy.bat'), 'w') as file_opened:
                         file_opened.write("corsproxy")
                     processo = subprocess.Popen([os.path.join(
                     self.cordova_app_folder, 'server_run_corsproxy.bat')], shell=True)          
-                    print "\n================ SERVER PROXY ==================" +\
+                    print("\n================ SERVER PROXY ==================" +\
                         "\n Server: Corsproxy\n Porta: %s\n PID: %s\n" %(1337, processo.pid) +\
-                        "------------------------------------\n"
+                        "------------------------------------\n")
             elif platform == 'linux' or platform == 'linux2':
-                if server_chosen=='cordova':
-                    subprocess.call(['cordova prepare'], shell=True, cwd=self.aplication_folder)
-                processo = subprocess.Popen(['%S serve %s' %(self.server_chosen, port)], shell=True, cwd=self.aplication_folder)                
+                subprocess.call(['corsproxy'], shell=True, cwd=self.aplication_folder)
 
 
     def urlAjaxServer(self, url_ajax):

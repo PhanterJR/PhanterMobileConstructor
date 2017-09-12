@@ -1,13 +1,24 @@
 # -*- coding: utf-8 -*-
 # versao: 1.5.0
+# python 3 comtability
+from __future__ import print_function
+from io import open
+
+try:
+    from urllib.request import urlopen
+except ImportError:
+    from urllib2 import urlopen
+
 # personal import
-from phanterparseconfigxml import parseConfigXML
+try:
+    from phanterparseconfigxml import parseConfigXML
+except ImportError:
+    from plugin_phantermobileconstructor.phanterparseconfigxml import parseConfigXML
 
 # python battery
 import subprocess
 import os
 import zipfile
-import urllib2
 import shutil
 import time
 import re
@@ -98,6 +109,7 @@ class PhanterAndroid(object):
             self._prepareTheEnvironment(buildHtml=True)
 
     def statusServer(self, server=None, timewait=1):
+        print("statusServer")
         if server:
             self.server_chosen = server
         time.sleep(timewait)
@@ -112,14 +124,19 @@ class PhanterAndroid(object):
         request = self.request
         if server:
             self.server_chosen = server
-        print "Open %s server..." % self.server_chosen
+        print("Open %s server..." % self.server_chosen)
         procs = self._examine_process()
         if procs:
             self.port = procs['port']
-            print 'Server is run in door %s' % procs['port']
+            print('Server is run in door %s' % procs['port'])
         else:
             port = 3000
-            for y in xrange(3000, 4000):
+            def myrange():
+                cont=3000
+                while cont<4000:
+                    cont+=1
+                    yield cont
+            for y in myrange():
                 if y in self.ports:
                     pass
                 else:
@@ -128,15 +145,40 @@ class PhanterAndroid(object):
                     break
             self.port = port
             if platform == "win32" or platform == 'cygwin':
+                configxml=parseConfigXML(os.path.join(self.aplication_folder, 'config.xml'))
+                engine=configxml.checkEngine('browser')
+                if not engine or not os.path.exists(os.path.join(self.aplication_folder,'platforms', 'browser')):
+                    with open(os.path.join(self.cordova_app_folder, '%s_platform_add_browser.bat' % self.aplication_name), 'w') as file_opened:
+                        content = "cd %s\n" %os.path.join(self.aplication_folder)
+                        content+="cordova platform add browser\n"
+                        try:
+                            content=content.decode('utf-8')
+                        except:
+                            pass
+                        file_opened.write(content)
+                    print("Inserting Browser Platform")
+                    try:
+                        subprocess.call([os.path.join(self.cordova_app_folder, '%s_platform_add_browser.bat' %
+                                                      self.aplication_name)])
+                    except Exception as e:
+                        print(e)
                 if self.server_chosen == 'phonegap':
                     with open(os.path.join(self.cordova_app_folder, 'server_%s_run_%s1.bat' %(self.server_chosen, self.aplication_name)), 'w') as file_opened:
                         content = "cd %s\nphonegap serve -p%s" % (
                             self.aplication_folder, port)
+                        try:
+                            content=content.decode('utf-8')
+                        except:
+                            pass
                         file_opened.write(content)
                 else:
                     with open(os.path.join(self.cordova_app_folder, 'server_%s_run_%s1.bat' %(self.server_chosen, self.aplication_name)), 'w') as file_opened:
                         content = "cd %s\ncordova serve %s" % (
                             self.aplication_folder, port)
+                        try:
+                            content=content.decode('utf-8')
+                        except:
+                            pass
                         file_opened.write(content)
                 processo = subprocess.Popen([os.path.join(
                     self.cordova_app_folder, 'server_%s_run_%s1.bat' %(self.server_chosen, self.aplication_name))], shell=True)
@@ -144,31 +186,54 @@ class PhanterAndroid(object):
 
                 processo = subprocess.Popen(['%S serve %s' %(self.server_chosen, port)], shell=True, cwd=self.aplication_folder)
             proc = psutil.Process(processo.pid)
-            print "%s run on door %s" % (self.server_chosen, port)
-            while True:
-                print "Try conect (open url) to 'http://%s:%s'..." %(self.request.env.http_host.split(':')[0], port),
-                if proc.children():
-                    try:
-                        urllib2.urlopen('http://%s:%s' %(self.request.env.http_host.split(':')[0], port))
-                        break
-                    except Exception as e:
-                        print "Fail! be patient! Waint 3 seconds..."
-                        time.sleep(3)
-                else:
-                    time.sleep(1)
-            print "\n================================\n  Conected\n-------------------------------\n"
+            while not proc.children():
+                print("Try open server %s run on door %s" % (self.server_chosen, port))
+            cont=50
+            while cont<50:
+                cont+=1
+                print("Try conect (open url) to 'http://%s:%s'..." %(self.request.env.http_host.split(':')[0], port),)
+                try:
+                    urlopen('http://%s:%s' %(self.request.env.http_host.split(':')[0], port))
+                    break
+                except Exception as e:
+                    print("Fail! be patient! Try again...")
+                    time.sleep(3)
+
+            print("\n================================\n  Conected\n-------------------------------\n")
 
     def closeServer(self):
         """
             Will try to find the server process and will close it
         """
-        print "Closing..."
+        print("Closing...")
         procs = self._examine_process()
         if procs:
             proc = psutil.Process(procs['pid'])
             proc.kill()
         else:
-            print 'Server not found. nothing to do'
+            print('Server not found. nothing to do')
+
+    def filterHtml(self, html):
+        request = self.request
+        if self.default_controller:
+            html_filtrado = html.replace(
+                "/%s/static/%s/" % (request.application, self.default_controller), "")
+            html_filtrado = html_filtrado.replace(
+                "%s/static/%s/" % (request.application, self.default_controller), "")
+            html_filtrado = html_filtrado.replace(
+                "/static/%s/" %self.default_controller, "")
+            html_filtrado = html_filtrado.replace(
+                "static/%s/" %self.default_controller, "")
+        else:
+            html_filtrado = html.replace(
+                "/%s/static/plugin_phantermobileconstructor/www/" % request.application, "")
+            html_filtrado = html_filtrado.replace(
+                "%s/static/plugin_phantermobileconstructor/www/" % request.application, "")
+            html_filtrado = html_filtrado.replace(
+                "/static/plugin_phantermobileconstructor/www/", "")
+            html_filtrado = html_filtrado.replace(
+                "static/plugin_phantermobileconstructor/www/", "")
+        return html_filtrado
 
     def buildHtml(self):
         """
@@ -177,7 +242,7 @@ class PhanterAndroid(object):
         """
         request = self.request
 
-        print "Compiling html..."
+        print("Compiling html...")
         self.closeServer()
         if self.default_controller:
             origem = os.path.join(request.env.web2py_path, 'applications',
@@ -194,71 +259,71 @@ class PhanterAndroid(object):
                 os.makedirs(y)
         for x in self.lista_de_arquivos_origem_e_destinos:
             shutil.copy(x[0], x[1])
+        mobile_functions = []
         if self.default_controller:
             new_controller = os.path.join(request.env.web2py_path, 'applications',
                                           self.aplication_name, 'controllers', "%s.py" % self.default_controller)
-            mobile_functions = []
             with open(new_controller, 'r') as file_opened:
                 mobile_functions = find_exposed_functions(file_opened.read())
-            if mobile_functions:
-                for x in mobile_functions:
-                    url = "%s?phantermobilebuild=True" % URL(
-                        c=self.default_controller, f=x, host=True)
-                    print "Try open url: %s" % url
-                    cont = 0
-                    html_file_name = x
-                    while cont < 5:
-                        try:
-                            html_url = urllib2.urlopen(url)
-                            html = html2 = html_url.read()
-                            arquivo_destino = os.path.join(
-                                self.aplication_folder, 'www', "%s.html" % html_file_name)
-                            with open(arquivo_destino, 'w') as file_opened:
-                                print 'Get html source of %s and copy to %s' % (url, arquivo_destino)
-                                file_opened.write(html)
-                            break
-                        except Exception as e:
-                            time.sleep(2)
-                            print e
-                            cont += 1
-                            print "Fail! try %s of 5" % cont            
-        else:       
-            arquivo_plugin = os.path.join(request.env.web2py_path, 'applications',
+            controller_name=self.default_controller
+        else:
+            controller_plugin = os.path.join(request.env.web2py_path, 'applications',
                                           self.aplication_name, 'controllers', 'plugin_phantermobileconstructor.py')
-            mobile_functions = []
-            with open(arquivo_plugin, 'r') as file_opened:
+            with open(controller_plugin, 'r') as file_opened:
                 mobile_functions = find_exposed_functions(file_opened.read())
-            if mobile_functions:
-                for x in (x for x in mobile_functions if x.startswith("www_")):
-                    url = "%s?phantermobilebuild=True" % URL(
-                        c='plugin_phantermobileconstructor', f=x, host=True)
-                    print "Try open url: %s" % url
+            mobile_functions=(x for x in mobile_functions if x.startswith("www_"))
+            controller_name='plugin_phantermobileconstructor'
+                              
+        if mobile_functions:
+            for function_m in mobile_functions:
+                if function_m:
+                    f=str(function_m)
+                    endereco=URL(controller_name, f, host=True)
+                    url = "%s" %endereco
+                    print("Try open url: %s" % url)
                     cont = 0
-                    html_file_name = x.replace('www_', '')
+                    if self.default_controller:
+                        html_file_name = function_m
+                    else:
+                        html_file_name = function_m.replace('www_', '')
                     while cont < 5:
                         try:
-                            html_url = urllib2.urlopen(url)
-                            html = html2 = html_url.read()
-                            arquivo_destino = os.path.join(
-                                self.aplication_folder, 'www', "%s.html" % html_file_name)
-                            with open(arquivo_destino, 'w') as file_opened:
-                                print 'Get html source of %s and copy to %s' % (url, arquivo_destino)
-                                file_opened.write(html)
+                            html_url = urlopen(url)
+                            html = html_url.read()
                             break
                         except Exception as e:
                             time.sleep(2)
-                            print e
+                            print(e)
                             cont += 1
-                            print "Fail! try %s of 5" % cont
+                            print("Fail! try %s of 5" % cont)
+                    try:
+                        html2=html.decode('utf-8')
+                    except:
+                        html2=html
+                    html2=self.filterHtml(html2)
+                    try:
+                        arquivo_destino = os.path.join(
+                            self.aplication_folder, 'www', "%s.html" % html_file_name)
+                        with open(arquivo_destino, 'w', encoding='utf8') as file_opened:
+                            print('Get html source of %s and copy to %s' % (url, arquivo_destino))
+                            file_opened.write(html2)
+                    except Exception as e:
+                        print(e)
+
         if platform == "win32" or platform == 'cygwin':
-            with open(os.path.join(self.cordova_app_folder, 'cordova_prepare_%s.bat' %(self.aplication_name)), 'w') as file_opened:
-                print 'cordova prepare'
+            with open(os.path.join(self.cordova_app_folder, '%s_cordova_prepare.bat' %(self.aplication_name)), 'w') as file_opened:
+                print('cordova prepare')
                 content = "cd %s\ncordova prepare" %self.aplication_folder
+                try:
+                    content=content.decode('utf-8')
+                except:
+                    pass
                 file_opened.write(content)
             processo = subprocess.Popen([os.path.join(
-                self.cordova_app_folder, 'cordova_prepare_%s.bat' %(self.aplication_name))], shell=True)
+                self.cordova_app_folder, '%s_cordova_prepare.bat' %(self.aplication_name))], shell=True)
         elif platform == "linux" or platform == "linux2":
             subprocess.call(['cordova prepare'], shell=True, cwd=self.aplication_folder)
+        print("html build")
 
     def _getServerandDoorCmdLine(self, cmdline):
         strcmdline=' '.join(cmdline)
@@ -270,7 +335,7 @@ class PhanterAndroid(object):
                     try:
                         port = int(port[0])
                     except:
-                        print "error: port dont is a number!"
+                        print("error: port dont is a number!")
                         port = None
                     if port:
                         self.ports.append(port)
@@ -285,7 +350,7 @@ class PhanterAndroid(object):
                 try:
                     port = int(port[0])
                 except:
-                    print "error: port dont is a number!"
+                    print("error: port dont is a number!")
                     port = None
                 if port:
                     self.ports.append(port)
@@ -297,7 +362,7 @@ class PhanterAndroid(object):
 
     def _examine_process(self):
         request = self.request
-        print 'locating all server program process (Node.exe)...'
+        print('locating all server program process (Node.exe)...')
         if platform == "win32" or platform == 'cygwin':
             nome = 'node.exe'
         elif platform =='linux' or platform =='linux2':
@@ -315,15 +380,15 @@ class PhanterAndroid(object):
                         processo_localizado['server'] = port_and_server[0]
                         processo_localizado['port'] = port_and_server[1]
                         processo_localizado['pid'] = proc.pid
-                        print "\n================ SERVER INFO ==================" +\
+                        print("\n================ SERVER INFO ==================" +\
                             "\n Server: %s\n Porta: %s\n Pasta:%s \n PID: %s\n" % (port_and_server[0], port_and_server[1], proc.cwd(), proc.pid) +\
-                            "------------------------------------\n"
+                            "------------------------------------\n")
         return processo_localizado
 
     def _examine_folders(self, path):
         request = self.request
 
-        print "Examine folders..."
+        print("Examine folders...")
         if not os.path.isfile(path):
             lista = os.listdir(path)
             if lista:
@@ -369,40 +434,48 @@ class PhanterAndroid(object):
     def _prepareTheEnvironment(self, buildHtml=True):
         request = self.request
 
-        print 'Prepare Environment'
+        print('Prepare Environment')
         if not os.path.exists(self.cordova_app_folder):
-            print 'Creating Folder: %s' % self.cordova_app_folder
+            print('Creating Folder: %s' % self.cordova_app_folder)
             os.makedirs(self.cordova_app_folder)
         if platform == "win32" or platform == 'cygwin':
-
-            if not os.path.exists(os.path.join(self.cordova_app_folder, 'create_app_%s.bat' % self.aplication_name)):
-                print "Creating file create_app_%s.bat" % self.aplication_name
-                with open(os.path.join(self.cordova_app_folder, 'create_app_%s.bat' % self.aplication_name), 'w') as file_opened:
-                    content = "cd %s\ncordova create %s %s %s\ncordova platform add browser" % (
+            if not os.path.exists(os.path.join(self.cordova_app_folder, '%s_create_app.bat' % self.aplication_name)):
+                print("Creating file %s_create_app.bat" % self.aplication_name)
+                with open(os.path.join(self.cordova_app_folder, '%s_create_app.bat' % self.aplication_name), 'w') as file_opened:
+                    content = "cd %s\ncordova create %s %s %s" % (
                         self.cordova_app_folder, self.aplication_name, 'com.yoursite.yourapp', self.aplication_name)
+                    try:
+                        content=content.decode('utf-8')
+                    except:
+                        pass                    
                     file_opened.write(content)
-            if not os.path.exists(self.aplication_folder):
-                print "Creating Folder cordova app: %s" % self.aplication_folder
-                os.makedirs(self.aplication_folder)
-                print "Executing: cordova create %s %s %s" % (self.aplication_name, 'com.yoursite.yourapp', self.aplication_name)
-                subprocess.call([os.path.join(self.cordova_app_folder, 'create_app_%s.bat' %
-                                              self.aplication_name)], stdout=subprocess.PIPE, shell=True, stdin=subprocess.PIPE)
-                print "copy template phanterandroid in: %s" % os.path.join(self.aplication_folder, 'www')
-                print "unzip template of: %s" % os.path.abspath(os.path.join(os.path.dirname(__file__), 'phanterandroidpack', 'template.zip'))
-                zip_ref = zipfile.ZipFile(os.path.abspath(os.path.join(
-                    os.path.dirname(__file__), 'phanterandroidpack', 'template.zip')), 'r')
-                zip_ref.extractall(os.path.join(self.aplication_folder, 'www'))
-                zip_ref.close()
+            print("Executing: %s_create_app" %self.aplication_name)
+            subprocess.call([os.path.join(self.cordova_app_folder, '%s_create_app.bat' %
+                                          self.aplication_name)], stdout=subprocess.PIPE, shell=True, stdin=subprocess.PIPE)
+
+            if not os.path.exists(os.path.join(self.cordova_app_folder, '%s_platform_browser.bat' % self.aplication_name)):
+                print("Creating file %s_platform_browser.bat" % self.aplication_name)
+                with open(os.path.join(self.cordova_app_folder, '%s_platform_browser.bat' % self.aplication_name), 'w') as file_opened:
+                    content = "cd %s\ncordova platform add browser" %(self.aplication_folder)
+                    try:
+                        content=content.decode('utf-8')
+                    except:
+                        pass                    
+                    file_opened.write(content)
+            print("Executing: %s_platform_browser.bat" %self.aplication_name)
+            subprocess.call([os.path.join(self.cordova_app_folder, '%s_platform_browser.bat' %
+                                          self.aplication_name)], stdout=subprocess.PIPE, shell=True, stdin=subprocess.PIPE)
+
         elif platform == "linux" or platform == "linux2":
             if not os.path.exists(self.aplication_folder):
                 subprocess.call(["cordova create %s %s %s" % (os.path.join(self.cordova_app_folder, self.aplication_name), 'com.yoursite.yourapp', self.aplication_name)], cwd=self.cordova_app_folder, shell=True)
-                subprocess.call(["cordova platform add browser"], cwd=self.cordova_app_folder, shell=True)
-                print "copy template phanterandroid in: %s" % os.path.join(self.aplication_folder, 'www')
-                print "unzip template of: %s" % os.path.abspath(os.path.join(os.path.dirname(__file__), 'phanterandroidpack', 'template.zip'))
-                zip_ref = zipfile.ZipFile(os.path.abspath(os.path.join(
-                    os.path.dirname(__file__), 'phanterandroidpack', 'template.zip')), 'r')
-                zip_ref.extractall(os.path.join(self.aplication_folder, 'www'))
-                zip_ref.close()
+                subprocess.call(["cordova platform add browser"], cwd=self.aplication_folder, shell=True)
+        print("copy template phanterandroid in: %s" % os.path.join(self.aplication_folder, 'www'))
+        print("unzip template of: %s" % os.path.abspath(os.path.join(os.path.dirname(__file__), 'phanterandroidpack', 'template.zip')))
+        zip_ref = zipfile.ZipFile(os.path.abspath(os.path.join(
+            os.path.dirname(__file__), 'phanterandroidpack', 'template.zip')), 'r')
+        zip_ref.extractall(os.path.join(self.aplication_folder, 'www'))
+        zip_ref.close()
 
         if buildHtml:
             self.buildHtml()
@@ -416,8 +489,8 @@ class PhanterAndroid(object):
             try:
                 os.unlink(file)
             except Exception as e:
-                print "Erro on remove:", file
-                print e
+                print("Erro on remove:", file)
+                print(e)
 
     def requeriments(self, update_req='all'):
         """try check requeriments
@@ -436,42 +509,45 @@ class PhanterAndroid(object):
                 try:
                     cordova=subprocess.check_output(['where','cordova.cmd'])
                     cordova=cordova.strip().split('\n')[0]
-                    path_cordova=re_cordova.findall(cordova)
+                    path_cordova=re_cordova.findall(cordova.decode('utf-8'))
                     self.requeriments_store['cordova']=path_cordova
                 except Exception as e:
-                    print "Don't find cordova in your system, try install. eg. npm install -g cordova"
-                    print e
+                    print("Don't find cordova in your system, try install. eg. npm install -g cordova")
+                    print(e)
             if update_req=='all' or update_req=='phonegap':
                 try:
                     phonegap=subprocess.check_output(['where','phonegap.cmd'])
                     phonegap=phonegap.strip().split('\n')[0]
-                    path_phonegap=re_phonegap.findall(phonegap)
+                    path_phonegap=re_phonegap.findall(phonegap.decode('utf-8'))
                     self.requeriments_store['phonegap']=path_phonegap
                 except Exception as e:
-                    print "Don't find phonegap in your system, try install. eg. npm install -g phonegap"
-                    print e
+                    print("Don't find phonegap in your system, try install. eg. npm install -g phonegap")
+                    print(e)
             if update_req=='all' or update_req=='keytool':
                 try:
                     with open(os.path.join(self.cordova_app_folder, 'check_keytool.bat'), 'w') as file_opened:
-                        file_opened.write('where /r "%ProgramW6432%\java" keytool.exe\nwhere /r "%ProgramFiles%\java" keytool.exe')
+                        file_opened.write('where /r "%ProgramW6432%\java" keytool.exe\nwhere /r "%ProgramFiles%\java" keytool.exe'.decode('utf-8'))
                     keytool=subprocess.Popen([os.path.join(self.cordova_app_folder, 'check_keytool.bat')], stdout=subprocess.PIPE)
                     result_keytool=keytool.stdout.read()
-                    path_keytool=re_keytool.findall(result_keytool)
+                    try:
+                        path_keytool=re_keytool.findall(result_keytool.decode('utf-8'))
+                    except Exception as e:
+                        raise e
                     self.requeriments_store['keytool']=path_keytool
                 except Exception as e:
-                    print "Don't find keytool in your system, try install JAVA SDK"
-                    print e  
+                    print("Don't find keytool in your system, try install JAVA SDK")
+                    print(e  )
             if update_req=='all' or update_req=='javac':
                 try:
                     with open(os.path.join(self.cordova_app_folder, 'check_javac.bat'), 'w') as file_opened:
-                        file_opened.write('where /r "%ProgramW6432%\java" javac.exe\nwhere /r "%ProgramFiles%\java" javac.exe')
+                        file_opened.write('where /r "%ProgramW6432%\java" javac.exe\nwhere /r "%ProgramFiles%\java" javac.exe'.decode('utf-8'))
                     javac=subprocess.Popen([os.path.join(self.cordova_app_folder, 'check_javac.bat')], stdout=subprocess.PIPE)
                     result_javac=javac.stdout.read()
-                    path_javac=re_javac.findall(result_javac)
+                    path_javac=re_javac.findall(result_javac.decode('utf-8'))
                     self.requeriments_store['javac']=path_javac
                 except Exception as e:
-                    print "Don't find javac in your system, try install JAVA SDK"
-                    print e
+                    print("Don't find javac in your system, try install JAVA SDK")
+                    print(e)
             return self.requeriments_store
         elif  platform=='linux' or platform=='linux2':
             if update_req=='all' or update_req=='cordova':
@@ -480,45 +556,45 @@ class PhanterAndroid(object):
                     cordova=cordova.strip().split('\n')[0]
                     self.requeriments_store['cordova']=[cordova]
                 except Exception as e:
-                    print "Don't find cordova in your system, try install. eg. npm install -g cordova"
-                    print e
+                    print("Don't find cordova in your system, try install. eg. npm install -g cordova")
+                    print(e)
             if update_req=='all' or update_req=='phonegap':
                 try:
                     phonegap=subprocess.check_output(['which','phonegap'])
                     phonegap=phonegap.strip().split('\n')[0]
                     self.requeriments_store['phonegap']=[phonegap]
                 except Exception as e:
-                    print "Don't find phonegap in your system, try install. eg. npm install -g phonegap"
-                    print e
+                    print("Don't find phonegap in your system, try install. eg. npm install -g phonegap")
+                    print(e)
             if update_req=='all' or update_req=='keytool':
                 try:
                     keytool=subprocess.check_output(['which','keytool'])
                     keytool=keytool.strip().split('\n')[0]
                     self.requeriments_store['keytool']=[keytool]
                 except Exception as e:
-                    print "Don't find keytool in your system, try install JAVA SDK"
-                    print e  
+                    print("Don't find keytool in your system, try install JAVA SDK")
+                    print(e  )
             if update_req=='all' or update_req=='javac':
                 try:
                     javac=subprocess.check_output(['which','javac'])
                     javac=javac.strip().split('\n')[0]
                     self.requeriments_store['javac']=[javac]
                 except Exception as e:
-                    print "Don't find javac in your system, try install JAVA SDK"
-                    print e
+                    print("Don't find javac in your system, try install JAVA SDK")
+                    print(e)
             return self.requeriments_store
 
     def removeCordovaApp(self):
         request = self.request
 
         self.closeServer()
-        print 'remove:', self.aplication_folder
+        print('remove:', self.aplication_folder)
         if os.path.exists(self.aplication_folder):
             try:
                 shutil.rmtree(self.aplication_folder)
             except Exception as e:
-                print "Erro on remove:", self.aplication_folder
-                print e
+                print("Erro on remove:", self.aplication_folder)
+                print(e)
         if platform == "win32" or platform == 'cygwin':
             self._remove_file(os.path.join(self.cordova_app_folder, 'create_app_%s.bat' % self.aplication_name))
             self._remove_file(os.path.join(self.cordova_app_folder, 'server_run_%s.bat' % self.aplication_name))
@@ -553,7 +629,7 @@ class PhanterAndroid(object):
         'C':C,
         }
         keytool=keytool.replace('program files', 'progra~1').replace('Program Files', 'Progra~1')
-        print keytool, "##############################################"
+        print(keytool, "##############################################")
         args_keytool="-genkey -v -keystore %(keyname)s.keystore -alias %(aliasname)s "\
         "-keyalg RSA -keysize 2048 -validity %(validity)s -storepass %(storepass)s -keypass "\
         "%(keypass)s -dname \"CN=%(CN)s OU=%(OU)s O=%(O)s L=%(L)s ST=%(ST)s C=%(C)s\""
@@ -563,17 +639,21 @@ class PhanterAndroid(object):
                 content = "cd %s\n" %os.path.join(self.cordova_app_folder)
                 complete_comand="%s %s" %(keytool, args_keytool_map)
                 content+=complete_comand
+                try:
+                    content=content.decode('utf-8')
+                except:
+                    pass
                 file_opened.write(content)
-            print "creating keystore"
+            print("creating keystore")
             subprocess.call([os.path.join(self.cordova_app_folder, 'create_key_%s.bat' %
                                           self.aplication_name)])
         elif platform == "linux" or platform == "linux2":
-            print "creating keystore"
+            print("creating keystore")
             if os.path.exists(os.path.join(self.cordova_app_folder, "%s.keystore" %keyname)):
                 self._remove_file(os.path.join(self.cordova_app_folder, "%s.keystore" %keyname))
 
             subprocess.call('keytool %s' %args_keytool, cwd=self.cordova_app_folder, shell=True)
-        print "Keystore saved in %s!" %self.cordova_app_folder
+        print("Keystore saved in %s!" %self.cordova_app_folder)
         self._created_key=[os.path.join(self.cordova_app_folder, "%s.keystore" %keyname), storepass, aliasname]
         return self._created_key
 
@@ -590,17 +670,21 @@ class PhanterAndroid(object):
 
         outputfilebase=os.path.join(self.aplication_folder,'platforms', 'android', 'build', 'outputs', 'apk')
         if platform == "win32" or platform == 'cygwin':
-            if not engine:
+            if not engine or not os.path.exists(os.path.join(self.aplication_folder,'platforms', 'android')):
                 with open(os.path.join(self.cordova_app_folder, 'create_apk_%s1.bat' % self.aplication_name), 'w') as file_opened:
                     content = "cd %s\n" %os.path.join(self.aplication_folder)
                     content+="cordova platform add android\n"
+                    try:
+                        content=content.decode('utf-8')
+                    except:
+                        pass
                     file_opened.write(content)
-                print "Inserting Android Platform"
+                print("Inserting Android Platform")
                 try:
                     apk1=subprocess.call([os.path.join(self.cordova_app_folder, 'create_apk_%s1.bat' %
                                                   self.aplication_name)])
                 except Exception as e:
-                    print e
+                    print(e)
 
             with open(os.path.join(self.cordova_app_folder, 'create_apk_%s2.bat' % self.aplication_name), 'w') as file_opened:
                 content = "cd %s\n" %os.path.join(self.aplication_folder)
@@ -615,23 +699,30 @@ class PhanterAndroid(object):
                 else:
                     outputfile=os.path.join(outputfilebase, 'android-debug.apk')
                     content+="cordova build android --verbose\n"
+                try:
+                    content=content.decode('utf-8')
+                except:
+                    pass                
                 file_opened.write(content)
             procs=subprocess.Popen([os.path.join(self.cordova_app_folder, 'create_apk_%s2.bat' %
                                               self.aplication_name)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-            print '\n\n\n####################################################'
-            print '# Creating APK file'
-            print '#####################################################\n\n\n'
+            print('\n\n\n####################################################')
+            print('# Creating APK file')
+            print("# PID: ", procs.pid)
+            print('#####################################################\n\n\n')
             while True:
                 time.sleep(.1) # so i don't kill the cpu on the machine i'm checking
-                output = procs.stdout.readline()
+                try:
+                    output = procs.stdout.readline()
+                except Exception as e:
+                    print(e)
+                    break
                 if output:
-                    print output.strip()
-                    if output.strip()==outputfile.replace('\\','/'):
+                    print(output.strip())
+                    if 'BUILD SUCCESSFUL' in str(output.strip()):
                         for proc in psutil.process_iter():
                             if proc.name()=='java.exe':
-                                cwd_proc = proc.cwd()
-                                if 'gradle\daemon' in cwd_proc:
-                                    proc.kill()
+                                proc.kill()
                         break
 
             saida=procs.stdout.read()
@@ -648,4 +739,4 @@ class PhanterAndroid(object):
                     subprocess.call(['cordova build android --verbose --release'], cwd=self.aplication_folder, shell=True)
             else:
                 subprocess.call(['cordova build android --verbose'], cwd=self.aplication_folder, shell=True)
-        print "Done!"
+        print("Done!")
