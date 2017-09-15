@@ -246,7 +246,11 @@ class PhanterAndroid(object):
                 html_filtrado = html_filtrado.replace(
                     self.ajax_developer, self.ajax_production)
         if self.advanced_filter:
-            html_filtrado = re.compile('\n\s\s+\n').sub('\n', html_filtrado)
+            html_filtrado= html_filtrado.replace('\r\n', '\n')
+            while '\n\n' in html_filtrado:
+                html_filtrado= html_filtrado.replace('\n\n', '\n')
+            html_filtrado=re.compile('\n\s\s+\n').sub('\n', html_filtrado)
+
         return html_filtrado
     def buildHtml(self):
         self._buildhtml()
