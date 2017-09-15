@@ -261,18 +261,18 @@ class PhanterAndroid(object):
         print("Compiling html...")
         self.closeServer()
         if self.default_controller:
-            origem = os.path.join(request.env.web2py_path, 'applications',
+            self.origem = os.path.join(request.env.web2py_path, 'applications',
                                   self.aplication_name, 'static', self.default_controller)            
         else:
-            origem = os.path.join(request.env.web2py_path, 'applications',
+            self.origem = os.path.join(request.env.web2py_path, 'applications',
                                   self.aplication_name, 'static', 'plugin_phantermobileconstructor', 'www')
-        self.lista_de_pastas_origem_e_destino = []
-        self.lista_de_pastas_destino = []
+        # self.lista_de_pastas_origem_e_destino = []
+        # self.lista_de_pastas_destino = []
         self.lista_de_arquivos_origem_e_destinos = []
-        self._examine_folders(origem)
-        for y in self.lista_de_pastas_destino:
-            if not os.path.exists(y):
-                os.makedirs(y)
+        self._examine_folders(self.origem)
+        # for y in self.lista_de_pastas_destino:
+        #     if not os.path.exists(y):
+        #         os.makedirs(y)
         for x in self.lista_de_arquivos_origem_e_destinos:
             shutil.copy(x[0], x[1])
         mobile_functions = []
@@ -407,48 +407,22 @@ class PhanterAndroid(object):
     def _examine_folders(self, path):
         request = self.request
 
-        print("Examine folders...")
+        print("Examinando folders...", path)
         if not os.path.isfile(path):
             lista = os.listdir(path)
             if lista:
                 for x in lista:
-                    if not os.path.isfile(os.path.join(path, x)):
-                        self.lista_de_pastas_destino.append(os.path.join(path.replace(os.path.join(
-                            request.env.web2py_path, 'applications', self.aplication_name, 'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.aplication_folder, 'www')), x))
-                        self._examine_folders(os.path.join(path, x))
-                        if self.default_controller:
-                            self.lista_de_pastas_origem_e_destino.append([os.path.join(path, x),
-                                                                      os.path.join(path.replace(os.path.join(request.env.web2py_path, 'applications', self.aplication_name,
-                                                                                                             'static', self.default_controller), os.path.join(self.aplication_folder, 'www')), x),
-                                                                      ])
-                        else:
-
-                            self.lista_de_pastas_origem_e_destino.append([os.path.join(path, x),
-                                                                      os.path.join(path.replace(os.path.join(request.env.web2py_path, 'applications', self.aplication_name,
-                                                                                                             'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.aplication_folder, 'www')), x),
-                                                                      ])
+                    target=os.path.join(path.replace(os.path.join(self.origem), os.path.join(self.aplication_folder, 'www')), x)
+                    if os.path.isfile(os.path.join(path, x)):
+                        if os.path.exists(target):
+                            os.unlink(target)
+                        self.lista_de_arquivos_origem_e_destinos.append([os.path.join(path, x), target])
                     else:
-                        if self.default_controller:
-                            self.lista_de_arquivos_origem_e_destinos.append([os.path.join(path, x),
-                                                                             os.path.join(path.replace(os.path.join(
-                                                                                 request.env.web2py_path, 'applications', self.aplication_name, 'static', self.default_controller), os.path.join(self.aplication_folder, 'www'))),
-                                                                             ])
-                        else:
-                            self.lista_de_arquivos_origem_e_destinos.append([os.path.join(path, x),
-                                                                             os.path.join(path.replace(os.path.join(
-                                                                                 request.env.web2py_path, 'applications', self.aplication_name, 'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.aplication_folder, 'www'))),
-                                                                             ])
-        else:
-            if self.default_controller:
-                self.lista_de_arquivos_origem_e_destinos.append([os.path.join(path),
-                                                                 os.path.join(path.replace(os.path.join(request.env.web2py_path, 'applications', self.aplication_name,
-                                                                                                        'static', self.default_controller), os.path.join(self.aplication_folder, 'www'))),
-                                                                 ])
-            else:
-                self.lista_de_arquivos_origem_e_destinos.append([os.path.join(path),
-                                                                 os.path.join(path.replace(os.path.join(request.env.web2py_path, 'applications', self.aplication_name,
-                                                                                                        'static', 'plugin_phantermobileconstructor', 'www'), os.path.join(self.aplication_folder, 'www'))),
-                                                                 ])
+                        try:
+                            os.makedirs(target)
+                        except:
+                            pass
+                        self._examine_folders(os.path.join(path, x))
 
     def _prepareTheEnvironment(self, buildHtml=True):
         request = self.request
@@ -483,18 +457,12 @@ class PhanterAndroid(object):
                     file_opened.write(content)
             print("Executing: %s_platform_browser.bat" %self.aplication_name)
             subprocess.call([os.path.join(self.cordova_app_folder, '%s_platform_browser.bat' %
-                                          self.aplication_name)], stdout=subprocess.PIPE, shell=True, stdin=subprocess.PIPE)
+                                          self.aplication_name)], shell=True)
 
         elif platform == "linux" or platform == "linux2":
             if not os.path.exists(self.aplication_folder):
                 subprocess.call(["cordova create %s %s %s" % (os.path.join(self.cordova_app_folder, self.aplication_name), 'com.yoursite.yourapp', self.aplication_name)], cwd=self.cordova_app_folder, shell=True)
                 subprocess.call(["cordova platform add browser"], cwd=self.aplication_folder, shell=True)
-        print("copy template phanterandroid in: %s" % os.path.join(self.aplication_folder, 'www'))
-        print("unzip template of: %s" % os.path.abspath(os.path.join(os.path.dirname(__file__), 'phanterandroidpack', 'template.zip')))
-        zip_ref = zipfile.ZipFile(os.path.abspath(os.path.join(
-            os.path.dirname(__file__), 'phanterandroidpack', 'template.zip')), 'r')
-        zip_ref.extractall(os.path.join(self.aplication_folder, 'www'))
-        zip_ref.close()
 
         if buildHtml:
             self._buildhtml()
@@ -667,14 +635,18 @@ class PhanterAndroid(object):
             print("creating keystore")
             subprocess.call([os.path.join(self.cordova_app_folder, 'create_key_%s.bat' %
                                           self.aplication_name)])
+
         elif platform == "linux" or platform == "linux2":
             print("creating keystore")
             if os.path.exists(os.path.join(self.cordova_app_folder, "%s.keystore" %keyname)):
                 self._remove_file(os.path.join(self.cordova_app_folder, "%s.keystore" %keyname))
 
             subprocess.call('keytool %s' %args_keytool, cwd=self.cordova_app_folder, shell=True)
-        print("Keystore saved in %s!" %self.cordova_app_folder)
-        self._created_key=[os.path.join(self.cordova_app_folder, "%s.keystore" %keyname), storepass, aliasname]
+        if os.path.exists(os.path.join(self.cordova_app_folder,"%s.keystore" %keyname)):
+            print("Keystore saved in %s!" %self.cordova_app_folder)
+            self._created_key=[os.path.join(self.cordova_app_folder, "%s.keystore" %keyname), storepass, aliasname, keypass]
+        else:
+            print("Keystore don't created!!!")
         return self._created_key
 
     def createApk(self, level="debug"):
@@ -711,8 +683,12 @@ class PhanterAndroid(object):
                 if level=='release':
                     if self._created_key:
                         outputfile=os.path.join(outputfilebase, 'android-release.apk')
-                        content+="cordova build android --verbose --release -- --keystore=\"%s\" --storePassword=%s --alias=%s" %(
-                            self._created_key[0],self._created_key[1],self._created_key[2])
+                        content+="cordova build android --verbose --release -- --keystore=\"%s\" --storePassword=%s --alias=%s --password=%s" %(
+                            self._created_key[0],self._created_key[1],self._created_key[2], self._created_key[3])
+                        # with open(os.path.join(self.aplication_folder, 'platforms', 'android', 'gradle.properties'), 'w') as file_opened2:
+
+                        #     content2="storeFile=%s\nstorePassword=%s\nstoreType=pkcs12\n" %(self._created_key[0], self._created_key[1])
+                        #             "keyAlias=%s\nkeyPassword=%(keypass)s" %(self._created_key[2], )
                     else:
                         outputfile=os.path.join(outputfilebase, 'android-release-unsigned.apk')
                         content+="cordova build android --verbose --release\n"
@@ -724,6 +700,7 @@ class PhanterAndroid(object):
                 except:
                     pass                
                 file_opened.write(content)
+
             procs=subprocess.Popen([os.path.join(self.cordova_app_folder, '%s_create_apk_release.bat' %
                                               self.aplication_name)], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
             print('\n\n\n####################################################')

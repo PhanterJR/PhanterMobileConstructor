@@ -15,7 +15,7 @@ from gluon import current
 import psutil
 
 class PhanterAjaxDevelopment(object):
-    def __init__(self, cmd_status=True):
+    def __init__(self, cmd_status=False):
         """
             The corsproxy is used in local development, local ajax request are blocked by CORs rules.
             Corsproxy will the Server/Client comunication.
@@ -67,7 +67,7 @@ class PhanterAjaxDevelopment(object):
                     with open(os.path.join(self.cordova_app_folder, 'server_run_corsproxy.bat'), 'w') as file_opened:
                         file_opened.write("corsproxy")
                     processo = subprocess.Popen([os.path.join(
-                    self.cordova_app_folder, 'server_run_corsproxy.bat')], shell=True)          
+                    self.cordova_app_folder, 'server_run_corsproxy.bat')], shell=True)       
                     print("\n================ SERVER PROXY ==================" +\
                         "\n Server: Corsproxy\n Porta: %s\n PID: %s\n" %(1337, processo.pid) +\
                         "------------------------------------\n")

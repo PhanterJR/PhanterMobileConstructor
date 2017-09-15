@@ -168,3 +168,31 @@ def removedordeacentosp2e3(palavra):
         p_sem_acento = normalize('NFKD', palavra.decode('utf-8')).encode('ASCII','ignore')
     return p_sem_acento
 
+
+if __name__ == '__main__':
+    meuxml=parseConfigXML(os.path.join('C:\web2py_mobile\cordova\welcome\config.xml'))
+    meuxml.appname = 'testando çã'
+    meuxml.description = 'descriçãoo testando'
+    meuxml.authorname = 'autor é testando'
+    meuxml.apkversion = '9.9.9'
+    meuxml.authoremail = 'email@email.com'
+    meuxml.authorwebsite = 'locuré.com.br'
+    meuxml.idapp = "isso é isso"
+    xs=["*"]
+    for x in xs:
+        meuxml.addElementList('access', 'origin', x)
+    ys=[]  
+    for y in ys:
+        meuxml.addElementList('allow-navigation', 'href2', y)
+    
+    zs=["http://*/*",
+        "https://*/*",
+        "tel:*",
+        "sms:*",
+        "mailto:*",
+        "geo:*"
+        ]
+    
+    meuxml.write('C:\web2py_mobile\cordova\welcome\config2.xml')
+
+
