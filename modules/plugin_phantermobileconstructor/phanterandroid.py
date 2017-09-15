@@ -80,7 +80,7 @@ class PhanterAndroid(object):
                                 |-Jquery.js
     """
 
-    def __init__(self, default_controller=None):
+    def __init__(self, default_controller=None, advanced_filter=False):
         """@aplication_id: generally follows the following format: com.yoursite.youraplication
               eg. br.com.conexaodidata.myaplication
               NOTE: this option is obsolet
@@ -91,6 +91,9 @@ class PhanterAndroid(object):
             'phonegap':False,
             'javac':False
         }
+        self.advanced_filter=advanced_filter
+        self.ajax_developer=None
+        self.ajax_production=None
         self._created_key=[]
         self.request = current.request
         self.aplication_name = self.request.application
@@ -201,6 +204,10 @@ class PhanterAndroid(object):
                     time.sleep(3)
 
             print("\n================================\n  Conected\n-------------------------------\n")
+    
+    def ajaxServer(self, developer, production):
+        self.ajax_developer=developer
+        self.ajax_production=production
 
     def closeServer(self):
         """
@@ -214,7 +221,7 @@ class PhanterAndroid(object):
         else:
             print('Server not found. nothing to do')
 
-    def filterHtml(self, html):
+    def _filterHtml(self, html, for_apk=False):
         request = self.request
         if self.default_controller:
             html_filtrado = html.replace(
@@ -234,9 +241,17 @@ class PhanterAndroid(object):
                 "/static/plugin_phantermobileconstructor/www/", "")
             html_filtrado = html_filtrado.replace(
                 "static/plugin_phantermobileconstructor/www/", "")
+        if for_apk:
+            if self.ajax_production and self.ajax_developer:
+                html_filtrado = html_filtrado.replace(
+                    self.ajax_developer, self.ajax_production)
+        if self.advanced_filter:
+            html_filtrado = re.compile('\n\s\s+\n').sub('\n', html_filtrado)
         return html_filtrado
-
     def buildHtml(self):
+        self._buildhtml()
+
+    def _buildhtml(self, for_apk=False):
         """
             All functions started with "www_" will be rendered in the cordova application (on buildHtml method)
             and all files in static/plugin_phantermobileconstructor/www will be copied to the www folder of cordova App
@@ -301,7 +316,10 @@ class PhanterAndroid(object):
                         html2=html.decode('utf-8')
                     except:
                         html2=html
-                    html2=self.filterHtml(html2)
+                    if for_apk:
+                        html2=self._filterHtml(html2, for_apk=True)
+                    else:
+                        html2=self._filterHtml(html2)
                     try:
                         arquivo_destino = os.path.join(
                             self.aplication_folder, 'www', "%s.html" % html_file_name)
@@ -479,7 +497,7 @@ class PhanterAndroid(object):
         zip_ref.close()
 
         if buildHtml:
-            self.buildHtml()
+            self._buildhtml()
 
     def resetApp(self):
         self.removeCordovaApp()
@@ -603,7 +621,6 @@ class PhanterAndroid(object):
             self._remove_file(os.path.join(self.cordova_app_folder, '%s_create_apk_release.bat' % self.aplication_name))
             self._remove_file(os.path.join(self.cordova_app_folder, '%s_platform_browser' % self.aplication_name))
             self._remove_file(os.path.join(self.cordova_app_folder, '%s_cordova_prepare' % self.aplication_name))
-
     
     def createKeystore(self, keytool, 
         keyname="phantermobile", 
@@ -665,7 +682,7 @@ class PhanterAndroid(object):
         @level: create apk debug if setted 'debug', create apk release if setted 'release'
         @include_key: is include in apk if keystore exists
         """
-        self.buildHtml()
+        self._buildhtml(for_apk=True)
         if os.path.exists(os.path.join(self.aplication_folder, 'package.json')):
             self._remove_file(os.path.join(self.aplication_folder, 'package.json'))
         configxml=parseConfigXML(os.path.join(self.aplication_folder, 'config.xml'))

@@ -55,7 +55,7 @@ def index():
                     _class='html_mobile_landscape responsivo'),
                 _class="mobile_landscape responsivo"),
                 DIV(
-                    A(DIV("without distractions", _class='menu_item_extra_buttons'), _href=response.server_phonegap_http_address, _target="_blank"),
+                    A(DIV("Without Distractions", _class='menu_item_extra_buttons'), _href=response.server_phonegap_http_address, _target="_blank"),
                     _class='extra_buttons'),
                 _class="painel_direito_g"),
             _class="painel_principal_g caixa_view_semdistracoes_landscape")
@@ -80,7 +80,7 @@ def index():
                     _class='html_mobile_landscape responsivo'),
                 _class="mobile_landscape responsivo"),
                 DIV(
-                    A(DIV("without distractions", _class='menu_item_extra_buttons'), _href=response.server_cordova_http_address, _target="_blank"),
+                    A(DIV("Without Distractions", _class='menu_item_extra_buttons'), _href=response.server_cordova_http_address, _target="_blank"),
                     _class='extra_buttons'),
                 _class="painel_direito_g"),
             _class="painel_principal_g caixa_view_semdistracoes_landscape")
@@ -107,7 +107,7 @@ def index():
                     _class='html_mobile_landscape responsivo'),
                 _class="mobile_landscape responsivo"),
                 DIV(
-                    A(DIV("without distractions", _class='menu_item_extra_buttons'), _href=URL('www', 'index'), _target="_blank"),
+                    A(DIV("Without Distractions", _class='menu_item_extra_buttons'), _href=URL('www', 'index'), _target="_blank"),
                     _class='extra_buttons'),
                 _class="painel_direito_g"),
             _class="painel_principal_g caixa_view_semdistracoes_landscape")
@@ -235,9 +235,6 @@ def configxml():
     form = SQLFORM(db.plugin_phantermobileconstructor_apps,
                    q_config.id if q_config else None, showid=False)
     if form.process().accepted:
-        if not os.path.exists(os.path.join(request.env.web2py_path, 'cordova', request.application, 'config.xml')):
-            from phanterandroid import PhanterAndroid
-            android = PhanterAndroid()
         meuxml = parseConfigXML(os.path.join(
             request.env.web2py_path, 'cordova', request.application, 'config.xml'))
         meuxml.appname = form.vars.appname
@@ -392,7 +389,6 @@ def echo_comand():
             if request.args(1) == 'release':
                 levelfile = 'release'
             else:
-
                 levelfile = 'debug'
 
         basedirapk = os.path.join(request.env.web2py_path, 'cordova',
@@ -450,7 +446,11 @@ def echo_comand():
             else:
                 return "$('#dowload_newapk_debug').html(%s)" % (json.dumps(SPAN(A(DIV(apk_saved_name, _class='download_newapk_debug'), _href=URL('default', 'download', args=[downloadapk]))).xml().decode('utf-8')))
         else:
-            return "$('#dowload_newapk_debug').html(%s); $('#dowload_newapk_release').html(%s);" % (json.dumps("<span>Apk don't created!</span>"), json.dumps("<span>Apk don't created!</span>"))
+            if request.args(1) == 'release':
+                return "$('#dowload_newapk_release').html(%s);" % (json.dumps("<span>Apk don't created!</span>"))
+            else:
+                return "$('#dowload_newapk_debug').html(%s);" % (json.dumps("<span>Apk don't created!</span>"))
+
     else:
         return "console.log('Notingh to do!');"
 
@@ -476,3 +476,4 @@ def css_head_layout_www():
 
 def www_index():
     return dict()
+    

@@ -10,40 +10,29 @@ import zipfile
 # personal import
 from plugin_phantermobileconstructor.phantermenubar import PhanterMenubar
 
-
 if not os.path.exists(os.path.join(request.folder, 'controllers', 'www.py')) \
     and not os.path.exists(os.path.join(request.folder, 'static', 'www')) \
     and not os.path.exists(os.path.join(request.folder, 'models', 'www.py')) \
     and not os.path.exists(os.path.join(request.folder, 'views', 'www')):
+    from plugin_phantermobileconstructor.phanterandroid import PhanterAndroid
+    from plugin_phantermobileconstructor.phanterajaxdevelopment import PhanterAjaxDevelopment
     print('creating controller "www.py", model "www.py", www static folder files and www in views.')
     zip_ref = zipfile.ZipFile(os.path.join(request.folder,  'modules',
         'plugin_phantermobileconstructor', 'phanterandroidpack', 'www.zip'), 'r')
     zip_ref.extractall(os.path.join(request.folder))
     zip_ref.close()    
-    from plugin_phantermobileconstructor.phanterandroid import PhanterAndroid
     phanterandroid = PhanterAndroid('www')
 
-# used in development
-MOBILE_DEVELOPMENT=True
-response.toolbar_mob = ""
-if MOBILE_DEVELOPMENT:
-    from plugin_phantermobileconstructor.phanterajaxdevelopment import PhanterAjaxDevelopment
-    phanteajaxdevelopment = PhanterAjaxDevelopment()
-    response.ajax_server = phanteajaxdevelopment.urlAjaxServer(
-        "%s/%s" % (request.env.http_host, request.application))
-    response.toolbar_mob = DIV(
-        DIV(A(T('Web2py ToolBar'), _style="color: #440808;", _href="#caixa_response_toolbar"),
-          _class='botao_response_toolbar',
-          _style='cursor:pointer; position: fixed;right: 0; bottom: 45px; width: 93px; padding: 5px; background-color: orange; text-transform: uppercase; font-weight: bold;font-size: 8pt;padding-left: 10px;box-shadow: -1px 2px 3px black;',
-          _onclick='$("#caixa_response_toolbar").toggle();'),
-        DIV(response.toolbar(),
-          _id='caixa_response_toolbar',
-          _style='background-color:white; padding:5px; display:none;'),
-        _style='position:relative; z-index:1005; width:100%;')
-else:
-    # Put the server ajax server in produtioon here
-    response.ajax_server = "http://%s/%s/" % (
-      request.env.http_host, request.application)
+response.toolbar_mob = DIV(
+    DIV(A(T('Web2py ToolBar'), _style="color: #440808;", _href="#caixa_response_toolbar"),
+      _class='botao_response_toolbar',
+      _style='cursor:pointer; position: fixed;right: 0; bottom: 45px; width: 93px; padding: 5px; background-color: orange; text-transform: uppercase; font-weight: bold;font-size: 8pt;padding-left: 10px;box-shadow: -1px 2px 3px black;',
+      _onclick='$("#caixa_response_toolbar").toggle();'),
+    DIV(response.toolbar(),
+      _id='caixa_response_toolbar',
+      _style='background-color:white; padding:5px; display:none;'),
+    _style='position:relative; z-index:1005; width:100%;')
+
 
 if request.controller == 'plugin_phantermobileconstructor':
 
