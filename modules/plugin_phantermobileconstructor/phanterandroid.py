@@ -26,6 +26,7 @@ from sys import platform
 
 # this import need install (battery dont incluided)
 import psutil
+from PIL import Image as PilImage
 
 # imports from web2py
 from gluon.html import URL
@@ -252,6 +253,7 @@ class PhanterAndroid(object):
             html_filtrado=re.compile('\n\s\s+\n').sub('\n', html_filtrado)
 
         return html_filtrado
+    
     def buildHtml(self):
         self._buildhtml()
 
@@ -462,11 +464,23 @@ class PhanterAndroid(object):
             print("Executing: %s_platform_browser.bat" %self.aplication_name)
             subprocess.call([os.path.join(self.cordova_app_folder, '%s_platform_browser.bat' %
                                           self.aplication_name)], shell=True)
+            if not configxml.checkPlugin('cordova-plugin-splashscreen'):
+                with open(os.path.join(self.cordova_app_folder, '%s_add_plugin_splashscreen.bat' % self.aplication_name), 'w') as file_opened:
+                    content = "cd %s\n" %os.path.join(self.aplication_folder)
+                    content+="cordova plugin add cordova-plugin-splashscreen\n"
+                    try:
+                        content=content.decode('utf-8')
+                    except:
+                        pass
+                    file_opened.write(content)
+                procs=subprocess.call([os.path.join(self.cordova_app_folder, '%s_add_plugin_splashscreen.bat' %
+                                                  self.aplication_name)])
 
         elif platform == "linux" or platform == "linux2":
             if not os.path.exists(self.aplication_folder):
                 subprocess.call(["cordova create %s %s %s" % (os.path.join(self.cordova_app_folder, self.aplication_name), 'com.yoursite.yourapp', self.aplication_name)], cwd=self.cordova_app_folder, shell=True)
                 subprocess.call(["cordova platform add browser"], cwd=self.aplication_folder, shell=True)
+                subprocess.call(["cordova plugin add cordova-plugin-splashscreen"], cwd=self.aplication_folder, shell=True)
 
         if buildHtml:
             self._buildhtml()
@@ -593,6 +607,93 @@ class PhanterAndroid(object):
             self._remove_file(os.path.join(self.cordova_app_folder, '%s_create_apk_release.bat' % self.aplication_name))
             self._remove_file(os.path.join(self.cordova_app_folder, '%s_platform_browser' % self.aplication_name))
             self._remove_file(os.path.join(self.cordova_app_folder, '%s_cordova_prepare' % self.aplication_name))
+    
+    def _processImg(self, file, nx, ny):
+        request = self.request
+        try:
+            img = PilImage.open(os.path.join(request.folder,'uploads', file))
+            tamanho_max_x = nx
+            tamanho_max_y = ny
+            x = img.size[0]
+            y = img.size[1]
+
+            proportion_x=float(tamanho_max_x)/x
+            tx_by=tamanho_max_x
+            ty_by=int(proportion_x*y)
+
+            proportion_y=float(tamanho_max_y)/y
+            tx_bx=int(proportion_y*x)
+            ty_bx=tamanho_max_y
+
+            if ty_by>tamanho_max_y:
+                imagem=img.resize((tx_by, ty_by), PilImage.ANTIALIAS)
+                cutter=(tamanho_max_y-ty_by)/-2.
+                imagem=imagem.crop((0, cutter, tamanho_max_x, cutter+tamanho_max_y))
+
+            elif tx_bx>tamanho_max_x:
+                imagem=img.resize((tx_bx, ty_bx), PilImage.ANTIALIAS)
+                cutter=(tamanho_max_x-tx_bx)/-2.
+                imagem=imagem.crop((cutter, 0, cutter+tamanho_max_x, tamanho_max_y))
+            else:
+                imagem=img.resize((tamanho_max_y, tamanho_max_y), PilImage.ANTIALIAS)
+            return imagem
+
+        except Exception as e:
+            print("Error! Process Image")
+            print(e)
+
+    def createIcon(self, file_db):
+        if file_db:
+            icons_sizes={'icon-36-ldpi':(36, 36),
+            'icon-48-mdpi':(48, 48),
+            'icon-72-hdpi':(72, 72),
+            'icon-96-xhdpi':(96, 96)
+            }
+            for x in icons_sizes.keys():
+                file_name = '%s.png' % x
+                imagem=self._processImg(file_db, icons_sizes[x][0],  icons_sizes[x][1])
+                if imagem:
+                    end_arquivo=os.path.join(self.aplication_folder, 'res', 'icon', 'android', file_name)
+                    print(end_arquivo)
+                    imagem.save(end_arquivo)
+            configxml=parseConfigXML(os.path.join(self.aplication_folder, 'config.xml'))
+            configxml.addIcons()
+            configxml.save()
+        else:
+            print("File dont exist")
+
+    def createSplash(self, file_db, portrait=True):
+        configxml=parseConfigXML(os.path.join(self.aplication_folder, 'config.xml'))
+
+        if file_db:
+            if portrait:
+                splash_sizes={
+                'screen-hdpi-portrait':(480, 800),
+                'screen-ldpi-portrait':(200, 320),
+                'screen-mdpi-portrait':(320, 480),
+                'screen-xhdpi-portrait':(720, 1280)
+                }
+            else:
+                splash_sizes={
+                'screen-hdpi-landscape':(800, 480),
+                'screen-ldpi-landscape':(320, 200),
+                'screen-mdpi-landscape':(480, 320),
+                'screen-xhdpi-landscape':(1280, 720)
+                }                
+            for x in splash_sizes.keys():
+                file_name = '%s.png' % x
+                imagem=self._processImg(file_db, splash_sizes[x][0],  splash_sizes[x][1])
+                if imagem:
+                    end_arquivo=os.path.join(self.aplication_folder, 'res', 'screen', 'android', file_name)
+                    print(end_arquivo)
+                    imagem.save(end_arquivo)
+            if portrait:
+                configxml.addSplash(portrait=True)
+            else:
+                configxml.addSplash(portrait=False)
+            configxml.save()
+        else:
+            print("File don't exist")
     
     def createKeystore(self, keytool, 
         keyname="phantermobile", 

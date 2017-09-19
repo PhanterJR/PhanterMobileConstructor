@@ -6,9 +6,11 @@ from io import open
 # battery inclued
 import os
 import zipfile
+from PIL import Image as PilImage
 
 # personal import
 from plugin_phantermobileconstructor.phantermenubar import PhanterMenubar
+from plugin_phantermobileconstructor.phanterandroidvalidator import RECOMMENDED_MIN_SIZE, IS_PNG
 
 if not os.path.exists(os.path.join(request.folder, 'controllers', 'www.py')) \
     and not os.path.exists(os.path.join(request.folder, 'static', 'www')) \
@@ -181,3 +183,18 @@ db.define_table('plugin_phantermobileconstructor_apks',
                 Field('signed', 'boolean', default=False),
                 Field('apkfile', 'upload', autodelete=True),
                 )
+
+
+
+db.define_table('plugin_phantermobileconstructor_icon',
+    Field('icon', 'upload', autodelete=True)
+    )
+
+db.define_table('plugin_phantermobileconstructor_splash',
+    Field('splash_portrait', 'upload', autodelete=True),
+    Field('splash_landscape', 'upload', autodelete=True)
+    )
+
+db.plugin_phantermobileconstructor_icon.icon.requires=[IS_PNG()]
+db.plugin_phantermobileconstructor_splash.splash_portrait.requires=[IS_PNG()]
+db.plugin_phantermobileconstructor_splash.splash_landscape.requires=[IS_PNG()]

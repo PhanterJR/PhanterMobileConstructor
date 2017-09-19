@@ -27,6 +27,14 @@ class parseConfigXML(object):
                             return True
         return False
 
+    def checkPlugin(self, plugin):
+        for x in self.root:
+            if x.tag.split(self._prefixmlns)[1] == 'plugin':
+                if x.attrib:
+                    if 'name' in x.attrib.keys():
+                        if x.attrib['name']==plugin:
+                            return True
+        return False
 
     def _changeText(self, element, new_text):
         for x in self.root:
@@ -79,7 +87,189 @@ class parseConfigXML(object):
             if last_position:
                 self.root.insert(last_position, new_element)
 
-                
+    def addIcons(self):
+        for x in self.root:
+            elementname="%s%s" %(self._prefixmlns, 'platform')
+            if elementname == x.tag:
+                if 'name' in x.attrib:
+                    if x.attrib['name']=='android':
+                        ldpi=False
+                        mdpi=False
+                        hdpi=False
+                        xhdpi=False
+                        for y in x:
+                            elementnameY="%s%s" %(self._prefixmlns, 'icon')
+                            if elementnameY==y.tag:
+                                if 'density' in y.attrib:
+                                    if y.attrib['density']=='ldpi':
+                                        ldpi=True
+                                        if 'src' in y.attrib:
+                                            y.attrib['src']='res/icon/android/icon-36-ldpi.png'
+                                        else:
+                                            y.set('src', 'res/icon/android/icon-36-ldpi.png')
+                                    elif y.attrib['density']=='mdpi':
+                                        mdpi=True
+                                        if 'src' in y.attrib:
+                                            y.attrib['src']='res/icon/android/icon-48-mdpi.png'
+                                        else:
+                                            y.set('src', 'res/icon/android/icon-48-mdpi.png')
+                                    elif y.attrib['density']=='hdpi':
+                                        hdpi=True
+                                        if 'src' in y.attrib:
+                                            y.attrib['src']='res/icon/android/icon-72-hdpi.png'
+                                        else:
+                                            y.set('src', 'res/icon/android/icon-72-hdpi.png')
+                                    elif y.attrib['density']=='xhdpi':
+                                        xhdpi=True
+                                        if 'src' in y.attrib:
+                                            y.attrib['src']='res/icon/android/icon-96-xhdpi.png'
+                                        else:
+                                            y.set('src', 'res/icon/android/icon-96-xhdpi.png')
+                        if not ldpi:
+                            new_element=ET.Element('icon')
+                            new_element.set('src', 'res/icon/android/icon-36-ldpi.png')
+                            new_element.set('density', 'ldpi')
+                            x.append(new_element)
+                        if not mdpi:
+                            new_element=ET.Element('icon')
+                            new_element.set('src', 'res/icon/android/icon-48-mdpi.png')
+                            new_element.set('density', 'mdpi')
+                            x.append(new_element)
+                        if not hdpi:
+                            new_element=ET.Element('icon')
+                            new_element.set('src', 'res/icon/android/icon-72-hdpi.png')
+                            new_element.set('density', 'hdpi')
+                            x.append(new_element)
+                        if not xhdpi:
+                            new_element=ET.Element('icon')
+                            new_element.set('src', 'res/icon/android/icon-96-xhdpi.png')
+                            new_element.set('density', 'xhdpi')
+                            x.append(new_element)
+
+    def addSplash(self, portrait=False):
+        preference=False
+        for x in self.root:
+            elementnamepreference="%s%s" %(self._prefixmlns, 'preference')
+            if elementnamepreference == x.tag:
+                if 'name' in x.attrib:
+                    if x.attrib['name']=='SplashScreenDelay':
+                        preference=True
+            elementname="%s%s" %(self._prefixmlns, 'platform')
+            if elementname == x.tag:
+                if 'name' in x.attrib:
+                    if x.attrib['name']=='android':
+                        land_ldpi=False
+                        land_mdpi=False
+                        land_hdpi=False
+                        land_xhdpi=False
+                        port_ldpi=False
+                        port_mdpi=False
+                        port_hdpi=False
+                        port_xhdpi=False
+                        for y in x:
+                            elementnameY="%s%s" %(self._prefixmlns, 'splash')
+                            if elementnameY==y.tag:
+                                if 'density' in y.attrib:
+                                    if portrait:
+                                        if y.attrib['density']=='port-ldpi':
+                                            port_ldpi=True
+                                            if 'src' in y.attrib:
+                                                y.attrib['src']='res/screen/android/screen-ldpi-portrait.png'
+                                            else:
+                                                y.set('src', 'res/screen/android/screen-ldpi-portrait.png')
+                                        elif y.attrib['density']=='port-mdpi':
+                                            port_mdpi=True
+                                            if 'src' in y.attrib:
+                                                y.attrib['src']='res/screen/android/screen-mdpi-portrait.png'
+                                            else:
+                                                y.set('src', 'res/screen/android/screen-mdpi-portrait.png')
+                                        elif y.attrib['density']=='port-hdpi':
+                                            port_hdpi=True
+                                            if 'src' in y.attrib:
+                                                y.attrib['src']='res/screen/android/screen-hdpi-portrait.png'
+                                            else:
+                                                y.set('src', 'res/screen/android/screen-hdpi-portrait.png')
+                                        elif y.attrib['density']=='port-xhdpi':
+                                            port_xhdpi=True
+                                            if 'src' in y.attrib:
+                                                y.attrib['src']='res/screen/android/screen-xhdpi-portrait.png'
+                                            else:
+                                                y.set('src', 'res/screen/android/screen-xhdpi-portrait.png')
+                                    else:
+                                        if y.attrib['density']=='land-ldpi':
+                                            land_ldpi=True
+                                            if 'src' in y.attrib:
+                                                y.attrib['src']='res/screen/android/screen-ldpi-landscape.png'
+                                            else:
+                                                y.set('src', 'res/screen/android/screen-ldpi-landscape.png')
+                                        elif y.attrib['density']=='land-mdpi':
+                                            land_mdpi=True
+                                            if 'src' in y.attrib:
+                                                y.attrib['src']='res/screen/android/screen-mdpi-landscape.png'
+                                            else:
+                                                y.set('src', 'res/screen/android/screen-mdpi-landscape.png')
+                                        elif y.attrib['density']=='land-hdpi':
+                                            land_hdpi=True
+                                            if 'src' in y.attrib:
+                                                y.attrib['src']='res/screen/android/screen-hdpi-landscape.png'
+                                            else:
+                                                y.set('src', 'res/screen/android/screen-hdpi-landscape.png')
+                                        elif y.attrib['density']=='land-xhdpi':
+                                            land_xhdpi=True
+                                            if 'src' in y.attrib:
+                                                y.attrib['src']='res/screen/android/screen-xhdpi-landscape.png'
+                                            else:
+                                                y.set('src', 'res/screen/android/screen-xhdpi-landscape.png')
+                        if portrait:
+                            if not port_ldpi:
+                                new_element=ET.Element('splash')
+                                new_element.set('src', 'res/screen/android/screen-ldpi-portrait.png')
+                                new_element.set('density', 'port-ldpi')
+                                x.append(new_element)
+                            if not port_mdpi:
+                                new_element=ET.Element('splash')
+                                new_element.set('src', 'res/screen/android/screen-mdpi-portrait.png')
+                                new_element.set('density', 'port-mdpi')
+                                x.append(new_element)
+                            if not port_hdpi:
+                                new_element=ET.Element('splash')
+                                new_element.set('src', 'res/screen/android/screen-hdpi-portrait.png')
+                                new_element.set('density', 'port-hdpi')
+                                x.append(new_element)
+                            if not port_xhdpi:
+                                new_element=ET.Element('splash')
+                                new_element.set('src', 'res/screen/android/screen-xhdpi-portrait.png')
+                                new_element.set('density', 'port-xhdpi')
+                                x.append(new_element)
+                        else:
+                            if not land_ldpi:
+                                new_element=ET.Element('splash')
+                                new_element.set('src', 'res/screen/android/screen-ldpi-landscape.png')
+                                new_element.set('density', 'land-ldpi')
+                                x.append(new_element)
+                            if not land_mdpi:
+                                new_element=ET.Element('splash')
+                                new_element.set('src', 'res/screen/android/screen-mdpi-landscape.png')
+                                new_element.set('density', 'land-mdpi')
+                                x.append(new_element)
+                            if not land_hdpi:
+                                new_element=ET.Element('splash')
+                                new_element.set('src', 'res/screen/android/screen-hdpi-landscape.png')
+                                new_element.set('density', 'land-hdpi')
+                                x.append(new_element)
+                            if not land_xhdpi:
+                                new_element=ET.Element('splash')
+                                new_element.set('src', 'res/screen/android/screen-xhdpi-landscape.png')
+                                new_element.set('density', 'land-xhdpi')
+                                x.append(new_element)
+
+        if not preference:
+            '<preference name="SplashScreenDelay" value="10000" />'
+            new_elementpreference=ET.Element('preference')
+            new_elementpreference.set('name', 'SplashScreenDelay')
+            new_elementpreference.set('value', '10000')
+            self.root.append(new_elementpreference)
+            
     @property
     def _prefixmlns(self):
         return "%s}" %self.root.tag.split('}widget')[0]
@@ -141,7 +331,6 @@ class parseConfigXML(object):
     def authorwebsite(self, value):
         self._changeatribute('author', 'href', value)
 
-
     def write(self, local):
         self.tree.write(local)
         with open(local, 'r') as f:
@@ -150,10 +339,15 @@ class parseConfigXML(object):
         with open(local, 'w') as f2:
             arquivo=arquivo.replace('ns0:','').replace('/><', '/>\n    <').replace('/>\n<', '/>\n    <').replace('    </widget>','</widget>')
             com=re.compile(r'<widget.+>')
+            com2=re.compile(r'\n    <icon ')
+            print(com2.findall(arquivo))
+            arquivo=com2.sub('\n        <icon ', arquivo)
+            com3=re.compile(r'\n    <screen ')
+            print(com3.findall(arquivo))
+            arquivo=com3.sub('\n        <screen ', arquivo)
             cabecalho='<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<widget id="%s" version="%s" xmlns="%s" xmlns:cdv="http://cordova.apache.org/ns/1.0">' %(self.idapp, self.apkversion, self._prefixmlns.replace('{','').replace('}',''))
             arquivo=com.sub(cabecalho, arquivo)
             f2.write(arquivo)
-
             
     def save(self):
         self.write(self.arquivo)
@@ -167,6 +361,3 @@ def removedordeacentosp2e3(palavra):
         #python2
         p_sem_acento = normalize('NFKD', palavra.decode('utf-8')).encode('ASCII','ignore')
     return p_sem_acento
-
-
-

@@ -223,6 +223,26 @@ def index():
                     ) else "", _id='status_config_keystore', _class='status_botao_principal'),
                     _class="caixa_botao_ajax_principal",
                 ),
+                    DIV(
+                    A(
+                        DIV(T("Config Icon"), _class="center_table_cell"),
+                        _alvo="#status_config_icon",
+                        _href=URL('configicon'),
+                        _class='botao_pagina_principal_comandos'),
+                    DIV(SPAN("Config your Icon", _style='color:red;') if db(db.plugin_phantermobileconstructor_icon).isempty(
+                    ) else "", _id='status_config_icon', _class='status_botao_principal'),
+                    _class="caixa_botao_ajax_principal",
+                ),
+                    DIV(
+                    A(
+                        DIV(T("Config Splashscreen"), _class="center_table_cell"),
+                        _alvo="#status_config_splash",
+                        _href=URL('configsplash'),
+                        _class='botao_pagina_principal_comandos'),
+                    DIV(SPAN("Config your Splashscreen", _style='color:red;') if db(db.plugin_phantermobileconstructor_splash).isempty(
+                    ) else "", _id='status_config_splash', _class='status_botao_principal'),
+                    _class="caixa_botao_ajax_principal",
+                ),
                     _class='caixa_comandos'),
                 _class='painel_direito_g'),
             _class='painel_principal_g')
@@ -258,6 +278,34 @@ def configxml():
         response.flash = T("Problems in form!")
     return dict(form=form)
 
+def configicon():
+    q_configicon = db(db.plugin_phantermobileconstructor_icon.icon).select().first()
+    form = SQLFORM(db.plugin_phantermobileconstructor_icon,
+                   q_configicon.id if q_configicon else None, showid=False)
+    if form.process().accepted:
+        phanterandroid.createIcon(form.vars.icon)
+        session.flash = "Icon Created"
+    return dict(form=form)
+
+def configsplash():
+    q_configsplash = db(db.plugin_phantermobileconstructor_splash).select().first()
+    if request.args(0)=='portrait':
+        form = SQLFORM(db.plugin_phantermobileconstructor_splash,
+                       q_configsplash.id if q_configsplash else None, fields=['splash_portrait'], showid=False)
+        if form.process().accepted:
+            q_configsplash = db(db.plugin_phantermobileconstructor_splash,id==form.vars.id).select().first()
+            phanterandroid.createSplash(q_configsplash.splash_portrait, portrait=True)
+            session.flash = "Splash Portrait Created"
+            redirect(URL('plugin_phantermobileconstructor', 'index'))
+    else:
+        form = SQLFORM(db.plugin_phantermobileconstructor_splash,
+                       q_configsplash.id if q_configsplash else None, fields=['splash_landscape'], showid=False)
+        if form.process().accepted:
+            q_configsplash = db(db.plugin_phantermobileconstructor_splash,id==form.vars.id).select().first()
+            phanterandroid.createSplash(q_configsplash.splash_landscape, portrait=False)
+            session.flash = "Splash Landscape Created"
+            redirect(URL('configsplash', args=['portrait']))       
+    return dict(form=form)
 
 def configkeystore():
     
@@ -476,4 +524,3 @@ def css_head_layout_www():
 
 def www_index():
     return dict()
-    
