@@ -246,6 +246,14 @@ class PhanterAndroid(object):
             if self.ajax_production and self.ajax_developer:
                 html_filtrado = html_filtrado.replace(
                     self.ajax_developer, self.ajax_production)
+        com_href=re.compile("href=[\"']/%s/%s/.+?[\"']" %(request.application, self.default_controller))
+
+        if com_href.findall(html_filtrado):
+            for r in com_href.findall(html_filtrado):
+                sample_link=r
+                html_fpage='href="%s.html"' %sample_link.split('/')[-1].replace('"','').replace("'","")
+                html_filtrado=html_filtrado.replace(sample_link, html_fpage)
+
         if self.advanced_filter:
             html_filtrado= html_filtrado.replace('\r\n', '\n')
             while '\n\n' in html_filtrado:
@@ -464,6 +472,7 @@ class PhanterAndroid(object):
             print("Executing: %s_platform_browser.bat" %self.aplication_name)
             subprocess.call([os.path.join(self.cordova_app_folder, '%s_platform_browser.bat' %
                                           self.aplication_name)], shell=True)
+            configxml=parseConfigXML(os.path.join(self.aplication_folder, 'config.xml'))
             if not configxml.checkPlugin('cordova-plugin-splashscreen'):
                 with open(os.path.join(self.cordova_app_folder, '%s_add_plugin_splashscreen.bat' % self.aplication_name), 'w') as file_opened:
                     content = "cd %s\n" %os.path.join(self.aplication_folder)
