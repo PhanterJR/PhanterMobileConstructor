@@ -21,7 +21,6 @@ class RECOMMENDED_MIN_SIZE(object):
             return (value, None)
         try:
             t_value=value
-            print(dir(t_value))
             img = PilImage.open(t_value.file)
             x = img.size[0]
             y = img.size[1]
@@ -45,7 +44,6 @@ class IS_PNG(object):
             return (value, None)
         extensao = os.path.splitext(value.filename)[1]
         if extensao == ".png" or extensao == ".PNG":
-            print('extensao',extensao)
             return (value, None)
         else:
             return (value, self.error_message)

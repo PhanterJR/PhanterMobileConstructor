@@ -248,7 +248,6 @@ def index():
             _class='painel_principal_g')
     return locals()
 
-
 def configxml():
     response.flash = T("Edit config.xml of app")
     q_config = db(db.plugin_phantermobileconstructor_apps).select().first()
@@ -264,13 +263,23 @@ def configxml():
         meuxml.idapp = form.vars.idapp
         meuxml.authoremail = form.vars.authoremail
         meuxml.authorwebsite = form.vars.authorwebsite
-        for x in form.vars.externalacess:
-            meuxml.addElementList('access', 'origin', x)
-        for y in form.vars.allownavigation:
-            meuxml.addElementList('allow-navigation', 'origin', y)
-        for z in form.vars.allowintent:
-            meuxml.addElementList('allow-intent', 'href', z)
+        if form.vars.externalacess:
+            for x in form.vars.externalacess:
+                meuxml.addElementList('access', 'origin', x)
+        else:
+            meuxml.removeElementRoot('access', 'origin')
 
+        if form.vars.allownavigation:
+            for y in form.vars.allownavigation:
+                meuxml.addElementList('allow-navigation', 'origin', y)
+        else:
+            meuxml.removeElementRoot('llow-navigation', 'origin')
+
+        if form.vars.allowintent:
+            for z in form.vars.allowintent:
+                meuxml.addElementList('allow-intent', 'href', z)
+        else:
+            meuxml.removeElementRoot('allow-intent', 'href')
         meuxml.save()
         session.flash = "config.xml saved!"
         redirect(URL('plugin_phantermobileconstructor', 'index'))
@@ -336,9 +345,7 @@ def configkeystore():
 
     return dict(form=form)
 
-
 def echo_comand():
-
     try: 
         import simplejson as json
     except ImportError:
@@ -501,26 +508,3 @@ def echo_comand():
 
     else:
         return "console.log('Notingh to do!');"
-
-
-####################################
-# Mobile app Functions(Views and Css)
-####################################
-
-# In this place you can develop the views that will be rendered in your mobile application, but must be started with www_. 
-# We encourage you to make a new controller, but to work properly PhanterAndroid Class must be instantiated by setting  
-# the name of the new controller in the models folder, the system will create, if it does not exist, an example file.  
-# Remembering that static files should be placed in the folder of the same name.
-
-
-# The generated css will be placed in the head of "www_layout.html"
-def css_head_layout_www():
-    return dict()
-
-
-# Functions started with "www" in your name will generate the htmls that will be placed in the www folder of cordova
-# Example: the function "def  www_index ()" will be generated in the www
-# folder the index.html file.
-
-def www_index():
-    return dict()

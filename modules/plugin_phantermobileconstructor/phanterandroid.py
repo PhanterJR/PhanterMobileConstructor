@@ -107,13 +107,12 @@ class PhanterAndroid(object):
             self.request.env.web2py_path, 'cordova', self.aplication_name)
         self.server_chosen = 'phonegap'
         self.requeriments_store
-        tem_condova = os.path.exists(self.cordova_app_folder)
-        tem_aplicativo = os.path.exists(self.aplication_folder)
-        if not tem_condova or not tem_aplicativo:
+        exists_condovapath = os.path.exists(self.cordova_app_folder)
+        exists_aplicationpath = os.path.exists(self.aplication_folder)
+        if not exists_condovapath or not exists_aplicationpath:
             self._prepareTheEnvironment(buildHtml=True)
 
     def statusServer(self, server=None, timewait=1):
-        print("statusServer")
         if server:
             self.server_chosen = server
         time.sleep(timewait)
@@ -395,7 +394,6 @@ class PhanterAndroid(object):
 
     def _examine_process(self):
         request = self.request
-        print('locating all server program process (Node.exe)...')
         if platform == "win32" or platform == 'cygwin':
             nome = 'node.exe'
         elif platform =='linux' or platform =='linux2':
@@ -420,8 +418,6 @@ class PhanterAndroid(object):
 
     def _examine_folders(self, path):
         request = self.request
-
-        print("Examinando folders...", path)
         if not os.path.isfile(path):
             lista = os.listdir(path)
             if lista:
@@ -831,12 +827,7 @@ class PhanterAndroid(object):
                 if output:
                     print(output.strip())
                     if 'BUILD SUCCESSFUL' in str(output.strip()):
-                        for proc in psutil.process_iter():
-                            if proc.name()=='java.exe':
-                                proc.kill()
                         break
-
-            saida=procs.stdout.read()
 
         elif platform == "linux" or platform == "linux2":
             if not engine:
@@ -850,4 +841,13 @@ class PhanterAndroid(object):
                     subprocess.call(['cordova build android --verbose --release'], cwd=self.aplication_folder, shell=True)
             else:
                 subprocess.call(['cordova build android --verbose'], cwd=self.aplication_folder, shell=True)
+        time.sleep(5)
+        for x in [1, 2, 3, 4, 5]:
+            time.sleep(1)
+            try:
+                for proc in psutil.process_iter():
+                    if proc.name()=='java.exe':
+                        proc.kill()
+            except Exception as e:
+                print(e)
         print("Done!")

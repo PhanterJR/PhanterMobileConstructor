@@ -13,9 +13,11 @@ from plugin_phantermobileconstructor.phantermenubar import PhanterMenubar
 from plugin_phantermobileconstructor.phanterandroidvalidator import RECOMMENDED_MIN_SIZE, IS_PNG
 
 if not os.path.exists(os.path.join(request.folder, 'controllers', 'www.py')) \
-    and not os.path.exists(os.path.join(request.folder, 'static', 'www')) \
-    and not os.path.exists(os.path.join(request.folder, 'models', 'www.py')) \
-    and not os.path.exists(os.path.join(request.folder, 'views', 'www')):
+        and not os.path.exists(os.path.join(request.folder, 'static', 'www')) \
+        and not os.path.exists(os.path.join(request.folder, 'models', 'www.py')) \
+        and not os.path.exists(os.path.join(request.folder, 'views', 'www')) \
+        and (request.controller=='plugin_phantermobileconstructor') \
+        and (request.function=='index'):
     from plugin_phantermobileconstructor.phanterandroid import PhanterAndroid
     from plugin_phantermobileconstructor.phanterajaxdevelopment import PhanterAjaxDevelopment
     print('creating controller "www.py", model "www.py", www static folder files and www in views.')
@@ -158,7 +160,6 @@ db.define_table('plugin_phantermobileconstructor_apps',
                       default=["*"],
                       label=CAT(T('Access origin'), SPAN(" ?", _class="help", _title=T(
                           "Defines the set of external domains the app is allowed to communicate with."))),
-                      requires=IS_NOT_EMPTY()
                       ),
                 Field('allownavigation', 'list:string',
                       label=CAT(T('Allow Navigation'), SPAN(" ?", _class="help", _title=T(
@@ -183,8 +184,6 @@ db.define_table('plugin_phantermobileconstructor_apks',
                 Field('signed', 'boolean', default=False),
                 Field('apkfile', 'upload', autodelete=True),
                 )
-
-
 
 db.define_table('plugin_phantermobileconstructor_icon',
     Field('icon', 'upload', autodelete=True)

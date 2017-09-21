@@ -48,7 +48,6 @@ class parseConfigXML(object):
             if elementname == x.tag:
                 x.set(atribute, removedordeacentosp2e3(value_atribute))
 
-
     def _changelementlist(self, element, atribute, old_value, new_value):
         for x in self.root:
             elementname="%s%s" %(self._prefixmlns, element)
@@ -86,6 +85,24 @@ class parseConfigXML(object):
         if not element_exists:
             if last_position:
                 self.root.insert(last_position, new_element)
+            else:
+                self.root.append(new_element)
+
+    def removeElementRoot(self, element, atribute=None, value_atribute=None):
+        elements_to_remove=[]
+        for x in self.root:
+            elementname="%s%s" %(self._prefixmlns, element)
+            if elementname==x.tag:
+                if atribute:
+                    if atribute in x.attrib:
+                        if value_atribute:
+                            if value_atribute==x.attrib[atribute]:
+                                self.root.remove(x)
+                        else:
+                            self.root.remove(x)
+                else:
+                    self.root.remove(x)
+
 
     def addIcons(self):
         for x in self.root:
@@ -340,10 +357,8 @@ class parseConfigXML(object):
             arquivo=arquivo.replace('ns0:','').replace('/><', '/>\n    <').replace('/>\n<', '/>\n    <').replace('    </widget>','</widget>')
             com=re.compile(r'<widget.+>')
             com2=re.compile(r'\n    <icon ')
-            print(com2.findall(arquivo))
             arquivo=com2.sub('\n        <icon ', arquivo)
             com3=re.compile(r'\n    <screen ')
-            print(com3.findall(arquivo))
             arquivo=com3.sub('\n        <screen ', arquivo)
             cabecalho='<?xml version=\'1.0\' encoding=\'utf-8\'?>\n<widget id="%s" version="%s" xmlns="%s" xmlns:cdv="http://cordova.apache.org/ns/1.0">' %(self.idapp, self.apkversion, self._prefixmlns.replace('{','').replace('}',''))
             arquivo=com.sub(cabecalho, arquivo)
