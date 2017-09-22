@@ -14,6 +14,10 @@ try:
     from phanterparseconfigxml import parseConfigXML
 except ImportError:
     from plugin_phantermobileconstructor.phanterparseconfigxml import parseConfigXML
+try:
+    from phanterparseandroidmanifestxml import parseAndroidManifestXML
+except ImportError:
+    from plugin_phantermobileconstructor.phanterparseandroidmanifestxml import parseAndroidManifestXML
 
 # python battery
 import subprocess
@@ -107,6 +111,81 @@ class PhanterAndroid(object):
             self.request.env.web2py_path, 'cordova', self.aplication_name)
         self.server_chosen = 'phonegap'
         self.requeriments_store
+        self.plugins_cordova={
+                'battery_status':[
+                    'Battery Status',
+                    'cordova-plugin-battery-status',
+                ],
+                'camera':[
+                    'Camera',
+                    'cordova-plugin-camera',
+                ],
+                'console':[
+                    'Console',
+                    'cordova-plugin-console',
+                ],
+                'contacts':[
+                    'Contacts',
+                    'cordova-plugin-contacts',
+                ],
+                'device':[
+                    'Device',
+                    'cordova-plugin-device',
+
+                ],
+                'device_motion':[
+                    'Device Motion',
+                    'cordova-plugin-device-motion',
+                ],
+                'device_orientation':[
+                    'Device Orientation',
+                    'cordova-plugin-device-orientation',
+                ],
+                'dialogs':[
+                    'Dialogs',
+                    'cordova-plugin-dialogs',
+                ],
+                'file':[
+                    'File',
+                    'cordova-plugin-file',
+                ],
+                'file_transfer':[
+                    'File Transfer',
+                    'cordova-plugin-file-transfer',
+                ],
+                'geolocation':[
+                    'Geolocation',
+                    'cordova-plugin-geolocation',
+                ],
+                'globalization':[
+                    'Globalization',
+                    'cordova-plugin-globalization',
+                ],
+                'inappbrowser':[
+                    'Inappbrowser',
+                    'cordova-plugin-inappbrowser',
+                ],
+                'media':[
+                    'Media',
+                    'cordova-plugin-media',
+                ],
+                'media_capture':[
+                    'Media Capture',
+                    'cordova-plugin-media-capture',
+                ],
+                'network_information':[
+                    'Network Information',
+                    'cordova-plugin-network-information',
+                ],
+                'vibration':[
+                    'Vibration',
+                    'cordova-plugin-vibration',
+                ],
+                'statusbar':[
+                    'Statusbar',
+                    'cordova-plugin-statusbar',
+                ]
+            }
         exists_condovapath = os.path.exists(self.cordova_app_folder)
         exists_aplicationpath = os.path.exists(self.aplication_folder)
         if not exists_condovapath or not exists_aplicationpath:
@@ -652,14 +731,15 @@ class PhanterAndroid(object):
             icons_sizes={'icon-36-ldpi':(36, 36),
             'icon-48-mdpi':(48, 48),
             'icon-72-hdpi':(72, 72),
-            'icon-96-xhdpi':(96, 96)
+            'icon-96-xhdpi':(96, 96),
+            'icon-96-xxhdpi':(144, 144),
+            'icon-96-xxxhdpi':(192, 192)
             }
             for x in icons_sizes.keys():
                 file_name = '%s.png' % x
                 imagem=self._processImg(file_db, icons_sizes[x][0],  icons_sizes[x][1])
                 if imagem:
                     end_arquivo=os.path.join(self.aplication_folder, 'res', 'icon', 'android', file_name)
-                    print(end_arquivo)
                     imagem.save(end_arquivo)
             configxml=parseConfigXML(os.path.join(self.aplication_folder, 'config.xml'))
             configxml.addIcons()
@@ -676,21 +756,24 @@ class PhanterAndroid(object):
                 'screen-hdpi-portrait':(480, 800),
                 'screen-ldpi-portrait':(200, 320),
                 'screen-mdpi-portrait':(320, 480),
-                'screen-xhdpi-portrait':(720, 1280)
+                'screen-xhdpi-portrait':(720, 1280),
+                'screen-xxhdpi-portrait':(1080, 1920),
+                'screen-xxxhdpi-portrait':(1440, 2560)
                 }
             else:
                 splash_sizes={
                 'screen-hdpi-landscape':(800, 480),
                 'screen-ldpi-landscape':(320, 200),
                 'screen-mdpi-landscape':(480, 320),
-                'screen-xhdpi-landscape':(1280, 720)
+                'screen-xhdpi-landscape':(1280, 720),
+                'screen-xxhdpi-landscape':(1920, 1080),
+                'screen-xxxhdpi-landscape':(2560, 1440)
                 }                
             for x in splash_sizes.keys():
                 file_name = '%s.png' % x
                 imagem=self._processImg(file_db, splash_sizes[x][0],  splash_sizes[x][1])
                 if imagem:
                     end_arquivo=os.path.join(self.aplication_folder, 'res', 'screen', 'android', file_name)
-                    print(end_arquivo)
                     imagem.save(end_arquivo)
             if portrait:
                 configxml.addSplash(portrait=True)
@@ -758,6 +841,79 @@ class PhanterAndroid(object):
         else:
             print("Keystore don't created!!!")
         return self._created_key
+    
+    def addPlugIn(self, plugin):
+        self._interruptJava()
+        if plugin in self.plugins_cordova.keys():
+            configxml=parseConfigXML(os.path.join(self.aplication_folder, 'config.xml'))
+            check_plugin=configxml.checkPlugin(self.plugins_cordova[plugin][1])
+            if not check_plugin:
+                if platform == "win32" or platform == 'cygwin':
+                    with open(os.path.join(self.cordova_app_folder, '%s_add_plugin_%s.bat' %(self.aplication_name, plugin)), 'w') as file_opened:
+                        content = "cd %s\n" %os.path.join(self.aplication_folder)
+                        content +="cordova plugin add %s" %self.plugins_cordova[plugin][1]
+                        try:
+                            content=content.decode('utf-8')
+                        except:
+                            pass
+                        file_opened.write(content)
+                    print('Install plugin "%s"' %self.plugins_cordova[plugin][0])
+                    try:
+                        subprocess.call(os.path.join(self.cordova_app_folder, '%s_add_plugin_%s.bat' %(self.aplication_name, plugin)))
+                    except Exception as e:
+                        print("Erros install plugin %s" %self.plugins_cordova[plugin][0])
+                        print(e)
+                elif platform == "linux" or platform == "linux2":
+                    try:
+                        subprocess.call("cordova plugin add %s" %self.plugins_cordova[plugin][1], cwd=self.aplication_folder, shell=True)
+                    except Exception as e:
+                        print("Erros install plugin %s" %self.plugins_cordova[plugin][0])
+                        print(e)                
+        else:
+            print("Don't is possible automatic install of plugin '%s'" %plugin)
+
+    def removePlugIn(self, plugin):
+        self._interruptJava()
+        if plugin in self.plugins_cordova.keys():
+            configxml=parseConfigXML(os.path.join(self.aplication_folder, 'config.xml'))
+            check_plugin=configxml.checkPlugin(self.plugins_cordova[plugin][1])
+            if check_plugin:
+                if platform == "win32" or platform == 'cygwin':
+                    with open(os.path.join(self.cordova_app_folder, '%s_remove_plugin_%s.bat' %(self.aplication_name, plugin)), 'w') as file_opened:
+                        content = "cd %s\n" %os.path.join(self.aplication_folder)
+                        content +="cordova plugin rm %s" %self.plugins_cordova[plugin][1]
+                        try:
+                            content=content.decode('utf-8')
+                        except:
+                            pass
+                        file_opened.write(content)
+                    print('Install plugin "%s"' %self.plugins_cordova[plugin][0])
+                    try:
+                        subprocess.call(os.path.join(self.cordova_app_folder, '%s_remove_plugin_%s.bat' %(self.aplication_name, plugin)))
+                    except Exception as e:
+                        print("Erros install plugin %s" %self.plugins_cordova[plugin][0])
+                        print("e")
+                elif platform == "linux" or platform == "linux2":
+                    try:
+                        subprocess.call("cordova plugin rm %s" %self.plugins_cordova[plugin][1], cwd=self.aplication_folder, shell=True)
+                    except Exception as e:
+                        print("Erros install plugin %s" %self.plugins_cordova[plugin][0])
+                        print(e)                
+
+        else:
+            print("Don't is possible automatic install of plugin '%s'" %plugin)
+        configxml=parseConfigXML(os.path.join(self.aplication_folder, 'config.xml'))
+        check_plugin=configxml.checkPlugin(self.plugins_cordova[plugin][1])
+
+    def _interruptJava(self):
+        for x in range(5):
+            time.sleep(1)
+            try:
+                for proc in psutil.process_iter():
+                    if proc.name()=='java.exe':
+                        proc.kill()
+            except Exception as e:
+                print(e)
 
     def createApk(self, level="debug"):
         """
@@ -769,6 +925,13 @@ class PhanterAndroid(object):
             self._remove_file(os.path.join(self.aplication_folder, 'package.json'))
         configxml=parseConfigXML(os.path.join(self.aplication_folder, 'config.xml'))
         engine=configxml.checkEngine('android')
+        manifestandroidxml=parseAndroidManifestXML(os.path.join(
+            request.env.web2py_path, 'cordova', request.application, 'platforms','android','AndroidManifest.xml'))
+        if not form.vars.externalacess and not form.vars.allownavigation:
+            manifestandroidxml.addElementRoot('uses-permission', 'name', "android.permission.INTERNET")
+        else:
+            manifestandroidxml.removeElementRoot('uses-permission', 'name', "android.permission.INTERNET")
+        manifestandroidxml.save()
 
         outputfilebase=os.path.join(self.aplication_folder,'platforms', 'android', 'build', 'outputs', 'apk')
         if platform == "win32" or platform == 'cygwin':
@@ -842,12 +1005,5 @@ class PhanterAndroid(object):
             else:
                 subprocess.call(['cordova build android --verbose'], cwd=self.aplication_folder, shell=True)
         time.sleep(5)
-        for x in [1, 2, 3, 4, 5]:
-            time.sleep(1)
-            try:
-                for proc in psutil.process_iter():
-                    if proc.name()=='java.exe':
-                        proc.kill()
-            except Exception as e:
-                print(e)
+        self._interruptJava()
         print("Done!")

@@ -4,6 +4,7 @@
 from __future__ import print_function
 
 import os
+import shutil
 import gluon.fileutils
 from plugin_phantermobileconstructor.phanterparseconfigxml import parseConfigXML
 
@@ -29,7 +30,7 @@ def index():
     
     q_config = None
     if db(db.plugin_phantermobileconstructor_apps).isempty():
-        appname, version, idapp = request.application, '0.0.1', 'com.yoursite.youapp'
+        appname, version, idapp = request.application, '0.0.1', 'com.yoursite.yourapp'
     else:
         q_config = db(db.plugin_phantermobileconstructor_apps).select().first()
         appname, version, idapp = q_config.appname, q_config.apkversion, q_config.idapp
@@ -136,117 +137,228 @@ def index():
             DIV(
                 DIV(H1('PhanterMobile Constructor'),
                     _class='caixa_titulo_painel_direito_g'),
-                DIV(DIV(H3(STRONG('App Name: ', _style='color:orange'), appname, STRONG(' Version: ', _style='color:orange'), version, STRONG(' ID: ', _style='color:orange'), idapp), _style="text-align:center;"),
+                DIV(
                     DIV(
+                        H3(STRONG('App Name: ', _style='color:orange'), appname, STRONG(' Version: ', _style='color:orange'), version, STRONG(' ID: ', _style='color:orange'), idapp), _style="text-align:center;"),
                     DIV(
-                        DIV(T("Compile html"), _class="center_table_cell"),
-                        _alvo="#status_compilar",
-                        _url_ajax=URL('plugin_phantermobileconstructor',
-                                      'echo_comand', args=['buildhtml']),
-                        _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
-                    DIV(_id="status_compilar", _class='status_botao_principal'),
-                    _class="caixa_botao_ajax_principal",
-                ),
+                        DIV(
+                            DIV(T("Compile html"), _class="center_table_cell"),
+                            _alvo="#status_compilar",
+                            _url_ajax=URL('plugin_phantermobileconstructor',
+                                          'echo_comand', args=['buildhtml']),
+                            _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
+                        DIV(_id="status_compilar", _class='status_botao_principal'),
+                        _class="caixa_botao_ajax_principal",
+                        ),
                     DIV(
-                    A(
-                        DIV(T("Open phonegap server"),
-                            _class="center_table_cell"),
-                        _alvo="#status_servidor_phonegap",
-                        _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=[
-                                      'info'], vars={'phonegapstatus': True, 'tryagain': True}),
-                        _href=URL(args=['phonegap']),
-                        _target="_blank",
-                        _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
-                    DIV(SPAN("Without Status", _style='color:grey;'),
-                        _id='status_servidor_phonegap', _class='status_botao_principal'),
-                    _class="caixa_botao_ajax_principal",
-                ),
+                        A(
+                            DIV(T("Open phonegap server"),
+                                _class="center_table_cell"),
+                            _alvo="#status_servidor_phonegap",
+                            _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=[
+                                          'info'], vars={'phonegapstatus': True, 'tryagain': True}),
+                            _href=URL(args=['phonegap']),
+                            _target="_blank",
+                            _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
+                        DIV(SPAN("Without Status", _style='color:grey;'),
+                            _id='status_servidor_phonegap', _class='status_botao_principal'),
+                        _class="caixa_botao_ajax_principal",
+                        ),
                     DIV(
-                    A(
-                        DIV(T("Open cordova server"),
-                            _class="center_table_cell"),
-                        _alvo="#status_servidor_cordova",
-                        _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=[
-                                      'info'], vars={'cordovastatus': True, 'tryagain': True}),
-                        _href=URL(args=['cordova']),
-                        _target="_blank",
-                        _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
-                    DIV(SPAN("Without Status", _style='color:grey;'),
-                        _id='status_servidor_cordova', _class='status_botao_principal'),
-                    _class="caixa_botao_ajax_principal",
-                ),
+                        A(
+                            DIV(T("Open cordova server"),
+                                _class="center_table_cell"),
+                            _alvo="#status_servidor_cordova",
+                            _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=[
+                                          'info'], vars={'cordovastatus': True, 'tryagain': True}),
+                            _href=URL(args=['cordova']),
+                            _target="_blank",
+                            _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
+                        DIV(SPAN("Without Status", _style='color:grey;'),
+                            _id='status_servidor_cordova', _class='status_botao_principal'),
+                        _class="caixa_botao_ajax_principal",
+                        ),
                     DIV(
-                    A(
-                        DIV(T("Local View"), _class="center_table_cell"),
-                        _href=URL(args=['localview']),
-                        _target="_blank",
-                        _class='botao_pagina_principal_comandos'),
-                    _class="caixa_botao_ajax_principal",
-                ),
+                        A(
+                            DIV(T("Local View"), _class="center_table_cell"),
+                            _href=URL(args=['localview']),
+                            _target="_blank",
+                            _class='botao_pagina_principal_comandos'),
+                        _class="caixa_botao_ajax_principal",
+                        ),
                     DIV(
-                    DIV(DIV(T("Create Debug APK"), _class="center_table_cell"),
-                        _alvo="#dowload_newapk_debug",
-                        _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=[
-                                      'createapk', 'debug']),
-                        _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
-                    DIV(_id="dowload_newapk_debug",
-                        _class='status_botao_principal'),
-                    _class="caixa_botao_ajax_principal",
-                ),
+                        DIV(DIV(T("Create Debug APK"), _class="center_table_cell"),
+                            _alvo="#dowload_newapk_debug",
+                            _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=[
+                                          'createapk', 'debug']),
+                            _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
+                        DIV(_id="dowload_newapk_debug",
+                            _class='status_botao_principal'),
+                        _class="caixa_botao_ajax_principal",
+                        ),
                     DIV(
-                    DIV(DIV(T("Create Release APK"), _class="center_table_cell"),
-                        _alvo="#dowload_newapk_release",
-                        _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=[
-                                      'createapk', 'release']),
-                        _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
-                    DIV(_id="dowload_newapk_release",
-                        _class='status_botao_principal'),
-                    _class="caixa_botao_ajax_principal",
-                ),
+                        DIV(DIV(T("Create Release APK"), _class="center_table_cell"),
+                            _alvo="#dowload_newapk_release",
+                            _url_ajax=URL('plugin_phantermobileconstructor', 'echo_comand', args=[
+                                          'createapk', 'release']),
+                            _class='phantermobile-botao-ajax botao_pagina_principal_comandos'),
+                        DIV(_id="dowload_newapk_release",
+                            _class='status_botao_principal'),
+                        _class="caixa_botao_ajax_principal",
+                        ),
                     DIV(
-                    A(
-                        DIV(T("Config XML"), _class="center_table_cell"),
-                        _alvo="#status_config_xml",
-                        _href=URL('configxml'),
-                        _class='botao_pagina_principal_comandos'),
-                    DIV(SPAN("Create first Config.xml", _style='color:red;') if db(db.plugin_phantermobileconstructor_apps).isempty(
-                    ) else "", _id='status_config_xml', _class='status_botao_principal'),
-                    _class="caixa_botao_ajax_principal",
-                ),
+                        A(
+                            DIV(T("Config XML"), _class="center_table_cell"),
+                            _alvo="#status_config_xml",
+                            _href=URL('configxml'),
+                            _class='botao_pagina_principal_comandos'),
+                        DIV(SPAN("Create first Config.xml", _style='color:red;') if db(db.plugin_phantermobileconstructor_apps).isempty(
+                        ) else "", _id='status_config_xml', _class='status_botao_principal'),
+                        _class="caixa_botao_ajax_principal",
+                        ),
                     DIV(
-                    A(
-                        DIV(T("Config KeyStore"), _class="center_table_cell"),
-                        _alvo="#status_config_keystore",
-                        _href=URL('configkeystore'),
-                        _class='botao_pagina_principal_comandos'),
-                    DIV(SPAN("Config your keystore", _style='color:red;') if db(db.plugin_phantermobileconstructor_keystore).isempty(
-                    ) else "", _id='status_config_keystore', _class='status_botao_principal'),
-                    _class="caixa_botao_ajax_principal",
-                ),
+                        A(
+                            DIV(T("Config KeyStore"), _class="center_table_cell"),
+                            _alvo="#status_config_keystore",
+                            _href=URL('configkeystore'),
+                            _class='botao_pagina_principal_comandos'),
+                        DIV(SPAN("Config your keystore", _style='color:red;') if db(db.plugin_phantermobileconstructor_keystore).isempty(
+                        ) else "", _id='status_config_keystore', _class='status_botao_principal'),
+                        _class="caixa_botao_ajax_principal",
+                        ),
                     DIV(
-                    A(
-                        DIV(T("Config Icon"), _class="center_table_cell"),
-                        _alvo="#status_config_icon",
-                        _href=URL('configicon'),
-                        _class='botao_pagina_principal_comandos'),
-                    DIV(SPAN("Config your Icon", _style='color:red;') if db(db.plugin_phantermobileconstructor_icon).isempty(
-                    ) else "", _id='status_config_icon', _class='status_botao_principal'),
-                    _class="caixa_botao_ajax_principal",
-                ),
+                        A(
+                            DIV(T("Config Icon"), _class="center_table_cell"),
+                            _alvo="#status_config_icon",
+                            _href=URL('configicon'),
+                            _class='botao_pagina_principal_comandos'),
+                        DIV(SPAN("Config your Icon", _style='color:red;') if db(db.plugin_phantermobileconstructor_icon).isempty(
+                        ) else "", _id='status_config_icon', _class='status_botao_principal'),
+                        _class="caixa_botao_ajax_principal",
+                        ),
                     DIV(
-                    A(
-                        DIV(T("Config Splashscreen"), _class="center_table_cell"),
-                        _alvo="#status_config_splash",
-                        _href=URL('configsplash'),
-                        _class='botao_pagina_principal_comandos'),
-                    DIV(SPAN("Config your Splashscreen", _style='color:red;') if db(db.plugin_phantermobileconstructor_splash).isempty(
-                    ) else "", _id='status_config_splash', _class='status_botao_principal'),
-                    _class="caixa_botao_ajax_principal",
-                ),
+                        A(
+                            DIV(T("Config Splashscreen"), _class="center_table_cell"),
+                            _alvo="#status_config_splash",
+                            _href=URL('configsplash'),
+                            _class='botao_pagina_principal_comandos'),
+                        DIV(SPAN("Config your Splashscreen", _style='color:red;') if db(db.plugin_phantermobileconstructor_splash).isempty(
+                        ) else "", _id='status_config_splash', _class='status_botao_principal'),
+                        _class="caixa_botao_ajax_principal",
+                        ),
+                    DIV(
+                        A(
+                            DIV(T("Add/Remove Plugins"), _class="center_table_cell"),
+                            _alvo="#status_plugins",
+                            _href=URL('configplugins'),
+                            _class='botao_pagina_principal_comandos'),
+                        DIV(SPAN("Config your Plugins", _style='color:red;') if db(db.plugin_phantermobileconstructor_plugins).isempty(
+                        ) else "", _id='status_plugins', _class='status_botao_principal'),
+                        _class="caixa_botao_ajax_principal",
+                        ),
                     _class='caixa_comandos'),
                 _class='painel_direito_g'),
             _class='painel_principal_g')
     return locals()
+
+def configplugins():
+    q_confplugin = db(db.plugin_phantermobileconstructor_plugins).select().first()
+    form = SQLFORM(db.plugin_phantermobileconstructor_plugins,
+                   q_confplugin.id if q_confplugin else None, showid=False)
+    if form.process().accepted:
+        if form.vars.plugin_battery_status:
+            phanterandroid.addPlugIn('battery_status')
+        else:
+            phanterandroid.removePlugIn('battery_status')
+
+        if form.vars.plugin_camera:
+            phanterandroid.addPlugIn('camera')
+        else:
+            phanterandroid.removePlugIn('camera')
+
+        if form.vars.plugin_console:
+            phanterandroid.addPlugIn('console')
+        else:
+            phanterandroid.removePlugIn('console')
+
+        if form.vars.plugin_contacts:
+            phanterandroid.addPlugIn('contacts')
+        else:
+            phanterandroid.removePlugIn('contacts')
+
+        if form.vars.plugin_device:
+            phanterandroid.addPlugIn('device')
+        else:
+            phanterandroid.removePlugIn('device')
+
+        if form.vars.plugin_device_motion:
+            phanterandroid.addPlugIn('device_motion')
+        else:
+            phanterandroid.removePlugIn('device_motion')
+
+        if form.vars.plugin_device_orientation:
+            phanterandroid.addPlugIn('device_orientation')
+        else:
+            phanterandroid.removePlugIn('device_orientation')
+
+        if form.vars.plugin_dialogs:
+            phanterandroid.addPlugIn('dialogs')
+        else:
+            phanterandroid.removePlugIn('dialogs')
+
+        if form.vars.plugin_file:
+            phanterandroid.addPlugIn('file')
+        else:
+            phanterandroid.removePlugIn('file')
+
+        if form.vars.plugin_file_transfer:
+            phanterandroid.addPlugIn('file_transfer')
+        else:
+            phanterandroid.removePlugIn('file_transfer')
+
+        if form.vars.plugin_geolocation:
+            phanterandroid.addPlugIn('geolocation')
+        else:
+            phanterandroid.removePlugIn('geolocation')
+
+        if form.vars.plugin_globalization:
+            phanterandroid.addPlugIn('globalization')
+        else:
+            phanterandroid.removePlugIn('globalization')
+
+        if form.vars.plugin_inappbrowser:
+            phanterandroid.addPlugIn('inappbrowser')
+        else:
+            phanterandroid.removePlugIn('inappbrowser')
+
+        if form.vars.plugin_media:
+            phanterandroid.addPlugIn('media')
+        else:
+            phanterandroid.removePlugIn('media')
+
+        if form.vars.plugin_media_capture:
+            phanterandroid.addPlugIn('media_capture')
+        else:
+            phanterandroid.removePlugIn('media_capture')
+
+        if form.vars.plugin_network_information:
+            phanterandroid.addPlugIn('network_information')
+        else:
+            phanterandroid.removePlugIn('network_information')
+
+        if form.vars.plugin_vibration:
+            phanterandroid.addPlugIn('vibration')
+        else:
+            phanterandroid.removePlugIn('vibration')
+
+        if form.vars.plugin_statusbar:
+            phanterandroid.addPlugIn('statusbar')
+        else:
+            phanterandroid.removePlugIn('statusbar')
+
+        session.flash = "Plugins configured"
+
+    return dict(form=form)
 
 def configxml():
     response.flash = T("Edit config.xml of app")
@@ -263,21 +375,22 @@ def configxml():
         meuxml.idapp = form.vars.idapp
         meuxml.authoremail = form.vars.authoremail
         meuxml.authorwebsite = form.vars.authorwebsite
+        
         if form.vars.externalacess:
             for x in form.vars.externalacess:
-                meuxml.addElementList('access', 'origin', x)
+                meuxml.addElementRoot('access', 'origin', x)
         else:
             meuxml.removeElementRoot('access', 'origin')
 
         if form.vars.allownavigation:
             for y in form.vars.allownavigation:
-                meuxml.addElementList('allow-navigation', 'origin', y)
+                meuxml.addElementRoot('allow-navigation', 'origin', y)
         else:
-            meuxml.removeElementRoot('llow-navigation', 'origin')
+            meuxml.removeElementRoot('allow-navigation', 'origin')
 
         if form.vars.allowintent:
             for z in form.vars.allowintent:
-                meuxml.addElementList('allow-intent', 'href', z)
+                meuxml.addElementRoot('allow-intent', 'href', z)
         else:
             meuxml.removeElementRoot('allow-intent', 'href')
         meuxml.save()
@@ -294,27 +407,113 @@ def configicon():
     if form.process().accepted:
         phanterandroid.createIcon(form.vars.icon)
         session.flash = "Icon Created"
-    return dict(form=form)
+        q_configicon = db(db.plugin_phantermobileconstructor_icon.icon).select().first()
+    if not q_configicon:
+        ldpi=URL('static','plugin_phantermobileconstructor', args=['images', 'phantermobileico.png'])
+        mdpi=URL('static','plugin_phantermobileconstructor', args=['images', 'phantermobileico.png'])
+        hdpi=URL('static','plugin_phantermobileconstructor', args=['images', 'phantermobileico.png'])
+        xhdpi=URL('static','plugin_phantermobileconstructor', args=['images', 'phantermobileico.png'])
+        xxhdpi=URL('static','plugin_phantermobileconstructor', args=['images', 'phantermobileico.png'])
+        xxxhdpi=URL('static','plugin_phantermobileconstructor', args=['images', 'phantermobileico.png'])
+    else:
+        ldpi=URL('default', 'downloas', args=[q_configicon.icon])
+        mdpi=URL('default', 'downloas', args=[q_configicon.icon])
+        hdpi=URL('default', 'downloas', args=[q_configicon.icon])
+        xhdpi=URL('default', 'downloas', args=[q_configicon.icon])
+        xxhdpi=URL('default', 'downloas', args=[q_configicon.icon])
+        xxxhdpi=URL('default', 'downloas', args=[q_configicon.icon])
+
+
+    html=DIV(H2('Android icons' ,_class='titulo_amostra_icone'),
+        DIV(
+            DIV(IMG(_src=ldpi, _class='imagem_amostra_icone'), _class='caixa_imagem_amostra_icone ldpi'),
+            DIV(IMG(_src=mdpi, _class='imagem_amostra_icone'), _class='caixa_imagem_amostra_icone mdpi'),
+            DIV(IMG(_src=hdpi, _class='imagem_amostra_icone'), _class='caixa_imagem_amostra_icone hdpi'),
+            DIV(IMG(_src=xhdpi, _class='imagem_amostra_icone'), _class='caixa_imagem_amostra_icone xhdpi'),
+            DIV(IMG(_src=xxhdpi, _class='imagem_amostra_icone'), _class='caixa_imagem_amostra_icone xxhdpi'),
+            DIV(IMG(_src=xxxhdpi, _class='imagem_amostra_icone'), _class='caixa_imagem_amostra_icone xxxhdpi'),
+            _class='caixa_com_icones'),
+        _class='caixa_amostra_icone')
+    return dict(form=form, html=html)
 
 def configsplash():
+
     q_configsplash = db(db.plugin_phantermobileconstructor_splash).select().first()
+    portrait_ldpi=URL('static', 'plugin_phantermobileconstructor', args=['images', 'screen-xxxhdpi-portrait.png'])
+    landscape_ldpi=URL('static', 'plugin_phantermobileconstructor', args=['images', 'screen-xxxhdpi-landscape.png'])
     if request.args(0)=='portrait':
         form = SQLFORM(db.plugin_phantermobileconstructor_splash,
                        q_configsplash.id if q_configsplash else None, fields=['splash_portrait'], showid=False)
+        html=CAT(DIV(
+                H1(T('Config the Portrait Splashscreen')), HR(),
+            _class="caixa_titulo_painel_direito_g"),
+            form, HR(),
+            DIV(
+                H2('Portrait Splashscreen' ,_class='titulo_amostra_screen'),
+                DIV(
+                    DIV(IMG(_src=portrait_ldpi, _class='imagem_amostra_screen'), _class='caixa_imagem_amostra_screen portrait_ldpi'),
+                    _class='caixa_com_screens'),
+                _class='caixa_amostra_screen')
+            )
         if form.process().accepted:
             q_configsplash = db(db.plugin_phantermobileconstructor_splash,id==form.vars.id).select().first()
             phanterandroid.createSplash(q_configsplash.splash_portrait, portrait=True)
             session.flash = "Splash Portrait Created"
-            redirect(URL('plugin_phantermobileconstructor', 'index'))
-    else:
+            redirect(URL())
+    elif request.args(0)=='landscape':
         form = SQLFORM(db.plugin_phantermobileconstructor_splash,
                        q_configsplash.id if q_configsplash else None, fields=['splash_landscape'], showid=False)
+        html=CAT(DIV(
+                H1(T('Config the Landscape Splashscreen')), HR(),
+            _class="caixa_titulo_painel_direito_g"),
+            form, HR(),
+            DIV(
+                H2('Landscape Splashscreen' ,_class='titulo_amostra_screen'),
+                DIV(
+                    DIV(IMG(_src=landscape_ldpi, _class='imagem_amostra_screen'), _class='caixa_imagem_amostra_screen landscape_ldpi'),
+                    _class='caixa_com_screens'),
+                _class='caixa_amostra_screen')
+            )
         if form.process().accepted:
             q_configsplash = db(db.plugin_phantermobileconstructor_splash,id==form.vars.id).select().first()
             phanterandroid.createSplash(q_configsplash.splash_landscape, portrait=False)
             session.flash = "Splash Landscape Created"
-            redirect(URL('configsplash', args=['portrait']))       
-    return dict(form=form)
+            redirect(URL()) 
+    else:
+        screen_landscape=os.path.join(request.folder, 'static', 'plugin_phantermobileconstructor', 'images', 'screen_landscape.png')
+        screen_portrait=os.path.join(request.folder, 'static', 'plugin_phantermobileconstructor', 'images', 'screen_portrait.png')
+        if q_configsplash:
+            generate_landscape=os.path.join(request.env.web2py_path, 'cordova',request.application, 'res', 
+                        'screen','android','screen-xxxhdpi-landscape.png')
+            generate_portrait=os.path.join(request.env.web2py_path, 'cordova',request.application, 'res', 
+                        'screen','android','screen-xxxhdpi-portrait.png')
+            if os.path.exists(generate_landscape) and os.path.exists(generate_portrait):
+                if os.path.exists(screen_landscape):
+                    os.unlink(screen_landscape)
+                if os.path.exists(screen_portrait):
+                    os.unlink(screen_portrait)
+                shutil.copy(generate_landscape, screen_landscape)
+                shutil.copy(generate_portrait, screen_portrait)
+        html=CAT(
+            DIV(
+                H1(T('Config the Splashscreen from project')), HR(),
+            _class="caixa_titulo_painel_direito_g"),
+            DIV(
+                DIV(A(DIV(T("Change Portrait Splashscreen"),_class="botao_define_screen"), _href=URL(args=['portrait'])), _class='organizer_50'),
+                DIV(A(DIV(T("Change Landscape Splashscreen"),_class="botao_define_screen"), _href=URL(args=['landscape'])), _class='organizer_50'),
+                _class='caixa_botoes_define_screen'),
+            DIV(
+                H2('Portrait Splashscreen' ,_class='titulo_amostra_screen'),
+                DIV(
+                    DIV(IMG(_src=portrait_ldpi, _class='imagem_amostra_screen'), _class='caixa_imagem_amostra_screen portrait_ldpi'),
+                    _class='caixa_com_screens'),
+                HR(),
+                H2('Landscape Splashscreen' ,_class='titulo_amostra_screen'),
+                DIV(
+                    DIV(IMG(_src=landscape_ldpi, _class='imagem_amostra_screen'), _class='caixa_imagem_amostra_screen landscape_ldpi'),
+                    _class='caixa_com_screens'),
+                _class='caixa_amostra_screen'))
+    return dict(html=html)
 
 def configkeystore():
     

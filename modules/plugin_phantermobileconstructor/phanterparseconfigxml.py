@@ -36,6 +36,15 @@ class parseConfigXML(object):
                             return True
         return False
 
+    def checkNeedInternet(self):
+        need=False
+        for x in self.root:
+            tag=x.tag.split(self._prefixmlns)[1]
+            if tag == 'access' or tag == 'allow-navigatio':
+                need=True
+        return need
+
+
     def _changeText(self, element, new_text):
         for x in self.root:
             elementname="%s%s" %(self._prefixmlns, element)
@@ -67,7 +76,7 @@ class parseConfigXML(object):
             if (elementname == x.tag) and (atribute in x.attrib):
                 return x.attrib[atribute]
 
-    def addElementList(self, element, atribute, value_atribute):
+    def addElementRoot(self, element, atribute, value_atribute):
         position=1
         last_position=0
         element_exists=False
@@ -114,6 +123,8 @@ class parseConfigXML(object):
                         mdpi=False
                         hdpi=False
                         xhdpi=False
+                        xxhdpi=False
+                        xxxhdpi=False
                         for y in x:
                             elementnameY="%s%s" %(self._prefixmlns, 'icon')
                             if elementnameY==y.tag:
@@ -142,6 +153,18 @@ class parseConfigXML(object):
                                             y.attrib['src']='res/icon/android/icon-96-xhdpi.png'
                                         else:
                                             y.set('src', 'res/icon/android/icon-96-xhdpi.png')
+                                    elif y.attrib['density']=='xxhdpi':
+                                        xxhdpi=True
+                                        if 'src' in y.attrib:
+                                            y.attrib['src']='res/icon/android/icon-144-xxhdpi.png'
+                                        else:
+                                            y.set('src', 'res/icon/android/icon-144-xxhdpi.png')
+                                    elif y.attrib['density']=='xxxhdpi':
+                                        xxxhdpi=True
+                                        if 'src' in y.attrib:
+                                            y.attrib['src']='res/icon/android/icon-192-xxxhdpi.png'
+                                        else:
+                                            y.set('src', 'res/icon/android/icon-192-xxxhdpi.png')
                         if not ldpi:
                             new_element=ET.Element('icon')
                             new_element.set('src', 'res/icon/android/icon-36-ldpi.png')
@@ -162,6 +185,16 @@ class parseConfigXML(object):
                             new_element.set('src', 'res/icon/android/icon-96-xhdpi.png')
                             new_element.set('density', 'xhdpi')
                             x.append(new_element)
+                        if not xxhdpi:
+                            new_element=ET.Element('icon')
+                            new_element.set('src', 'res/icon/android/icon-144-xxhdpi.png')
+                            new_element.set('density', 'xxhdpi')
+                            x.append(new_element)
+                        if not xxxhdpi:
+                            new_element=ET.Element('icon')
+                            new_element.set('src', 'res/icon/android/icon-192-xxxhdpi.png')
+                            new_element.set('density', 'xxxhdpi')
+                            x.append(new_element)
 
     def addSplash(self, portrait=False):
         preference=False
@@ -179,10 +212,14 @@ class parseConfigXML(object):
                         land_mdpi=False
                         land_hdpi=False
                         land_xhdpi=False
+                        land_xxhdpi=False
+                        land_xxxhdpi=False
                         port_ldpi=False
                         port_mdpi=False
                         port_hdpi=False
                         port_xhdpi=False
+                        port_xxhdpi=False
+                        port_xxxhdpi=False
                         for y in x:
                             elementnameY="%s%s" %(self._prefixmlns, 'splash')
                             if elementnameY==y.tag:
@@ -212,6 +249,18 @@ class parseConfigXML(object):
                                                 y.attrib['src']='res/screen/android/screen-xhdpi-portrait.png'
                                             else:
                                                 y.set('src', 'res/screen/android/screen-xhdpi-portrait.png')
+                                        elif y.attrib['density']=='port-xxhdpi':
+                                            port_xxhdpi=True
+                                            if 'src' in y.attrib:
+                                                y.attrib['src']='res/screen/android/screen-xxhdpi-portrait.png'
+                                            else:
+                                                y.set('src', 'res/screen/android/screen-xxhdpi-portrait.png')
+                                        elif y.attrib['density']=='port-xxxhdpi':
+                                            port_xxxhdpi=True
+                                            if 'src' in y.attrib:
+                                                y.attrib['src']='res/screen/android/screen-xxxhdpi-portrait.png'
+                                            else:
+                                                y.set('src', 'res/screen/android/screen-xxxhdpi-portrait.png')
                                     else:
                                         if y.attrib['density']=='land-ldpi':
                                             land_ldpi=True
@@ -237,6 +286,18 @@ class parseConfigXML(object):
                                                 y.attrib['src']='res/screen/android/screen-xhdpi-landscape.png'
                                             else:
                                                 y.set('src', 'res/screen/android/screen-xhdpi-landscape.png')
+                                        elif y.attrib['density']=='land-xxhdpi':
+                                            land_xxhdpi=True
+                                            if 'src' in y.attrib:
+                                                y.attrib['src']='res/screen/android/screen-xxhdpi-landscape.png'
+                                            else:
+                                                y.set('src', 'res/screen/android/screen-xxhdpi-landscape.png')
+                                        elif y.attrib['density']=='land-xxxhdpi':
+                                            land_xxxhdpi=True
+                                            if 'src' in y.attrib:
+                                                y.attrib['src']='res/screen/android/screen-xxxhdpi-landscape.png'
+                                            else:
+                                                y.set('src', 'res/screen/android/screen-xxxhdpi-landscape.png')
                         if portrait:
                             if not port_ldpi:
                                 new_element=ET.Element('splash')
@@ -258,6 +319,16 @@ class parseConfigXML(object):
                                 new_element.set('src', 'res/screen/android/screen-xhdpi-portrait.png')
                                 new_element.set('density', 'port-xhdpi')
                                 x.append(new_element)
+                            if not port_xxhdpi:
+                                new_element=ET.Element('splash')
+                                new_element.set('src', 'res/screen/android/screen-xxhdpi-portrait.png')
+                                new_element.set('density', 'port-xxhdpi')
+                                x.append(new_element)
+                            if not port_xxxhdpi:
+                                new_element=ET.Element('splash')
+                                new_element.set('src', 'res/screen/android/screen-xxxhdpi-portrait.png')
+                                new_element.set('density', 'port-xxxhdpi')
+                                x.append(new_element)
                         else:
                             if not land_ldpi:
                                 new_element=ET.Element('splash')
@@ -278,6 +349,16 @@ class parseConfigXML(object):
                                 new_element=ET.Element('splash')
                                 new_element.set('src', 'res/screen/android/screen-xhdpi-landscape.png')
                                 new_element.set('density', 'land-xhdpi')
+                                x.append(new_element)
+                            if not land_xxhdpi:
+                                new_element=ET.Element('splash')
+                                new_element.set('src', 'res/screen/android/screen-xxhdpi-landscape.png')
+                                new_element.set('density', 'land-xxhdpi')
+                                x.append(new_element)
+                            if not land_xxxhdpi:
+                                new_element=ET.Element('splash')
+                                new_element.set('src', 'res/screen/android/screen-xxxhdpi-landscape.png')
+                                new_element.set('density', 'land-xxxhdpi')
                                 x.append(new_element)
 
         if not preference:
