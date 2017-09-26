@@ -416,12 +416,12 @@ def configicon():
         xxhdpi=URL('static','plugin_phantermobileconstructor', args=['images', 'phantermobileico.png'])
         xxxhdpi=URL('static','plugin_phantermobileconstructor', args=['images', 'phantermobileico.png'])
     else:
-        ldpi=URL('default', 'downloas', args=[q_configicon.icon])
-        mdpi=URL('default', 'downloas', args=[q_configicon.icon])
-        hdpi=URL('default', 'downloas', args=[q_configicon.icon])
-        xhdpi=URL('default', 'downloas', args=[q_configicon.icon])
-        xxhdpi=URL('default', 'downloas', args=[q_configicon.icon])
-        xxxhdpi=URL('default', 'downloas', args=[q_configicon.icon])
+        ldpi=URL('default', 'download', args=[q_configicon.icon])
+        mdpi=URL('default', 'download', args=[q_configicon.icon])
+        hdpi=URL('default', 'download', args=[q_configicon.icon])
+        xhdpi=URL('default', 'download', args=[q_configicon.icon])
+        xxhdpi=URL('default', 'download', args=[q_configicon.icon])
+        xxxhdpi=URL('default', 'download', args=[q_configicon.icon])
 
 
     html=DIV(H2('Android icons' ,_class='titulo_amostra_icone'),
@@ -439,8 +439,8 @@ def configicon():
 def configsplash():
 
     q_configsplash = db(db.plugin_phantermobileconstructor_splash).select().first()
-    portrait_ldpi=URL('static', 'plugin_phantermobileconstructor', args=['images', 'screen-xxxhdpi-portrait.png'])
-    landscape_ldpi=URL('static', 'plugin_phantermobileconstructor', args=['images', 'screen-xxxhdpi-landscape.png'])
+    portrait_ldpi=URL('static', 'plugin_phantermobileconstructor', args=['images', 'screen_portrait.png'])
+    landscape_ldpi=URL('static', 'plugin_phantermobileconstructor', args=['images', 'screen_landscape.png'])
     if request.args(0)=='portrait':
         form = SQLFORM(db.plugin_phantermobileconstructor_splash,
                        q_configsplash.id if q_configsplash else None, fields=['splash_portrait'], showid=False)
@@ -556,7 +556,6 @@ def echo_comand():
     elif request.args(0) == 'info':
         if request.vars.phonegapstatus:
             status = phanterandroid.statusServer()
-            print("stataus phonegap",status)
             jquery = ""
             if status:
                 html_status = SPAN(T("Running on port "), SPAN(
@@ -573,7 +572,6 @@ def echo_comand():
         elif request.vars.cordovastatus:
             status = phanterandroid.statusServer('cordova')
             jquery = ""
-            print("status cordova",status)
             if status:
                 html_status = SPAN(T("Running on port: "), SPAN(
                     status['port']), _style="color:#165016")

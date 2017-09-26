@@ -732,8 +732,8 @@ class PhanterAndroid(object):
             'icon-48-mdpi':(48, 48),
             'icon-72-hdpi':(72, 72),
             'icon-96-xhdpi':(96, 96),
-            'icon-96-xxhdpi':(144, 144),
-            'icon-96-xxxhdpi':(192, 192)
+            'icon-144-xxhdpi':(144, 144),
+            'icon-192-xxxhdpi':(192, 192)
             }
             for x in icons_sizes.keys():
                 file_name = '%s.png' % x
@@ -926,8 +926,8 @@ class PhanterAndroid(object):
         configxml=parseConfigXML(os.path.join(self.aplication_folder, 'config.xml'))
         engine=configxml.checkEngine('android')
         manifestandroidxml=parseAndroidManifestXML(os.path.join(
-            request.env.web2py_path, 'cordova', request.application, 'platforms','android','AndroidManifest.xml'))
-        if not form.vars.externalacess and not form.vars.allownavigation:
+            self.request.env.web2py_path, 'cordova', self.request.application, 'platforms','android','AndroidManifest.xml'))
+        if configxml.checkNeedInternet():
             manifestandroidxml.addElementRoot('uses-permission', 'name', "android.permission.INTERNET")
         else:
             manifestandroidxml.removeElementRoot('uses-permission', 'name', "android.permission.INTERNET")

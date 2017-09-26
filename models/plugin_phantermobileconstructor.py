@@ -355,9 +355,3 @@ db.define_table('plugin_phantermobileconstructor_plugins',
                 _title=T("Control the device status bar.")))
    ), 
 )
-
-
-
-
-
-
