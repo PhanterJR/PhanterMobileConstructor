@@ -548,6 +548,22 @@ class PhanterAndroid(object):
             subprocess.call([os.path.join(self.cordova_app_folder, '%s_platform_browser.bat' %
                                           self.aplication_name)], shell=True)
             configxml=parseConfigXML(os.path.join(self.aplication_folder, 'config.xml'))
+            engine=configxml.checkEngine('android')
+            if not engine or not os.path.exists(os.path.join(self.aplication_folder,'platforms', 'android')):
+                with open(os.path.join(self.cordova_app_folder, '%s_create_apk_build.bat' % self.aplication_name), 'w') as file_opened:
+                    content = "cd %s\n" %os.path.join(self.aplication_folder)
+                    content+="cordova platform add android\n"
+                    try:
+                        content=content.decode('utf-8')
+                    except:
+                        pass
+                    file_opened.write(content)
+                print("Inserting Android Platform")
+                try:
+                    apk1=subprocess.call([os.path.join(self.cordova_app_folder, '%s_create_apk_build.bat' %
+                                                  self.aplication_name)])
+                except Exception as e:
+                    print(e)
             if not configxml.checkPlugin('cordova-plugin-splashscreen'):
                 with open(os.path.join(self.cordova_app_folder, '%s_add_plugin_splashscreen.bat' % self.aplication_name), 'w') as file_opened:
                     content = "cd %s\n" %os.path.join(self.aplication_folder)
@@ -925,13 +941,6 @@ class PhanterAndroid(object):
             self._remove_file(os.path.join(self.aplication_folder, 'package.json'))
         configxml=parseConfigXML(os.path.join(self.aplication_folder, 'config.xml'))
         engine=configxml.checkEngine('android')
-        manifestandroidxml=parseAndroidManifestXML(os.path.join(
-            self.request.env.web2py_path, 'cordova', self.request.application, 'platforms','android','AndroidManifest.xml'))
-        if configxml.checkNeedInternet():
-            manifestandroidxml.addElementRoot('uses-permission', 'name', "android.permission.INTERNET")
-        else:
-            manifestandroidxml.removeElementRoot('uses-permission', 'name', "android.permission.INTERNET")
-        manifestandroidxml.save()
 
         outputfilebase=os.path.join(self.aplication_folder,'platforms', 'android', 'build', 'outputs', 'apk')
         if platform == "win32" or platform == 'cygwin':
@@ -950,6 +959,13 @@ class PhanterAndroid(object):
                                                   self.aplication_name)])
                 except Exception as e:
                     print(e)
+            manifestandroidxml=parseAndroidManifestXML(os.path.join(
+                self.request.env.web2py_path, 'cordova', self.request.application, 'platforms','android','AndroidManifest.xml'))
+            if configxml.checkNeedInternet():
+                manifestandroidxml.addElementRoot('uses-permission', 'name', "android.permission.INTERNET")
+            else:
+                manifestandroidxml.removeElementRoot('uses-permission', 'name', "android.permission.INTERNET")
+            manifestandroidxml.save()
 
             with open(os.path.join(self.cordova_app_folder, '%s_create_apk_release.bat' % self.aplication_name), 'w') as file_opened:
                 content = "cd %s\n" %os.path.join(self.aplication_folder)
@@ -995,6 +1011,13 @@ class PhanterAndroid(object):
         elif platform == "linux" or platform == "linux2":
             if not engine:
                 subprocess.call(["cordova platform add android"], cwd=self.aplication_folder, shell=True)
+            manifestandroidxml=parseAndroidManifestXML(os.path.join(
+                self.request.env.web2py_path, 'cordova', self.request.application, 'platforms','android','AndroidManifest.xml'))
+            if configxml.checkNeedInternet():
+                manifestandroidxml.addElementRoot('uses-permission', 'name', "android.permission.INTERNET")
+            else:
+                manifestandroidxml.removeElementRoot('uses-permission', 'name', "android.permission.INTERNET")
+            manifestandroidxml.save()
             if level=='release':
                 if self._created_key:
                     subprocess.call(["cordova build android --verbose --release -- --keystore=\"%s\" --storePassword=%s --alias=%s" %(
